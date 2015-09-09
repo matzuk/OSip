@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="toolbar_color_primary">#5b95c2</color>
+    <color name="toolbar_color_primary_dark">#4a87b5</color>
+    <color name="material_blue_color">#4196CD</color>
+    <color name="edit_text_background_line_color">#c5c5c5</color>
+    <color name="btn_plain_1_pressed">#255375</color>
+    <color name="btn_plain_1_checked">#002437</color>
+    <color name="btn_plain_1_disabled">#275474</color>
+    <color name="custom_text_color">#6D6D6D</color>
+    <color name="blue_transparent_color">#aa4196CD</color>
+    <color name="red_transparent_color">#aaff0000</color>
+    <color name="background_tab_pressed">#6633B5E5</color>
+    <color name="indicator_color">#ff33b5e5</color>
+    <color name="typical_background_color">#F5F6F7</color>
+    <color name="registration_no_color">#CE5757</color>
+    <color name="registration_yes_color">#58BA80</color>
+</resources>
