@@ -7,6 +7,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import com.tg.osip.utils.AndroidUtils;
+import com.tg.osip.utils.log.Logger;
 
 import org.drinkless.td.libcore.telegram.Client;
 import org.drinkless.td.libcore.telegram.TG;
@@ -41,14 +42,14 @@ public class MainActivity extends AppCompatActivity {
     private Client.ResultHandler updatesHandler = new Client.ResultHandler() {
         @Override
         public void onResult(TdApi.TLObject object) {
-            Log.d("update:", object.toString());
+            Logger.debug("update:", object.toString());
         }
     };
 
     private Client.ResultHandler authGetResultHandler = new Client.ResultHandler() {
         @Override
         public void onResult(TdApi.TLObject object) {
-            Log.d("auth:", object.toString());
+            Logger.debug("auth:", object.toString());
         }
     };
 }

@@ -8,7 +8,7 @@ import android.os.Environment;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 
-import com.tg.osip.ApplicationLoader;
+import com.tg.osip.ApplicationSIP;
 import com.tg.osip.R;
 
 import java.io.File;
@@ -68,12 +68,12 @@ public class AndroidUtils {
     }
 
     public static int dp(float value) {
-        float density = ApplicationLoader.applicationContext.getResources().getDisplayMetrics().density;
+        float density = ApplicationSIP.applicationContext.getResources().getDisplayMetrics().density;
         return (int) Math.ceil(density * value);
     }
 
     public static int fromDp(float value) {
-        float density = ApplicationLoader.applicationContext.getResources().getDisplayMetrics().density;
+        float density = ApplicationSIP.applicationContext.getResources().getDisplayMetrics().density;
         return (int) Math.ceil(value / density);
     }
 
@@ -95,7 +95,7 @@ public class AndroidUtils {
         }
         if (state == null || state.startsWith(Environment.MEDIA_MOUNTED)) {
             try {
-                File file = ApplicationLoader.applicationContext.getExternalCacheDir();
+                File file = ApplicationSIP.applicationContext.getExternalCacheDir();
                 if (file != null) {
                     return file.getPath();
                 }
@@ -104,7 +104,7 @@ public class AndroidUtils {
             }
         }
         try {
-            File file = ApplicationLoader.applicationContext.getCacheDir();
+            File file = ApplicationSIP.applicationContext.getCacheDir();
             if (file != null) {
                 return file.getPath();
             }
