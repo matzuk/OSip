@@ -6,6 +6,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.tg.osip.tdclient.TGProxy;
 import com.tg.osip.utils.AndroidUtils;
 import com.tg.osip.utils.log.Logger;
 
@@ -20,31 +21,9 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        try {
-            Thread.sleep(3000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-
-        TG.setDir(AndroidUtils.getCacheDirPath());
-        TG.setUpdatesHandler(updatesHandler);
-
-        try {
-            Thread.sleep(3000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-
-        TG.getClientInstance().send(new TdApi.GetAuthState(), authGetResultHandler);
+        TGProxy.getInstance().getClientInstance().send(new TdApi.GetAuthState(), authGetResultHandler);
 
     }
-
-    private Client.ResultHandler updatesHandler = new Client.ResultHandler() {
-        @Override
-        public void onResult(TdApi.TLObject object) {
-            Logger.debug("update:", object.toString());
-        }
-    };
 
     private Client.ResultHandler authGetResultHandler = new Client.ResultHandler() {
         @Override
