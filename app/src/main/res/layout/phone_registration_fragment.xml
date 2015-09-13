@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/white">
+
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:minHeight="?attr/actionBarSize"
+        android:background="?attr/colorPrimary"
+        android:layout_gravity="right"
+        app:titleTextAppearance="@style/Toolbar.TitleText"
+        app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+        app:popupTheme="@style/ThemeOverlay.AppCompat.Light" >
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="right"
+            android:orientation="horizontal">
+
+            <org.telegram.tdlibclient.utils.ui.ScalableImageView
+                android:id="@+id/next_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="16dp"
+                android:layout_gravity="right"
+                android:visibility="gone"
+                android:src="@drawable/checkbig"
+                android:scaleType="centerCrop"/>
+
+        </LinearLayout>
+
+    </android.support.v7.widget.Toolbar>
+
+
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true"
+        android:overScrollMode="never" >
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@android:color/white"
+            android:padding="@dimen/activity_horizontal_margin">
+
+            <EditText
+                android:id="@+id/phone_reg_country_edit"
+                style="@style/MaterialEditText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                android:clickable="true"
+                android:hint="@string/reg_phone_choose_country"
+                android:focusable="false"
+                android:singleLine="true"
+                android:ellipsize="end"
+                android:inputType="text"/>
+
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                android:layout_marginBottom="32dp">
+
+                <TextView
+                    android:id="@+id/phone_reg_code_plus_edit"
+                    style="@style/MaterialEditText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/reg_phone_edit_plus" />
+
+                <EditText
+                    android:id="@+id/phone_reg_code_edit"
+                    style="@style/MaterialEditText"
+                    android:layout_width="72dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="-20dp"
+                    android:paddingLeft="20dp"
+                    android:layout_marginRight="16dp"
+                    android:singleLine="true"
+                    android:inputType="phone"
+                    android:imeOptions="actionNext|flagNoExtractUi"/>
+
+                <EditText
+                    android:id="@+id/phone_reg_phone_edit"
+                    style="@style/MaterialEditText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:focusable="true"
+                    android:singleLine="true"
+                    android:ellipsize="end"
+                    android:inputType="phone"
+                    android:imeOptions="actionNext|flagNoExtractUi">
+                    <requestFocus />
+                </EditText>
+
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/phone_reg_help_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="16sp"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:text="@string/reg_phone_help_text" />
+
+        </LinearLayout>
+
+    </ScrollView>
+
+</LinearLayout>

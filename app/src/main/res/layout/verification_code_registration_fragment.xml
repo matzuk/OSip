@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/white">
+
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:minHeight="?attr/actionBarSize"
+        android:background="?attr/colorPrimary"
+        app:titleTextAppearance="@style/Toolbar.TitleText"
+        app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+        app:popupTheme="@style/ThemeOverlay.AppCompat.Light" >
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="right"
+            android:orientation="horizontal">
+
+            <org.telegram.tdlibclient.utils.ui.ScalableImageView
+                android:id="@+id/next_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="16dp"
+                android:layout_gravity="right"
+                android:visibility="gone"
+                android:src="@drawable/checkbig"
+                android:scaleType="centerCrop"/>
+
+        </LinearLayout>
+
+    </android.support.v7.widget.Toolbar>
+
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true"
+        android:overScrollMode="never" >
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:padding="@dimen/activity_horizontal_margin">
+
+
+
+
+
+            <TextView
+                android:id="@+id/verification_help_text"
+                android:layout_width="wrap_content"
+                android:layout_height="48dp"
+                android:textSize="16sp"
+                android:layout_marginTop="24dp"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:text="@string/reg_verification_help_text" />
+
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                android:gravity="center">
+
+                <EditText
+                    android:id="@+id/verification_code_edit"
+                    style="@style/MaterialEditText"
+                    android:layout_width="165dp"
+                    android:layout_height="wrap_content"
+                    android:focusable="true"
+                    android:singleLine="true"
+                    android:ellipsize="end"
+                    android:inputType="phone"
+                    android:imeOptions="actionNext|flagNoExtractUi">
+                    <requestFocus />
+                </EditText>
+
+                <org.telegram.tdlibclient.utils.ui.ScalableImageView
+                    android:id="@+id/verification_code_image"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="16dp"
+                    android:visibility="gone"
+                    android:src="@drawable/register_no"/>
+
+            </LinearLayout>
+
+            <org.telegram.tdlibclient.utils.ui.TransitionTextView
+                android:id="@+id/verification_wrong_number"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                android:textSize="16sp"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:textColor="@color/custom_text_color"
+                android:text="@string/reg_verification_wrong_number" />
+
+            <org.telegram.tdlibclient.utils.ui.PreLoader
+                android:id="@+id/pro_loader"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginTop="16dp"
+                android:visibility="gone"/>
+
+        </LinearLayout>
+
+    </ScrollView>
+</LinearLayout>
