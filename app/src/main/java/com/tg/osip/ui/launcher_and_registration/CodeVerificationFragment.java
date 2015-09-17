@@ -1,10 +1,12 @@
 package com.tg.osip.ui.launcher_and_registration;
 
-import android.app.Fragment;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.support.v4.app.Fragment;
 import android.support.v4.content.res.ResourcesCompat;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
@@ -15,7 +17,6 @@ import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.TextView;
-import android.widget.Toolbar;
 
 import com.tg.osip.R;
 import com.tg.osip.utils.AndroidUtils;
@@ -70,7 +71,7 @@ public class CodeVerificationFragment extends Fragment {
 
     private void initToolbar(View view) {
         Toolbar toolbar = (Toolbar) view.findViewById(R.id.toolbar);
-        getActivity().setActionBar(toolbar);
+        ((AppCompatActivity)getActivity()).setSupportActionBar(toolbar);
 
         if (getActivity() != null && getActivity().getActionBar() != null) {
             getActivity().getActionBar().show();

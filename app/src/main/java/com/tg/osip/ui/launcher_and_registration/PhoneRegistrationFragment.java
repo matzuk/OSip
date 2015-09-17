@@ -1,10 +1,12 @@
 package com.tg.osip.ui.launcher_and_registration;
 
-import android.app.Fragment;
 import android.content.Context;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.support.v4.app.Fragment;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.telephony.TelephonyManager;
 import android.text.Editable;
 import android.text.InputFilter;
@@ -17,16 +19,22 @@ import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.TextView;
-import android.widget.Toolbar;
 
 import com.tg.osip.R;
+import com.tg.osip.business.AuthManager;
+import com.tg.osip.tdclient.TGProxy;
+import com.tg.osip.ui.launcher_and_registration.country.utils.Country;
+import com.tg.osip.ui.launcher_and_registration.country.utils.CountryUtils;
 import com.tg.osip.utils.AndroidUtils;
 import com.tg.osip.utils.PhoneFormat.PhoneFormat;
+import com.tg.osip.utils.log.Logger;
 import com.tg.osip.utils.ui.ScalableImageView;
 import com.tg.osip.utils.ui.SimpleAlertDialog;
 
 import org.drinkless.td.libcore.telegram.Client;
 import org.drinkless.td.libcore.telegram.TdApi;
+
+import java.util.HashMap;
 
 
 /**
@@ -39,8 +47,8 @@ public class PhoneRegistrationFragment extends Fragment {
     private EditText codeEdit;
     private ScalableImageView nextButton;
 
-//    private Country selectedCountryFromCountryFragment;
-//    private HashMap<String, Country> countryCodeMap;
+    private Country selectedCountryFromCountryFragment;
+    private HashMap<String, Country> countryCodeMap;
 
     // prevent stackoverflow exception in TextWatcher in codeEdit
     private boolean ignoreOnTextChange;
@@ -58,7 +66,7 @@ public class PhoneRegistrationFragment extends Fragment {
 
     private void initToolbar(View rootView) {
         Toolbar toolbar = (Toolbar) rootView.findViewById(R.id.toolbar);
-        getActivity().setActionBar(toolbar);
+        ((AppCompatActivity)getActivity()).setSupportActionBar(toolbar);
 
         if (getActivity() != null && getActivity().getActionBar() != null) {
             getActivity().getActionBar().show();
@@ -71,7 +79,7 @@ public class PhoneRegistrationFragment extends Fragment {
         nextButton = (ScalableImageView)view.findViewById(R.id.next_button);
         nextButton.setOnClickListener(v -> onNextPressed());
 
-//        countryCodeMap = CountryUtils.getCountryCodeMap();
+        countryCodeMap = CountryUtils.getCountryCodeMap();
 
         phoneEdit = (EditText)view.findViewById(R.id.phone_reg_phone_edit);
         phoneEdit.addTextChangedListener(phoneEditTextWatcher);
@@ -212,29 +220,16 @@ public class PhoneRegistrationFragment extends Fragment {
             );
             return;
         }
-//        TGProxy.getInstance().getClientInstance().send(new TdApi.AuthSetPhoneNumber(phoneNumber), authGetResultHandler);
+//        TGProxy.getInstance().getClientInstance().send(new TdApi.SetAuthPhoneNumber(phoneNumber), authGetResultHandler);
+        AuthManager.getInstance().setAuthPhoneNumberRequest(phoneNumber);
     }
 
-//    private Client.ResultHandler authGetResultHandler = new Client.ResultHandler() {
-//        @Override
-//        public void onResult(TdApi.TLObject object) {
-//            if (getActivity() == null) {
-//                return;
-//            }
-//            if (object instanceof TdApi.AuthStateWaitSetCode ) {
-//                goToCodeVerificationFragment();
-//            } else if (object instanceof TdApi.AuthStateWaitSetName ) {
-//                goToNameFragment();
-//            } else if (object instanceof TdApi.Error) {
-//                String message = "ERROR \ncode:" + ((TdApi.Error)object).code + "\ntext:" + ((TdApi.Error)object).text;
-//                SimpleAlertDialog.show(
-//                        getActivity(),
-//                        ApplicationLoader.applicationContext.getString(R.string.app_name),
-//                        message
-//                );
-//            }
-//        }
-//    };
+    private Client.ResultHandler authGetResultHandler = new Client.ResultHandler() {
+        @Override
+        public void onResult(TdApi.TLObject object) {
+           Logger.debug(object);
+        }
+    };
 
 //    private TextWatcher codeEditTextWatcher = new TextWatcher() {
 //        @Override

@@ -1,11 +1,15 @@
 package com.tg.osip;
 
-import android.app.FragmentTransaction;
+import android.os.Handler;
+import android.os.Looper;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
 import com.tg.osip.business.AuthManager;
+import com.tg.osip.business.AuthManager.AuthStateEnum;
 import com.tg.osip.tdclient.TGProxy;
+import com.tg.osip.ui.launcher_and_registration.CodeVerificationFragment;
 import com.tg.osip.ui.launcher_and_registration.PhoneRegistrationFragment;
 import com.tg.osip.ui.launcher_and_registration.SplashFragment;
 import com.tg.osip.utils.log.Logger;
@@ -18,7 +22,7 @@ import rx.android.schedulers.AndroidSchedulers;
 
 public class MainActivity extends AppCompatActivity {
 
-    Subscription channelSubscription;
+    private Subscription channelSubscription;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,35 +33,62 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void subscribeToChannel() {
-        channelSubscription = AuthManager.getInstance().getAuthChannel()
-                .subscribe(new Subscriber<AuthManager.AuthStateEnum>() {
-                    @Override
-                    public void onCompleted() {
+        channelSubscription = AuthManager.getInstance().getAuthChannel().subscribe(channelSubscriptionSubscriber);
+    }
 
-                    }
+    private Subscriber<AuthStateEnum> channelSubscriptionSubscriber = new Subscriber<AuthStateEnum>() {
+        @Override
+        public void onCompleted() {
+        }
 
-                    @Override
-                    public void onError(Throwable e) {
-                        Logger.error(e);
-                    }
+        @Override
+        public void onError(Throwable e) {
+            Logger.error(e);
+        }
 
-                    @Override
-                    public void onNext(AuthManager.AuthStateEnum authStateEnum) {
-                        Logger.debug(authStateEnum);
-                        if (authStateEnum == AuthManager.AuthStateEnum.AUTH_STATE_WAIT_PHONE_NUMBER) {
-                            PhoneRegistrationFragment newFragment = new PhoneRegistrationFragment();
-                            FragmentTransaction transaction = getFragmentManager().beginTransaction();
-                            transaction.addToBackStack(null);
-                            transaction.replace(R.id.container, newFragment);
-                            transaction.commit();
-                        }
-                    }
-                });
+        @Override
+        public void onNext(AuthStateEnum authStateEnum) {
+            Logger.debug(authStateEnum);
+            startNextFragment(authStateEnum);
+        }
+    };
+
+    private void startNextFragment(AuthStateEnum authStateEnum) {
+        switch (authStateEnum) {
+            case AUTH_STATE_WAIT_PHONE_NUMBER:
+                startPhoneNumberFragment();
+                break;
+            case AUTH_STATE_LOGGING_OUT:
+                break;
+            case AUTH_STATE_OK:
+                break;
+            case AUTH_STATE_WAIT_CODE:
+                startCodeVerificationFragment();
+                break;
+            case AUTH_STATE_WAIT_NAME:
+                break;
+            case AUTH_STATE_WAIT_PASSWORD:
+                break;
+        }
+    }
+
+    private void startPhoneNumberFragment() {
+        PhoneRegistrationFragment newFragment = new PhoneRegistrationFragment();
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+        transaction.replace(R.id.container, newFragment);
+        transaction.commit();
+    }
+
+    private void startCodeVerificationFragment() {
+        CodeVerificationFragment newFragment = new CodeVerificationFragment();
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+        transaction.replace(R.id.container, newFragment);
+        transaction.commit();
     }
 
     private void startSplash() {
         SplashFragment newFragment = new SplashFragment();
-        FragmentTransaction transaction = getFragmentManager().beginTransaction();
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         transaction.replace(R.id.container, newFragment);
         transaction.commit();
     }

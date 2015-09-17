@@ -40,24 +40,15 @@ public class ScalableImageView extends ImageView {
     }
 
     @Override
-    public void setVisibility(int visibility) {
+    protected void onVisibilityChanged(View changedView, int visibility) {
         if (visibility == View.VISIBLE) {
             setAlpha(0f);
-            super.setVisibility(visibility);
+            super.onVisibilityChanged(changedView, visibility);
             startAnimation();
         } else {
-            super.setVisibility(visibility);
+            super.onVisibilityChanged(changedView, visibility);
         }
     }
-
-//    @Override
-//    protected void onVisibilityChanged(View changedView, int visibility) {
-//        if (visibility == View.VISIBLE) {
-//            startAnimation();
-//        } else {
-//            super.onVisibilityChanged(changedView, visibility);
-//        }
-//    }
 
     public void startAnimation() {
         AnimatorSet animatorSetBig = new AnimatorSet();

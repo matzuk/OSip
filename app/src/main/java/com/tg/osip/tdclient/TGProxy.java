@@ -4,6 +4,7 @@ import com.tg.osip.tdclient.exceptions.TdApiClassCastException;
 import com.tg.osip.tdclient.exceptions.TdApiErrorException;
 import com.tg.osip.utils.AndroidUtils;
 import com.tg.osip.utils.BackgroundExecutor;
+import com.tg.osip.utils.log.Logger;
 
 import org.drinkless.td.libcore.telegram.Client;
 import org.drinkless.td.libcore.telegram.TG;
@@ -42,7 +43,7 @@ public class TGProxy {
         TG.setUpdatesHandler(updatesHandler);
     }
 
-    private Client getClientInstance() {
+    public Client getClientInstance() {
         return TG.getClientInstance();
     }
 
@@ -52,6 +53,7 @@ public class TGProxy {
                 TGProxy.getInstance().getClientInstance().send(tlFunction, object -> resultHandling(subscriber, object, clazz));
             } catch (Exception exception) {
                 subscriber.onError(exception);
+                subscriber.onCompleted();
             }
         });
     }
@@ -75,6 +77,7 @@ public class TGProxy {
             subscriber.onNext(t);
         } catch(ClassCastException e) {
             subscriber.onError(new TdApiClassCastException(e));
+            subscriber.onCompleted();
         }
     }
 
@@ -82,7 +85,7 @@ public class TGProxy {
     private Client.ResultHandler updatesHandler = new Client.ResultHandler() {
         @Override
         public void onResult(TdApi.TLObject object) {
-
+            Logger.debug(object);
         }
     };
 

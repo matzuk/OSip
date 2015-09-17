@@ -66,6 +66,7 @@ public class AuthManager {
                 .subscribe(new Subscriber<AuthStateEnum>() {
                     @Override
                     public void onCompleted() {
+                        Logger.debug("onCompleted");
                     }
 
                     @Override
@@ -83,6 +84,7 @@ public class AuthManager {
     }
 
     private AuthStateEnum mappingToAuthStateEnum(TdApi.AuthState authState) {
+        Logger.debug(authState);
         if (authState instanceof TdApi.AuthStateLoggingOut) {
             return AuthStateEnum.AUTH_STATE_LOGGING_OUT;
         } else if (authState instanceof TdApi.AuthStateOk) {

@@ -1,30 +1,14 @@
 package com.tg.osip.ui.launcher_and_registration;
 
-import android.app.Fragment;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
+import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ScrollView;
 
 import com.tg.osip.R;
 import com.tg.osip.business.AuthManager;
-import com.tg.osip.utils.BackgroundExecutor;
-import com.tg.osip.utils.log.Logger;
 import com.tg.osip.utils.ui.ScalableImageView;
-import com.tg.osip.utils.ui.ScalableImageViewEndAnimListener;
-
-import java.util.concurrent.TimeUnit;
-
-import rx.Observable;
-import rx.Subscriber;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.functions.Action1;
-import rx.functions.Func0;
-import rx.functions.Func1;
-import rx.schedulers.Schedulers;
 
 /**
  * @author e.matsyuk
@@ -34,7 +18,7 @@ public class SplashFragment extends Fragment {
     // in MS
     private static final long preDelayForAnimation = 1000;
     // in MS
-    private static final long preDelayForRequest = 1400;
+    private static final long preDelayForRequest = 2000;
 
     private ScalableImageView imageView1;
     private ScalableImageView imageView2;
