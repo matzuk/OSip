@@ -1,11 +1,18 @@
 package com.tg.osip.business;
 
 import com.tg.osip.tdclient.TGProxy;
+import com.tg.osip.utils.log.Logger;
 
 import org.drinkless.td.libcore.telegram.TdApi;
 
+import java.util.concurrent.TimeUnit;
+
 import rx.Observable;
+import rx.Subscriber;
+import rx.Subscription;
+import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Func1;
+import rx.subjects.PublishSubject;
 
 /**
  * Authentication manager
@@ -24,6 +31,7 @@ public class AuthManager {
     }
 
     private static volatile AuthManager instance;
+    private PublishSubject<AuthStateEnum> authChannel = PublishSubject.create();
 
     public static AuthManager getInstance() {
         if (instance == null) {
@@ -36,9 +44,42 @@ public class AuthManager {
         return instance;
     }
 
-    public Observable<AuthStateEnum> getAuthState() {
+    public void authStateRequest() {
+        sendToChannel(getAuthStateObs());
+    }
+
+    public void authStateRequestWithDelay(long delayInMS) {
+        sendToChannel(
+                getAuthStateObs()
+                .delay(delayInMS, TimeUnit.MILLISECONDS)
+        );
+    }
+
+    private Observable<AuthStateEnum> getAuthStateObs() {
         return TGProxy.getInstance().sendTD(new TdApi.GetAuthState(), TdApi.AuthState.class)
                 .map(this::mappingToAuthStateEnum);
+    }
+
+    private void sendToChannel(Observable<AuthStateEnum> observable) {
+        observable
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Subscriber<AuthStateEnum>() {
+                    @Override
+                    public void onCompleted() {
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        Logger.debug(e.getMessage());
+                        authChannel.onError(e);
+                    }
+
+                    @Override
+                    public void onNext(AuthStateEnum authStateEnum) {
+                        Logger.debug(authStateEnum);
+                        authChannel.onNext(authStateEnum);
+                    }
+                });
     }
 
     private AuthStateEnum mappingToAuthStateEnum(TdApi.AuthState authState) {
@@ -59,19 +100,35 @@ public class AuthManager {
         return AuthStateEnum.AUTH_STATE_WAIT_PHONE_NUMBER;
     }
 
-    public Observable<AuthStateEnum> setAuthPhoneNumber(String phoneNumber) {
+    public void setAuthPhoneNumberRequest(String phoneNumber) {
+        sendToChannel(setAuthPhoneNumberObs(phoneNumber));
+    }
+
+    private Observable<AuthStateEnum> setAuthPhoneNumberObs(String phoneNumber) {
         return TGProxy.getInstance().sendTD(new TdApi.SetAuthPhoneNumber(phoneNumber), TdApi.AuthState.class)
                 .map(this::mappingToAuthStateEnum);
     }
 
-    public Observable<AuthStateEnum> setAuthName(String firstName, String lastName) {
+    public void setAuthNameRequest(String firstName, String lastName) {
+        sendToChannel(setAuthNameObs(firstName, lastName));
+    }
+
+    private Observable<AuthStateEnum> setAuthNameObs(String firstName, String lastName) {
         return TGProxy.getInstance().sendTD(new TdApi.SetAuthName(firstName, lastName), TdApi.AuthState.class)
                 .map(this::mappingToAuthStateEnum);
     }
 
-    public Observable<AuthStateEnum> setAuthCode(String code) {
+    public void setAuthCodeRequest(String code) {
+        sendToChannel(setAuthCodeObs(code));
+    }
+
+    private Observable<AuthStateEnum> setAuthCodeObs(String code) {
         return TGProxy.getInstance().sendTD(new TdApi.SetAuthCode(code), TdApi.AuthState.class)
                 .map(this::mappingToAuthStateEnum);
+    }
+
+    public PublishSubject<AuthStateEnum> getAuthChannel() {
+        return authChannel;
     }
 
 }

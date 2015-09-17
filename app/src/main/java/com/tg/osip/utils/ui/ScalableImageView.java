@@ -1,5 +1,6 @@
 package com.tg.osip.utils.ui;
 
+import android.animation.Animator;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.content.Context;
@@ -7,10 +8,16 @@ import android.util.AttributeSet;
 import android.view.View;
 import android.widget.ImageView;
 
+import com.tg.osip.utils.log.Logger;
+
 /**
  * @author e.matsyuk
  */
 public class ScalableImageView extends ImageView {
+
+    private static final long ANIM_DURATION = 100;
+
+    private long delayForVisibleAnim;
 
     public ScalableImageView(Context context) {
         super(context);
@@ -24,15 +31,36 @@ public class ScalableImageView extends ImageView {
         super(context, attrs, defStyleAttr);
     }
 
+    /**
+     *
+     * @param delayForVisibleAnim delay in milliseconds
+     */
+    public void setDelayForVisibleAnim(long delayForVisibleAnim) {
+        this.delayForVisibleAnim = delayForVisibleAnim;
+    }
+
     @Override
-    protected void onVisibilityChanged(View changedView, int visibility) {
-        super.onVisibilityChanged(changedView, visibility);
+    public void setVisibility(int visibility) {
         if (visibility == View.VISIBLE) {
+            setAlpha(0f);
+            super.setVisibility(visibility);
             startAnimation();
+        } else {
+            super.setVisibility(visibility);
         }
     }
 
+//    @Override
+//    protected void onVisibilityChanged(View changedView, int visibility) {
+//        if (visibility == View.VISIBLE) {
+//            startAnimation();
+//        } else {
+//            super.onVisibilityChanged(changedView, visibility);
+//        }
+//    }
+
     public void startAnimation() {
+        AnimatorSet animatorSetBig = new AnimatorSet();
         AnimatorSet animatorSet = new AnimatorSet();
         ObjectAnimator expansionAnimX = ObjectAnimator.ofFloat(this, "scaleX", 1f, 1.4f);
         ObjectAnimator expansionAnimY = ObjectAnimator.ofFloat(this, "scaleY", 1f, 1.4f);
@@ -40,15 +68,22 @@ public class ScalableImageView extends ImageView {
         ObjectAnimator compressionAnimY = ObjectAnimator.ofFloat(this, "scaleY", 1.4f, 0.6f);
         ObjectAnimator toNormalAnimX = ObjectAnimator.ofFloat(this, "scaleX", 0.6f, 1f);
         ObjectAnimator toNormalAnimY = ObjectAnimator.ofFloat(this, "scaleY", 0.6f, 1f);
-        animatorSet.
-                play(compressionAnimX).
-                with(compressionAnimY).
-                after(expansionAnimX).
-                after(expansionAnimY).
-                before(toNormalAnimX).
-                before(toNormalAnimY);
-        animatorSet.setDuration(100);
-        animatorSet.start();
+        animatorSet
+                .play(compressionAnimX)
+                .with(compressionAnimY)
+                .after(expansionAnimX)
+                .after(expansionAnimY)
+                .before(toNormalAnimX)
+                .before(toNormalAnimY);
+
+        ObjectAnimator alpha = ObjectAnimator.ofFloat(this, "alpha", 0f, 1f);
+        animatorSetBig
+                .play(animatorSet)
+                .with(alpha);
+
+        animatorSetBig.setDuration(ANIM_DURATION);
+        animatorSetBig.setStartDelay(delayForVisibleAnim);
+        animatorSetBig.start();
     }
 
 }

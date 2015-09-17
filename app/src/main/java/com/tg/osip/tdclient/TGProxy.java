@@ -52,8 +52,6 @@ public class TGProxy {
                 TGProxy.getInstance().getClientInstance().send(tlFunction, object -> resultHandling(subscriber, object, clazz));
             } catch (Exception exception) {
                 subscriber.onError(exception);
-            } finally {
-                subscriber.onCompleted();
             }
         });
     }
@@ -77,8 +75,6 @@ public class TGProxy {
             subscriber.onNext(t);
         } catch(ClassCastException e) {
             subscriber.onError(new TdApiClassCastException(e));
-        } finally {
-            subscriber.onCompleted();
         }
     }
 
