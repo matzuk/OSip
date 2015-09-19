@@ -1,10 +1,12 @@
 package com.tg.osip.ui.launcher_and_registration;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.telephony.TelephonyManager;
 import android.text.Editable;
 import android.text.InputFilter;
 import android.text.TextUtils;
@@ -17,6 +19,7 @@ import android.widget.EditText;
 
 import com.tg.osip.R;
 import com.tg.osip.business.AuthManager;
+import com.tg.osip.ui.launcher_and_registration.country.ui.CountryRegistrationFragment;
 import com.tg.osip.ui.launcher_and_registration.country.utils.Country;
 import com.tg.osip.ui.launcher_and_registration.country.utils.CountryUtils;
 import com.tg.osip.utils.AndroidUtils;
@@ -94,7 +97,7 @@ public class PhoneRegistrationFragment extends Fragment {
         InputFilter[] inputFilters = new InputFilter[1];
         inputFilters[0] = new InputFilter.LengthFilter(4);
         codeEdit.setFilters(inputFilters);
-//        codeEdit.addTextChangedListener(codeEditTextWatcher);
+        codeEdit.addTextChangedListener(codeEditTextWatcher);
         codeEdit.setOnEditorActionListener((textView, i, keyEvent) -> {
             if (i == EditorInfo.IME_ACTION_NEXT) {
                 phoneEdit.requestFocus();
@@ -103,9 +106,15 @@ public class PhoneRegistrationFragment extends Fragment {
             return false;
         });
 
-//        setValuesFromSIM();
+        setValuesFromSIM();
         showKeyboard();
 
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        setSelectedCountryFromCountryFragment(selectedCountryFromCountryFragment);
     }
 
     private TextWatcher phoneEditTextWatcher = new TextWatcher() {
@@ -196,14 +205,14 @@ public class PhoneRegistrationFragment extends Fragment {
             );
             return;
         }
-//        if (!countryCodeMap.containsKey(countryCode)) {
-//            SimpleAlertDialog.show(
-//                    getActivity(),
-//                    getContext().getString(R.string.app_name),
-//                    getResources().getString(R.string.reg_phone_wrong_country)
-//            );
-//            return;
-//        }
+        if (!countryCodeMap.containsKey(countryCode)) {
+            SimpleAlertDialog.show(
+                    getActivity(),
+                    getContext().getString(R.string.app_name),
+                    getResources().getString(R.string.reg_phone_wrong_country)
+            );
+            return;
+        }
         String phoneNumber = "+" + codeEdit.getText().toString() + phoneEdit.getText().toString();
         if (!PhoneFormat.getInstance().isPhoneNumberValid(phoneNumber)) {
             SimpleAlertDialog.show(
@@ -216,61 +225,61 @@ public class PhoneRegistrationFragment extends Fragment {
         AuthManager.getInstance().setAuthPhoneNumberRequest(phoneNumber);
     }
 
-//    private TextWatcher codeEditTextWatcher = new TextWatcher() {
-//        @Override
-//        public void beforeTextChanged(CharSequence charSequence, int i, int i2, int i3) { }
-//
-//        @Override
-//        public void onTextChanged(CharSequence charSequence, int i, int i2, int i3) { }
-//
-//        @Override
-//        public void afterTextChanged(Editable editable) {
-//            if (ignoreOnTextChange) {
-//                ignoreOnTextChange = false;
-//                return;
-//            }
-//            ignoreOnTextChange = true;
-//            String text = PhoneFormat.stripExceptNumbers(codeEdit.getText().toString());
-//            codeEdit.setText(text);
-//            if (text.length() == 0) {
-//                countryEdit.setText(getResources().getString(R.string.reg_phone_choose_country));
-//            } else {
-//                Country country = countryCodeMap.get(text);
-//                if (country != null) {
-//                    countryEdit.setText(country.getName());
-//                    updatePhoneField();
-//                } else {
-//                    countryEdit.setText(getResources().getString(R.string.reg_phone_wrong_country));
-//                }
-//            }
-//            codeEdit.setSelection(codeEdit.getText().length());
-//        }
-//    };
+    private TextWatcher codeEditTextWatcher = new TextWatcher() {
+        @Override
+        public void beforeTextChanged(CharSequence charSequence, int i, int i2, int i3) { }
 
-//    private void setValuesFromSIM() {
-//        String countryShortName = "";
-//        try {
-//            TelephonyManager telephonyManager = (TelephonyManager) getContext().getSystemService(Context.TELEPHONY_SERVICE);
-//            if (telephonyManager != null) {
-//                countryShortName = telephonyManager.getSimCountryIso().toUpperCase();
-//            }
-//        } catch (Exception e) {
-////            FileLog.e("tmessages", e); FIXME
-//        }
-//
-//        if (TextUtils.isEmpty(countryShortName)) {
-//            return;
-//        }
-//
-//        HashMap<String, Country> countryShortNameMap = CountryUtils.getCountryShortNameMap();
-//
-//        String countryName = countryShortNameMap.get(countryShortName).getName();
-//        String countryCode = countryShortNameMap.get(countryShortName).getCode();
-//
-//        countryEdit.setText(countryName);
-//        codeEdit.setText(countryCode);
-//
-//    }
+        @Override
+        public void onTextChanged(CharSequence charSequence, int i, int i2, int i3) { }
+
+        @Override
+        public void afterTextChanged(Editable editable) {
+            if (ignoreOnTextChange) {
+                ignoreOnTextChange = false;
+                return;
+            }
+            ignoreOnTextChange = true;
+            String text = PhoneFormat.stripExceptNumbers(codeEdit.getText().toString());
+            codeEdit.setText(text);
+            if (text.length() == 0) {
+                countryEdit.setText(getResources().getString(R.string.reg_phone_choose_country));
+            } else {
+                Country country = countryCodeMap.get(text);
+                if (country != null) {
+                    countryEdit.setText(country.getName());
+                    updatePhoneField();
+                } else {
+                    countryEdit.setText(getResources().getString(R.string.reg_phone_wrong_country));
+                }
+            }
+            codeEdit.setSelection(codeEdit.getText().length());
+        }
+    };
+
+    private void setValuesFromSIM() {
+        String countryShortName = "";
+        try {
+            TelephonyManager telephonyManager = (TelephonyManager) getContext().getSystemService(Context.TELEPHONY_SERVICE);
+            if (telephonyManager != null) {
+                countryShortName = telephonyManager.getSimCountryIso().toUpperCase();
+            }
+        } catch (Exception e) {
+//            FileLog.e("tmessages", e); FIXME
+        }
+
+        if (TextUtils.isEmpty(countryShortName)) {
+            return;
+        }
+
+        HashMap<String, Country> countryShortNameMap = CountryUtils.getCountryShortNameMap();
+
+        String countryName = countryShortNameMap.get(countryShortName).getName();
+        String countryCode = countryShortNameMap.get(countryShortName).getCode();
+
+        countryEdit.setText(countryName);
+        codeEdit.setText(countryCode);
+
+    }
 
     /**
      * hack method for showing keyboard in onResume
@@ -282,57 +291,28 @@ public class PhoneRegistrationFragment extends Fragment {
 
     private void goToCountryFragment() {
         AndroidUtils.hideKeyboard(getActivity());
-
-//        CountryRegistrationFragment countryRegistrationFragment = new CountryRegistrationFragment(getActivity());
-//        FrameManager.getInstance().putBaseFragment(countryRegistrationFragment, FrameManager.Animation.PUT_BOTTOM_TOP_ANIMATION, false);
+        CountryRegistrationFragment countryRegistrationFragment = new CountryRegistrationFragment();
+        countryRegistrationFragment.setTargetFragment(this, 0);
+        getActivity()
+                .getSupportFragmentManager()
+                .beginTransaction()
+                .addToBackStack(null)
+                .replace(R.id.container, countryRegistrationFragment)
+                .commit();
 
     }
 
-//    private void goToCodeVerificationFragment() {
-//        Handler handler = new Handler(Looper.getMainLooper());
-//        handler.post(new Runnable() {
-//            @Override
-//            public void run() {
-//                AndroidUtils.hideKeyboard(getActivity());
-//            }
-//        });
-//        handler.postDelayed(new Runnable() {
-//            @Override
-//            public void run() {
-//                CodeVerificationFragment codeVerificationFragment = new CodeVerificationFragment(getActivity());
-//                FrameManager.getInstance().putBaseFragment(codeVerificationFragment, FrameManager.Animation.PUT_RIGHT_LEFT_ANIMATION, true);
-//            }
-//        }, AndroidUtils.KEYBOARD_HIDDEN_TIME);
-//    }
-//
-//    private void goToNameFragment() {
-//        Handler handler = new Handler(Looper.getMainLooper());
-//        handler.post(new Runnable() {
-//            @Override
-//            public void run() {
-//                AndroidUtils.hideKeyboard(getActivity());
-//            }
-//        });
-//        handler.postDelayed(new Runnable() {
-//            @Override
-//            public void run() {
-//                NameRegistrationFragment nameRegistrationFragment = new NameRegistrationFragment(getActivity());
-//                FrameManager.getInstance().putBaseFragment(nameRegistrationFragment, FrameManager.Animation.PUT_RIGHT_LEFT_ANIMATION, true);
-//            }
-//        }, AndroidUtils.KEYBOARD_HIDDEN_TIME);
-//    }
+    public void setEditsFromSelectedCountry() {
+        if (selectedCountryFromCountryFragment == null) {
+            return;
+        }
+        countryEdit.setText(selectedCountryFromCountryFragment.getName());
+        codeEdit.setText(selectedCountryFromCountryFragment.getCode());
+    }
 
-//    public void setEditsFromSelectedCountry() {
-//        if (selectedCountryFromCountryFragment == null) {
-//            return;
-//        }
-//        countryEdit.setText(selectedCountryFromCountryFragment.getName());
-//        codeEdit.setText(selectedCountryFromCountryFragment.getCode());
-//    }
-//
-//    public void setSelectedCountryFromCountryFragment(Country selectedCountryFromCountryFragment) {
-//        this.selectedCountryFromCountryFragment = selectedCountryFromCountryFragment;
-//        setEditsFromSelectedCountry();
-//    }
+    public void setSelectedCountryFromCountryFragment(Country selectedCountryFromCountryFragment) {
+        this.selectedCountryFromCountryFragment = selectedCountryFromCountryFragment;
+        setEditsFromSelectedCountry();
+    }
 
 }

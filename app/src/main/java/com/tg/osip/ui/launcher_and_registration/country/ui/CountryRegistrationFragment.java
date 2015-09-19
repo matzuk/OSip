@@ -10,6 +10,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 
 import com.tg.osip.R;
+import com.tg.osip.ui.launcher_and_registration.PhoneRegistrationFragment;
 import com.tg.osip.ui.launcher_and_registration.country.adapters.CountryAdapter;
 import com.tg.osip.ui.launcher_and_registration.country.utils.Country;
 import com.tg.osip.utils.AndroidUtils;
@@ -25,7 +26,7 @@ public class CountryRegistrationFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.fmt_phone_registration, container, false);
+        View rootView = inflater.inflate(R.layout.fmt_country_registration, container, false);
         init(rootView);
         initToolbar(rootView);
         return rootView;
@@ -63,19 +64,10 @@ public class CountryRegistrationFragment extends Fragment {
             if (i < 0) {
                 return;
             }
-//            PhoneRegistrationFragment phoneRegistrationFragment = (PhoneRegistrationFragment) FrameManager.getInstance().getLastFrameLayout();
-//            if (phoneRegistrationFragment != null) {
-//                phoneRegistrationFragment.setSelectedCountryFromCountryFragment(country);
-//            }
-//            finishFragment();
+
+            ((PhoneRegistrationFragment)getTargetFragment()).setSelectedCountryFromCountryFragment(country);
+            getActivity().getSupportFragmentManager().popBackStack();
         }
     };
-
-//    public void finishFragment() {
-//        FrameManager.getInstance().removeTopBaseFragment();
-////        if (getActivity() != null) {
-////            getFragmentManager().popBackStack();
-////        }
-//    }
 
 }
