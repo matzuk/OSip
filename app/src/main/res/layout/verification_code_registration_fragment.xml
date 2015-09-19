@@ -23,7 +23,7 @@
             android:layout_gravity="right"
             android:orientation="horizontal">
 
-            <org.telegram.tdlibclient.utils.ui.ScalableImageView
+            <com.tg.osip.utils.ui.ScalableImageView
                 android:id="@+id/next_button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -49,10 +49,6 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:padding="@dimen/activity_horizontal_margin">
-
-
-
-
 
             <TextView
                 android:id="@+id/verification_help_text"
@@ -83,7 +79,7 @@
                     <requestFocus />
                 </EditText>
 
-                <org.telegram.tdlibclient.utils.ui.ScalableImageView
+                <com.tg.osip.utils.ui.ScalableImageView
                     android:id="@+id/verification_code_image"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -93,7 +89,7 @@
 
             </LinearLayout>
 
-            <org.telegram.tdlibclient.utils.ui.TransitionTextView
+            <com.tg.osip.utils.ui.TransitionTextView
                 android:id="@+id/verification_wrong_number"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -103,7 +99,7 @@
                 android:textColor="@color/custom_text_color"
                 android:text="@string/reg_verification_wrong_number" />
 
-            <org.telegram.tdlibclient.utils.ui.PreLoader
+            <com.tg.osip.utils.ui.PreLoader
                 android:id="@+id/pro_loader"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

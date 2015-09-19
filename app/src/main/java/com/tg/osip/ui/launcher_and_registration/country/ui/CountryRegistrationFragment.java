@@ -64,19 +64,19 @@ public class CountryRegistrationFragment extends Fragment {
             if (i < 0) {
                 return;
             }
-            PhoneRegistrationFragment phoneRegistrationFragment = (PhoneRegistrationFragment) FrameManager.getInstance().getLastFrameLayout();
-            if (phoneRegistrationFragment != null) {
-                phoneRegistrationFragment.setSelectedCountryFromCountryFragment(country);
-            }
-            finishFragment();
+//            PhoneRegistrationFragment phoneRegistrationFragment = (PhoneRegistrationFragment) FrameManager.getInstance().getLastFrameLayout();
+//            if (phoneRegistrationFragment != null) {
+//                phoneRegistrationFragment.setSelectedCountryFromCountryFragment(country);
+//            }
+//            finishFragment();
         }
     };
 
-    public void finishFragment() {
-        FrameManager.getInstance().removeTopBaseFragment();
-//        if (getActivity() != null) {
-//            getFragmentManager().popBackStack();
-//        }
-    }
+//    public void finishFragment() {
+//        FrameManager.getInstance().removeTopBaseFragment();
+////        if (getActivity() != null) {
+////            getFragmentManager().popBackStack();
+////        }
+//    }
 
 }

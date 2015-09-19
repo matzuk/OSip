@@ -38,8 +38,6 @@ public class CodeVerificationFragment extends Fragment {
     private ScalableImageView verificationCodeImage;
     private PreLoader preLoader;
 
-    private Handler handler = new Handler(Looper.getMainLooper());
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {

@@ -82,6 +82,7 @@ public class MainActivity extends AppCompatActivity {
     private void startCodeVerificationFragment() {
         CodeVerificationFragment newFragment = new CodeVerificationFragment();
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+        transaction.addToBackStack(null);
         transaction.replace(R.id.container, newFragment);
         transaction.commit();
     }
