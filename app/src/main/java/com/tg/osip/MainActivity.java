@@ -9,6 +9,7 @@ import com.tg.osip.business.AuthManager.AuthStateEnum;
 import com.tg.osip.tdclient.exceptions.TdApiClassCastException;
 import com.tg.osip.tdclient.exceptions.TdApiErrorException;
 import com.tg.osip.ui.launcher_and_registration.CodeVerificationFragment;
+import com.tg.osip.ui.launcher_and_registration.NameRegistrationFragment;
 import com.tg.osip.ui.launcher_and_registration.PhoneRegistrationFragment;
 import com.tg.osip.ui.launcher_and_registration.SplashFragment;
 import com.tg.osip.utils.AndroidUtils;
@@ -79,6 +80,7 @@ public class MainActivity extends AppCompatActivity {
                 startCodeVerificationFragment();
                 break;
             case AUTH_STATE_WAIT_NAME:
+                startNameFragment();
                 break;
             case AUTH_STATE_WAIT_PASSWORD:
                 break;
@@ -87,6 +89,13 @@ public class MainActivity extends AppCompatActivity {
 
     private void startPhoneNumberFragment() {
         PhoneRegistrationFragment newFragment = new PhoneRegistrationFragment();
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+        transaction.replace(R.id.container, newFragment);
+        transaction.commit();
+    }
+
+    private void startNameFragment() {
+        NameRegistrationFragment newFragment = new NameRegistrationFragment();
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         transaction.replace(R.id.container, newFragment);
         transaction.commit();

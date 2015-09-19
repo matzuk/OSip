@@ -1,6 +1,7 @@
 package com.tg.osip.ui.launcher_and_registration;
 
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.res.ResourcesCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -15,16 +16,22 @@ import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 
 import com.tg.osip.R;
+import com.tg.osip.business.AuthManager;
 import com.tg.osip.utils.AndroidUtils;
+import com.tg.osip.utils.log.Logger;
 import com.tg.osip.utils.ui.PreLoader;
 import com.tg.osip.utils.ui.ScalableImageView;
 import com.tg.osip.utils.ui.TransitionTextView;
+
+import rx.Subscriber;
+import rx.Subscription;
 
 /**
  * @author e.matsyuk
  */
 public class CodeVerificationFragment extends Fragment {
 
+    private Subscription channelSubscription;
     private EditText codeVerificationEdit;
     private ScalableImageView nextButton;
     private TransitionTextView resultTextView;
@@ -37,6 +44,7 @@ public class CodeVerificationFragment extends Fragment {
         View rootView = inflater.inflate(R.layout.fmt_code_registration, container, false);
         init(rootView);
         initToolbar(rootView);
+        subscribeToChannel();
         return rootView;
     }
 
@@ -58,6 +66,7 @@ public class CodeVerificationFragment extends Fragment {
             }
             return false;
         });
+        showKeyboard();
     }
 
     private void initToolbar(View view) {
@@ -73,52 +82,31 @@ public class CodeVerificationFragment extends Fragment {
 
     private void onNextPressed() {
         String code = codeVerificationEdit.getText().toString();
-//        TGProxy.getInstance().getClientInstance().send(new TdApi.AuthSetCode(code), authGetResultHandler);
+        AuthManager.getInstance().setAuthCodeRequest(code);
     }
 
-//    private Client.ResultHandler authGetResultHandler = new Client.ResultHandler() {
-//        @Override
-//        public void onResult(TdApi.TLObject object) {
-//            if (getActivity() == null) {
-//                return;
-//            }
-//            if (object instanceof TdApi.AuthStateOk) {
-//                long delay = AndroidUtils.KEYBOARD_HIDDEN_TIME;
-//                long delayAnimation = 200;
-//                handler.post(successUI);
-//                if (AndroidUtils.isKeyboardMayShow(getActivity())) {
-//                    delay += delayAnimation;
-//                    handler.postDelayed(hideKeyboardUI, delayAnimation);
-//                }
-//                handler.postDelayed(chatLoadingUI, delay);
-//            } else if (object instanceof TdApi.Error) {
-//                handler.post(errorUI);
-//            }
-//        }
-//    };
+    private void subscribeToChannel() {
+        channelSubscription = AuthManager.getInstance().getAuthChannel().subscribe(channelSubscriptionSubscriber);
+    }
 
-//    private Runnable chatLoadingUI = new Runnable() {
-//        @Override
-//        public void run() {
-//            FrameManager.getInstance().removePreviousStack();
-//            chatListFragment = new ChatListFragment(getActivity(), firstChatLoadingListener);
-//            if (AndroidUtils.isNewAndroid()) {
-//                preLoader.setVisibility(View.VISIBLE);
-//            }
-//        }
-//    };
-
-    private Runnable hideKeyboardUI = new Runnable() {
+    private Subscriber<AuthManager.AuthStateEnum> channelSubscriptionSubscriber = new Subscriber<AuthManager.AuthStateEnum>() {
         @Override
-        public void run() {
-            AndroidUtils.hideKeyboard(getActivity());
+        public void onCompleted() {
         }
-    };
 
-    private Runnable errorUI = new Runnable() {
         @Override
-        public void run() {
+        public void onError(Throwable e) {
+            Logger.error(e);
             showError();
+
+        }
+
+        @Override
+        public void onNext(AuthManager.AuthStateEnum authStateEnum) {
+            Logger.debug(authStateEnum);
+            if (authStateEnum == AuthManager.AuthStateEnum.AUTH_STATE_OK) {
+                showSuccess();
+            }
         }
     };
 
@@ -133,13 +121,6 @@ public class CodeVerificationFragment extends Fragment {
         resultTextView.setVisibility(View.VISIBLE);
         verificationCodeImage.setVisibility(View.VISIBLE);
     }
-
-    private Runnable successUI = new Runnable() {
-        @Override
-        public void run() {
-            showSuccess();
-        }
-    };
 
     private void showSuccess() {
         resultTextView.setVisibility(View.GONE);
@@ -172,22 +153,20 @@ public class CodeVerificationFragment extends Fragment {
         }
     };
 
-//    private FirstChatLoadingListener firstChatLoadingListener = new FirstChatLoadingListener() {
-//        @Override
-//        public void done() {
-//            handler.post(startChatList);
-//        }
-//    };
-//
-//    private Runnable startChatList = new Runnable() {
-//        @Override
-//        public void run() {
-//            if (AndroidUtils.isNewAndroid()) {
-//                preLoader.setVisibility(View.GONE);
-//            }
-//            FrameManager.getInstance().putBaseFragment(chatListFragment, FrameManager.Animation.PUT_BOTTOM_TOP_ANIMATION, true);
-//            chatListFragment = null;
-//        }
-//    };
+    /**
+     * hack method for showing keyboard in onResume
+     */
+    private void showKeyboard() {
+        Handler mHandler = new Handler();
+        mHandler.postDelayed(() -> AndroidUtils.showKeyboard(getActivity()), 500);
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        if (channelSubscription != null && !channelSubscription.isUnsubscribed()) {
+            channelSubscription.unsubscribe();
+        }
+    }
 
 }

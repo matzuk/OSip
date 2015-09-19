@@ -1,6 +1,7 @@
 package com.tg.osip.ui.launcher_and_registration;
 
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -16,6 +17,7 @@ import android.widget.EditText;
 import com.tg.osip.R;
 import com.tg.osip.business.AuthManager;
 import com.tg.osip.tdclient.TGProxy;
+import com.tg.osip.utils.AndroidUtils;
 import com.tg.osip.utils.ui.ScalableImageView;
 import com.tg.osip.utils.ui.SimpleAlertDialog;
 
@@ -61,6 +63,7 @@ public class NameRegistrationFragment extends Fragment {
             }
             return false;
         });
+        showKeyboard();
     }
 
     private void initToolbar(View view) {
@@ -114,5 +117,13 @@ public class NameRegistrationFragment extends Fragment {
             }
         }
     };
+
+    /**
+     * hack method for showing keyboard in onResume
+     */
+    private void showKeyboard() {
+        Handler mHandler = new Handler();
+        mHandler.postDelayed(() -> AndroidUtils.showKeyboard(getActivity()), 500);
+    }
 
 }

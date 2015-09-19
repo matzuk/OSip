@@ -129,6 +129,15 @@ public class AuthManager {
                 .map(this::mappingToAuthStateEnum);
     }
 
+    public void resetAuth(boolean force) {
+        sendToChannel(resetAuthObs(force));
+    }
+
+    private Observable<AuthStateEnum> resetAuthObs(boolean force) {
+        return TGProxy.getInstance().sendTD(new TdApi.ResetAuth(force), TdApi.AuthState.class)
+                .map(this::mappingToAuthStateEnum);
+    }
+
     public PublishSubject<AuthStateEnum> getAuthChannel() {
         return authChannel;
     }
