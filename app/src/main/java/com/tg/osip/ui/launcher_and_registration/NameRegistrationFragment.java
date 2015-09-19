@@ -1,7 +1,9 @@
 package com.tg.osip.ui.launcher_and_registration;
 
-import android.app.Fragment;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
@@ -10,11 +12,14 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
-import android.widget.Toolbar;
 
 import com.tg.osip.R;
+import com.tg.osip.business.AuthManager;
+import com.tg.osip.tdclient.TGProxy;
 import com.tg.osip.utils.ui.ScalableImageView;
 import com.tg.osip.utils.ui.SimpleAlertDialog;
+
+import org.drinkless.td.libcore.telegram.TdApi;
 
 /**
  * @author e.matsyuk
@@ -60,7 +65,7 @@ public class NameRegistrationFragment extends Fragment {
 
     private void initToolbar(View view) {
         Toolbar toolbar = (Toolbar) view.findViewById(R.id.toolbar);
-        getActivity().setActionBar(toolbar);
+        ((AppCompatActivity)getActivity()).setSupportActionBar(toolbar);
 
         if (getActivity() != null && getActivity().getActionBar() != null) {
             getActivity().getActionBar().show();
@@ -88,7 +93,7 @@ public class NameRegistrationFragment extends Fragment {
             );
             return;
         }
-//        TGProxy.getInstance().getClientInstance().send(new TdApi.AuthSetName(firstName, lastName), authGetResultHandler);
+        AuthManager.getInstance().setAuthNameRequest(firstName, lastName);
     }
 
     private TextWatcher nameEditTextWatcher = new TextWatcher() {
@@ -109,41 +114,5 @@ public class NameRegistrationFragment extends Fragment {
             }
         }
     };
-
-//    private Client.ResultHandler authGetResultHandler = new Client.ResultHandler() {
-//        @Override
-//        public void onResult(TdApi.TLObject object) {
-//            if (getActivity() == null) {
-//                return;
-//            }
-//            if (object instanceof TdApi.AuthStateWaitSetCode ) {
-//                goToCodeVerificationFragment();
-//            } else if (object instanceof TdApi.Error) {
-//                String message = "ERROR \ncode:" + ((TdApi.Error)object).code + "\ntext:" + ((TdApi.Error)object).text;
-//                SimpleAlertDialog.show(
-//                        getActivity(),
-//                        getResources().getString(R.string.app_name),
-//                        message
-//                );
-//            }
-//        }
-//    };
-//
-//    private void goToCodeVerificationFragment() {
-//        Handler handler = new Handler(Looper.getMainLooper());
-//        handler.post(new Runnable() {
-//            @Override
-//            public void run() {
-//                AndroidUtils.hideKeyboard(getActivity());
-//            }
-//        });
-//        handler.postDelayed(new Runnable() {
-//            @Override
-//            public void run() {
-//                CodeVerificationFragment codeVerificationFragment = new CodeVerificationFragment(getActivity());
-//                FrameManager.getInstance().putBaseFragment(codeVerificationFragment, FrameManager.Animation.PUT_RIGHT_LEFT_ANIMATION, true);
-//            }
-//        }, AndroidUtils.KEYBOARD_HIDDEN_TIME);
-//    }
 
 }

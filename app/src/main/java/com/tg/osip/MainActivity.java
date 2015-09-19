@@ -6,11 +6,14 @@ import android.os.Bundle;
 
 import com.tg.osip.business.AuthManager;
 import com.tg.osip.business.AuthManager.AuthStateEnum;
+import com.tg.osip.tdclient.exceptions.TdApiClassCastException;
+import com.tg.osip.tdclient.exceptions.TdApiErrorException;
 import com.tg.osip.ui.launcher_and_registration.CodeVerificationFragment;
 import com.tg.osip.ui.launcher_and_registration.PhoneRegistrationFragment;
 import com.tg.osip.ui.launcher_and_registration.SplashFragment;
 import com.tg.osip.utils.AndroidUtils;
 import com.tg.osip.utils.log.Logger;
+import com.tg.osip.utils.ui.SimpleAlertDialog;
 
 import rx.Subscriber;
 import rx.Subscription;
@@ -39,6 +42,8 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void onError(Throwable e) {
             Logger.error(e);
+            errorHandling(e);
+
         }
 
         @Override
@@ -47,6 +52,18 @@ public class MainActivity extends AppCompatActivity {
             startNextFragment(authStateEnum);
         }
     };
+
+    private void errorHandling(Throwable e) {
+        if (e instanceof TdApiErrorException) {
+            TdApiErrorException tdApiErrorException = (TdApiErrorException)e;
+            String message = "ERROR \ncode:" + tdApiErrorException.getCode() + "\ntext:" + tdApiErrorException.getText();
+            SimpleAlertDialog.show(
+                    MainActivity.this,
+                    getResources().getString(R.string.app_name),
+                    message
+            );
+        }
+    }
 
     private void startNextFragment(AuthStateEnum authStateEnum) {
         AndroidUtils.hideKeyboard(this);
