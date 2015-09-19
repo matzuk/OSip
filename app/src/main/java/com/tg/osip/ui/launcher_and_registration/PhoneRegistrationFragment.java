@@ -104,8 +104,7 @@ public class PhoneRegistrationFragment extends Fragment {
         });
 
 //        setValuesFromSIM();
-
-//        showKeyboard();
+        showKeyboard();
 
     }
 
@@ -214,16 +213,8 @@ public class PhoneRegistrationFragment extends Fragment {
             );
             return;
         }
-//        TGProxy.getInstance().getClientInstance().send(new TdApi.SetAuthPhoneNumber(phoneNumber), authGetResultHandler);
         AuthManager.getInstance().setAuthPhoneNumberRequest(phoneNumber);
     }
-
-    private Client.ResultHandler authGetResultHandler = new Client.ResultHandler() {
-        @Override
-        public void onResult(TdApi.TLObject object) {
-           Logger.debug(object);
-        }
-    };
 
 //    private TextWatcher codeEditTextWatcher = new TextWatcher() {
 //        @Override

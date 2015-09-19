@@ -9,6 +9,7 @@ import com.tg.osip.business.AuthManager.AuthStateEnum;
 import com.tg.osip.ui.launcher_and_registration.CodeVerificationFragment;
 import com.tg.osip.ui.launcher_and_registration.PhoneRegistrationFragment;
 import com.tg.osip.ui.launcher_and_registration.SplashFragment;
+import com.tg.osip.utils.AndroidUtils;
 import com.tg.osip.utils.log.Logger;
 
 import rx.Subscriber;
@@ -48,6 +49,7 @@ public class MainActivity extends AppCompatActivity {
     };
 
     private void startNextFragment(AuthStateEnum authStateEnum) {
+        AndroidUtils.hideKeyboard(this);
         switch (authStateEnum) {
             case AUTH_STATE_WAIT_PHONE_NUMBER:
                 startPhoneNumberFragment();
@@ -87,4 +89,11 @@ public class MainActivity extends AppCompatActivity {
         transaction.replace(R.id.container, newFragment);
         transaction.commit();
     }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        channelSubscription.unsubscribe();
+    }
+
 }
