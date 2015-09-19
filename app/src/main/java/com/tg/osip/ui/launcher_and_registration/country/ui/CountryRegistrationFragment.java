@@ -1,6 +1,5 @@
 package com.tg.osip.ui.launcher_and_registration.country.ui;
 
-import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
@@ -26,7 +25,7 @@ public class CountryRegistrationFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.phone_registration_fragment, container, false);
+        View rootView = inflater.inflate(R.layout.fmt_phone_registration, container, false);
         init(rootView);
         initToolbar(rootView);
         return rootView;

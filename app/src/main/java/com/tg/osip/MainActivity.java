@@ -1,24 +1,18 @@
 package com.tg.osip;
 
-import android.os.Handler;
-import android.os.Looper;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
 import com.tg.osip.business.AuthManager;
 import com.tg.osip.business.AuthManager.AuthStateEnum;
-import com.tg.osip.tdclient.TGProxy;
 import com.tg.osip.ui.launcher_and_registration.CodeVerificationFragment;
 import com.tg.osip.ui.launcher_and_registration.PhoneRegistrationFragment;
 import com.tg.osip.ui.launcher_and_registration.SplashFragment;
 import com.tg.osip.utils.log.Logger;
 
-import org.drinkless.td.libcore.telegram.TdApi;
-
 import rx.Subscriber;
 import rx.Subscription;
-import rx.android.schedulers.AndroidSchedulers;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -27,7 +21,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.ac_main);
         subscribeToChannel();
         startSplash();
     }

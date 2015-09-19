@@ -1,28 +1,20 @@
 package com.tg.osip.ui.launcher_and_registration;
 
 import android.app.Fragment;
-import android.content.Context;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
-import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
-import android.widget.TextView;
 import android.widget.Toolbar;
 
 import com.tg.osip.R;
 import com.tg.osip.utils.ui.ScalableImageView;
 import com.tg.osip.utils.ui.SimpleAlertDialog;
-
-import org.drinkless.td.libcore.telegram.Client;
-import org.drinkless.td.libcore.telegram.TdApi;
 
 /**
  * @author e.matsyuk
@@ -36,7 +28,7 @@ public class NameRegistrationFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.name_registration_fragment, container, false);
+        View rootView = inflater.inflate(R.layout.fmt_name_registration, container, false);
         init(rootView);
         initToolbar(rootView);
         return rootView;

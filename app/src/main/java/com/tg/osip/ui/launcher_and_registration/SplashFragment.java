@@ -27,7 +27,7 @@ public class SplashFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-        View rootView = inflater.inflate(R.layout.splash_fragment, container, false);
+        View rootView = inflater.inflate(R.layout.fmt_splash, container, false);
         imageView1 = (ScalableImageView) rootView.findViewById(R.id.imageView1);
         imageView1.setDelayForVisibleAnim(preDelayForAnimation);
         imageView2 = (ScalableImageView) rootView.findViewById(R.id.imageView2);
