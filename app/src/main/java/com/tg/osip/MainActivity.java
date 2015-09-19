@@ -1,5 +1,6 @@
 package com.tg.osip;
 
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -28,7 +29,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.ac_main);
         subscribeToChannel();
-        startSplash();
+        startFragment(new SplashFragment(), false);
     }
 
     private void subscribeToChannel() {
@@ -70,56 +71,47 @@ public class MainActivity extends AppCompatActivity {
         AndroidUtils.hideKeyboard(this);
         switch (authStateEnum) {
             case AUTH_STATE_WAIT_PHONE_NUMBER:
-                startPhoneNumberFragment();
+                startFragment(new PhoneRegistrationFragment(), true);
                 break;
             case AUTH_STATE_LOGGING_OUT:
                 break;
             case AUTH_STATE_OK:
                 break;
             case AUTH_STATE_WAIT_CODE:
-                startCodeVerificationFragment();
+                startFragment(new CodeVerificationFragment(), true);
                 break;
             case AUTH_STATE_WAIT_NAME:
-                startNameFragment();
+                startFragment(new NameRegistrationFragment(), true);
                 break;
             case AUTH_STATE_WAIT_PASSWORD:
                 break;
         }
     }
 
-    private void startPhoneNumberFragment() {
-        PhoneRegistrationFragment newFragment = new PhoneRegistrationFragment();
+    private void startFragment(Fragment fragment, boolean withBackStack) {
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        transaction.replace(R.id.container, newFragment);
+        if (withBackStack) {
+            transaction.addToBackStack(null);
+        }
+        transaction.replace(R.id.container, fragment);
         transaction.commit();
     }
 
-    private void startNameFragment() {
-        NameRegistrationFragment newFragment = new NameRegistrationFragment();
-        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        transaction.replace(R.id.container, newFragment);
-        transaction.commit();
-    }
-
-    private void startCodeVerificationFragment() {
-        CodeVerificationFragment newFragment = new CodeVerificationFragment();
-        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        transaction.addToBackStack(null);
-        transaction.replace(R.id.container, newFragment);
-        transaction.commit();
-    }
-
-    private void startSplash() {
-        SplashFragment newFragment = new SplashFragment();
-        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        transaction.replace(R.id.container, newFragment);
-        transaction.commit();
+    @Override
+    public void onBackPressed() {
+        if (getSupportFragmentManager().getBackStackEntryCount() > 1) {
+            getSupportFragmentManager().popBackStack();
+        } else {
+            finish();
+        }
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        channelSubscription.unsubscribe();
+        if (channelSubscription != null && !channelSubscription.isUnsubscribed()) {
+            channelSubscription.unsubscribe();
+        }
     }
 
 }

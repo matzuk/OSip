@@ -41,7 +41,7 @@ public class CodeVerificationFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.fmt_code_registration, container, false);
+        View rootView = inflater.inflate(R.layout.fmt_code_verification_registration, container, false);
         init(rootView);
         initToolbar(rootView);
         subscribeToChannel();
