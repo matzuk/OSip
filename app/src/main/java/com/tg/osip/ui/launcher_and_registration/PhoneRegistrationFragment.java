@@ -24,12 +24,8 @@ import com.tg.osip.ui.launcher_and_registration.country.utils.Country;
 import com.tg.osip.ui.launcher_and_registration.country.utils.CountryUtils;
 import com.tg.osip.utils.AndroidUtils;
 import com.tg.osip.utils.PhoneFormat.PhoneFormat;
-import com.tg.osip.utils.log.Logger;
 import com.tg.osip.utils.ui.ScalableImageView;
 import com.tg.osip.utils.ui.SimpleAlertDialog;
-
-import org.drinkless.td.libcore.telegram.Client;
-import org.drinkless.td.libcore.telegram.TdApi;
 
 import java.util.HashMap;
 

@@ -35,6 +35,10 @@ import com.tg.osip.utils.log.config.DefaultLoggerConfig;
 import com.tg.osip.utils.log.config.LoggerConfig;
 import com.tg.osip.utils.log.filter.LogFilter;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.net.UnknownHostException;
+
 /**
  * Logger only for DEBUG mode because Logger will not work if apk was obfuscating
  *
@@ -94,6 +98,10 @@ public class Logger {
         LoggerHolder.INSTANCE.log(LogEvent.Level.ERROR, message);
     }
 
+    public static void error(Throwable tr) {
+        LoggerHolder.INSTANCE.log(LogEvent.Level.ERROR, getStackTraceString(tr));
+    }
+
     public static void fatal(Object... message) {
         LoggerHolder.INSTANCE.log(LogEvent.Level.FATAL, message);
     }
@@ -140,6 +148,32 @@ public class Logger {
 
         public static final Logger INSTANCE = new Logger();
 
+    }
+
+    /**
+     * Handy function to get a loggable stack trace from a Throwable
+     * @param tr An exception to log
+     */
+    private static String getStackTraceString(Throwable tr) {
+        if (tr == null) {
+            return "";
+        }
+
+        // This is to reduce the amount of log spew that apps do in the non-error
+        // condition of the network being unavailable.
+        Throwable t = tr;
+        while (t != null) {
+            if (t instanceof UnknownHostException) {
+                return "";
+            }
+            t = t.getCause();
+        }
+
+        StringWriter sw = new StringWriter();
+        PrintWriter pw = new PrintWriter(sw);
+        tr.printStackTrace(pw);
+        pw.flush();
+        return sw.toString();
     }
 
 }
