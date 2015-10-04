@@ -24,6 +24,7 @@ import com.tg.osip.ui.launcher_and_registration.country.utils.Country;
 import com.tg.osip.ui.launcher_and_registration.country.utils.CountryUtils;
 import com.tg.osip.utils.AndroidUtils;
 import com.tg.osip.utils.PhoneFormat.PhoneFormat;
+import com.tg.osip.utils.log.Logger;
 import com.tg.osip.utils.ui.ScalableImageView;
 import com.tg.osip.utils.ui.SimpleAlertDialog;
 
@@ -186,7 +187,7 @@ public class PhoneRegistrationFragment extends Fragment {
                 phoneEdit.setSelection(phoneEdit.length());
             }
         } catch (Exception e) {
-//            FileLog.e("tmessages", e); FIXME
+            Logger.error(e);
         }
         ignoreOnPhoneChange = false;
     }
@@ -260,7 +261,7 @@ public class PhoneRegistrationFragment extends Fragment {
                 countryShortName = telephonyManager.getSimCountryIso().toUpperCase();
             }
         } catch (Exception e) {
-//            FileLog.e("tmessages", e); FIXME
+            Logger.error(e);
         }
 
         if (TextUtils.isEmpty(countryShortName)) {

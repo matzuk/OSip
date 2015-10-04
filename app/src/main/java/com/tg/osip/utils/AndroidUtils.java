@@ -10,6 +10,7 @@ import android.view.inputmethod.InputMethodManager;
 
 import com.tg.osip.ApplicationSIP;
 import com.tg.osip.R;
+import com.tg.osip.utils.log.Logger;
 
 import java.io.File;
 import java.util.Locale;
@@ -91,7 +92,7 @@ public class AndroidUtils {
         try {
             state = Environment.getExternalStorageState();
         } catch (Exception e) {
-//            FileLog.e("tmessages", e); FIXME
+            Logger.error(e);
         }
         if (state == null || state.startsWith(Environment.MEDIA_MOUNTED)) {
             try {
@@ -100,7 +101,7 @@ public class AndroidUtils {
                     return file.getPath();
                 }
             } catch (Exception e) {
-//                FileLog.e("tmessages", e); FIXME
+                Logger.error(e);
             }
         }
         try {
@@ -109,7 +110,7 @@ public class AndroidUtils {
                 return file.getPath();
             }
         } catch (Exception e) {
-//            FileLog.e("tmessages", e); FIXME
+            Logger.error(e);
         }
         return new File("").getPath();
     }

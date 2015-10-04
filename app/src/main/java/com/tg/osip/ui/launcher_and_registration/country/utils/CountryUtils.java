@@ -1,6 +1,7 @@
 package com.tg.osip.ui.launcher_and_registration.country.utils;
 
 import com.tg.osip.ApplicationSIP;
+import com.tg.osip.utils.log.Logger;
 
 import java.io.BufferedReader;
 import java.io.InputStream;
@@ -34,7 +35,7 @@ public class CountryUtils {
             reader.close();
             stream.close();
         } catch (Exception e) {
-//            FileLog.e("tmessages", e); FIXME
+            Logger.error(e);
         }
 
         return countryList;

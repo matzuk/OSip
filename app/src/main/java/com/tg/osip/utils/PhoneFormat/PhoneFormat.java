@@ -25,6 +25,7 @@
 package com.tg.osip.utils.PhoneFormat;
 
 import com.tg.osip.ApplicationSIP;
+import com.tg.osip.utils.log.Logger;
 
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
@@ -119,14 +120,14 @@ public class PhoneFormat {
                     bos.close();
                 }
             } catch (Exception e) {
-//                FileLog.e("tmessages", e); FIXME
+                Logger.error(e);
             }
             try {
                 if (stream != null) {
                     stream.close();
                 }
             } catch (Exception e) {
-//                FileLog.e("tmessages", e); FIXME
+                Logger.error(e);
             }
         }
 
