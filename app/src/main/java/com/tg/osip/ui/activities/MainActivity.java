@@ -1,13 +1,13 @@
-package com.tg.osip;
+package com.tg.osip.ui.activities;
 
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
+import com.tg.osip.R;
 import com.tg.osip.business.AuthManager;
 import com.tg.osip.business.AuthManager.AuthStateEnum;
-import com.tg.osip.tdclient.exceptions.TdApiClassCastException;
 import com.tg.osip.tdclient.exceptions.TdApiErrorException;
 import com.tg.osip.ui.launcher_and_registration.CodeVerificationFragment;
 import com.tg.osip.ui.launcher_and_registration.NameRegistrationFragment;
