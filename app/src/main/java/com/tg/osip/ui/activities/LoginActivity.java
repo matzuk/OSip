@@ -1,5 +1,6 @@
 package com.tg.osip.ui.activities;
 
+import android.content.Intent;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
@@ -27,7 +28,7 @@ public class LoginActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.ac_main);
+        setContentView(R.layout.ac_login);
         subscribeToChannel();
         startFragment(new SplashFragment(), false);
     }
@@ -76,6 +77,8 @@ public class LoginActivity extends AppCompatActivity {
             case AUTH_STATE_LOGGING_OUT:
                 break;
             case AUTH_STATE_OK:
+                startActivity(new Intent(this, MainActivity.class));
+                finish();
                 break;
             case AUTH_STATE_WAIT_CODE:
                 startFragment(new CodeVerificationFragment(), true);
