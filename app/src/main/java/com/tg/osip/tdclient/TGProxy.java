@@ -83,7 +83,7 @@ public class TGProxy {
     private Client.ResultHandler updatesHandler = new Client.ResultHandler() {
         @Override
         public void onResult(TdApi.TLObject object) {
-            Logger.debug(object);
+//            Logger.debug(object);
         }
     };
 

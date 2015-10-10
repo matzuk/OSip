@@ -6,6 +6,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
@@ -19,6 +20,7 @@ import android.view.ViewGroup;
 
 import com.tg.osip.R;
 import com.tg.osip.tdclient.TGProxy;
+import com.tg.osip.ui.chat.ChatFragment;
 import com.tg.osip.utils.ui.RecyclerItemClickListener;
 import com.tg.osip.utils.ui.SimpleAlertDialogFragment;
 
@@ -141,8 +143,15 @@ public class ChatListFragment extends Fragment {
 
     private void goToConcreteChat(int position) {
         long chatId = recyclerViewAdapter.getChat(position).id;
-//        ChatFragment chatFragment = new ChatFragment(getActivity(), chatId);
-//        FrameManager.getInstance().putBaseFragment(chatFragment, FrameManager.Animation.PUT_RIGHT_LEFT_ANIMATION, false);
+        ChatFragment chatFragment = ChatFragment.newInstance(chatId);
+        startFragment(chatFragment);
+    }
+
+    private void startFragment(Fragment fragment) {
+        FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
+        transaction.addToBackStack(null);
+        transaction.replace(R.id.container, fragment);
+        transaction.commit();
     }
 
     private Client.ResultHandler getChatsResultHandler = new Client.ResultHandler() {
