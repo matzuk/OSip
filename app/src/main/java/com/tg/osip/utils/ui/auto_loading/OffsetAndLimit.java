@@ -1,7 +1,7 @@
-package com.tg.osip.utils.ui.auto_loaded_views;
+package com.tg.osip.utils.ui.auto_loading;
 
 /**
- * Offset and limit for {@link AutoLoadedRecyclerView AutoLoadedRecyclerView channel}
+ * Offset and limit for {@link AutoLoadingRecyclerView AutoLoadedRecyclerView channel}
  *
  * @author e.matsyuk
  */

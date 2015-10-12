@@ -1,17 +1,16 @@
-package com.tg.osip.utils.ui.auto_loaded_views;
+package com.tg.osip.utils.ui.auto_loading;
 
 import android.support.v7.widget.RecyclerView;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 /**
- * Adapter for {@link AutoLoadedRecyclerView AutoLoadedRecyclerView}
+ * Adapter for {@link AutoLoadingRecyclerView AutoLoadedRecyclerView}
  *
  * @author e.matsyuk
  */
-public abstract class AutoLoadedAdapter<T> extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+public abstract class AutoLoadingAdapter<T> extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     private List<T> listElements = new ArrayList<>();
 

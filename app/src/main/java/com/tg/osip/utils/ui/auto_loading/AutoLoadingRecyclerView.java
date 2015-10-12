@@ -1,4 +1,4 @@
-package com.tg.osip.utils.ui.auto_loaded_views;
+package com.tg.osip.utils.ui.auto_loading;
 
 import android.content.Context;
 import android.support.v7.widget.LinearLayoutManager;
@@ -12,6 +12,7 @@ import com.tg.osip.utils.log.Logger;
 import java.util.List;
 
 import rx.Subscriber;
+import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 import rx.subjects.PublishSubject;
@@ -19,26 +20,28 @@ import rx.subjects.PublishSubject;
 /**
  * @author e.matsyuk
  */
-public class AutoLoadedRecyclerView<T> extends RecyclerView {
+public class AutoLoadingRecyclerView<T> extends RecyclerView {
 
     private static  final int START_OFFSET = 0;
 
     private PublishSubject<OffsetAndLimit> scrollLoadingChannel = PublishSubject.create();
-    private int onceDownloadsLimit;
+    private Subscription loadNewItemsSubscription;
+    private Subscription subscribeToLoadingChannelSubscription;
+    private int limit;
     private ILoading<T> iLoading;
-    private AutoLoadedAdapter<T> autoLoadedAdapter;
+    private AutoLoadingAdapter<T> autoLoadingAdapter;
 
-    public AutoLoadedRecyclerView(Context context) {
+    public AutoLoadingRecyclerView(Context context) {
         super(context);
         init();
     }
 
-    public AutoLoadedRecyclerView(Context context, AttributeSet attrs) {
+    public AutoLoadingRecyclerView(Context context, AttributeSet attrs) {
         super(context, attrs);
         init();
     }
 
-    public AutoLoadedRecyclerView(Context context, AttributeSet attrs, int defStyle) {
+    public AutoLoadingRecyclerView(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
         init();
     }
@@ -48,8 +51,7 @@ public class AutoLoadedRecyclerView<T> extends RecyclerView {
      * call after init all parameters in AutoLoadedRecyclerView
      */
     public void startLoading() {
-        Logger.debug("start loading");
-        OffsetAndLimit offsetAndLimit = new OffsetAndLimit(START_OFFSET, getOnceDownloadsLimit());
+        OffsetAndLimit offsetAndLimit = new OffsetAndLimit(START_OFFSET, getLimit());
         loadNewItems(offsetAndLimit);
     }
 
@@ -62,13 +64,11 @@ public class AutoLoadedRecyclerView<T> extends RecyclerView {
             @Override
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
                 int position = getSupportLinearLayoutManager().findLastVisibleItemPosition();
-                int limit = getOnceDownloadsLimit();
+                int limit = getLimit();
                 int updatePosition = getAdapter().getItemCount() - 1 - (limit / 2);
                 if (position >= updatePosition) {
                     int offset = getAdapter().getItemCount() - 1;
                     OffsetAndLimit offsetAndLimit = new OffsetAndLimit(offset, limit);
-                    Logger.debug("scroll update event in channel");
-                    Logger.debug("offsetAndLimit: " + offsetAndLimit.toString());
                     scrollLoadingChannel.onNext(offsetAndLimit);
                 }
             }
@@ -80,7 +80,7 @@ public class AutoLoadedRecyclerView<T> extends RecyclerView {
         // FIXME temp restriction
         // later add handling for StaggeredGridLayoutManager
         if (layout instanceof StaggeredGridLayoutManager) {
-            throw new AutoLoadedRecyclerViewExceptions("Incorrect LayoutManager. Please set LinearLayoutManager!");
+            throw new AutoLoadingRecyclerViewExceptions("Incorrect LayoutManager. Please set LinearLayoutManager!");
         }
         super.setLayoutManager(layout);
     }
@@ -89,46 +89,46 @@ public class AutoLoadedRecyclerView<T> extends RecyclerView {
         return (LinearLayoutManager)getLayoutManager();
     }
 
-    public int getOnceDownloadsLimit() {
-        if (onceDownloadsLimit <= 0) {
-            throw new AutoLoadedRecyclerViewExceptions("onceDownloadsLimit must be initialised! And onceDownloadsLimit must be more than zero!");
+    public int getLimit() {
+        if (limit <= 0) {
+            throw new AutoLoadingRecyclerViewExceptions("limit must be initialised! And limit must be more than zero!");
         }
-        return onceDownloadsLimit;
+        return limit;
     }
 
     /**
      * required method
      */
-    public void setOnceDownloadsLimit(int onceDownloadsLimit) {
-        this.onceDownloadsLimit = onceDownloadsLimit;
+    public void setLimit(int limit) {
+        this.limit = limit;
     }
 
     @Deprecated
     @Override
     public void setAdapter(Adapter adapter) {
-        if (adapter instanceof AutoLoadedAdapter) {
+        if (adapter instanceof AutoLoadingAdapter) {
             super.setAdapter(adapter);
         } else {
-            throw new AutoLoadedRecyclerViewExceptions("Adapter must be implement IAutoLoadedAdapter");
+            throw new AutoLoadingRecyclerViewExceptions("Adapter must be implement IAutoLoadedAdapter");
         }
     }
 
     /**
      * required method
      */
-    public void setAdapter(AutoLoadedAdapter<T> autoLoadedAdapter) {
-        if (autoLoadedAdapter == null) {
-            throw new AutoLoadedRecyclerViewExceptions("Null adapter. Please initialise adapter!");
+    public void setAdapter(AutoLoadingAdapter<T> autoLoadingAdapter) {
+        if (autoLoadingAdapter == null) {
+            throw new AutoLoadingRecyclerViewExceptions("Null adapter. Please initialise adapter!");
         }
-        this.autoLoadedAdapter = autoLoadedAdapter;
-        super.setAdapter(autoLoadedAdapter);
+        this.autoLoadingAdapter = autoLoadingAdapter;
+        super.setAdapter(autoLoadingAdapter);
     }
 
-    public AutoLoadedAdapter<T> getAdapter() {
-        if (autoLoadedAdapter == null) {
-            throw new AutoLoadedRecyclerViewExceptions("Null adapter. Please initialise adapter!");
+    public AutoLoadingAdapter<T> getAdapter() {
+        if (autoLoadingAdapter == null) {
+            throw new AutoLoadingRecyclerViewExceptions("Null adapter. Please initialise adapter!");
         }
-        return autoLoadedAdapter;
+        return autoLoadingAdapter;
     }
 
     public void setLoadingObservable(ILoading<T> iLoading) {
@@ -137,17 +137,15 @@ public class AutoLoadedRecyclerView<T> extends RecyclerView {
 
     public ILoading<T> getLoadingObservable() {
         if (iLoading == null) {
-            throw new AutoLoadedRecyclerViewExceptions("Null LoadingObservable. Please initialise LoadingObservable!");
+            throw new AutoLoadingRecyclerViewExceptions("Null LoadingObservable. Please initialise LoadingObservable!");
         }
         return iLoading;
     }
 
     private void subscribeToLoadingChannel() {
-        Logger.debug("call method");
-        Subscriber<OffsetAndLimit> subscriber = new Subscriber<OffsetAndLimit>() {
+        Subscriber<OffsetAndLimit> toLoadingChannelSubscriber = new Subscriber<OffsetAndLimit>() {
             @Override
             public void onCompleted() {
-
             }
 
             @Override
@@ -157,20 +155,18 @@ public class AutoLoadedRecyclerView<T> extends RecyclerView {
 
             @Override
             public void onNext(OffsetAndLimit offsetAndLimit) {
-                Logger.debug("scroll update event in channel Subscriber");
                 unsubscribe();
                 loadNewItems(offsetAndLimit);
             }
         };
-        scrollLoadingChannel
+        subscribeToLoadingChannelSubscription = scrollLoadingChannel
                 .subscribeOn(Schedulers.from(BackgroundExecutor.getSafeBackgroundExecutor()))
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(subscriber);
+                .subscribe(toLoadingChannelSubscriber);
     }
 
     private void loadNewItems(OffsetAndLimit offsetAndLimit) {
-        Logger.debug("call method");
-        Subscriber<List<T>> subscriber = new Subscriber<List<T>>() {
+        Subscriber<List<T>> loadNewItemsSubscriber = new Subscriber<List<T>>() {
             @Override
             public void onCompleted() {
 
@@ -184,7 +180,6 @@ public class AutoLoadedRecyclerView<T> extends RecyclerView {
 
             @Override
             public void onNext(List<T> ts) {
-                Logger.debug("loaded new items");
                 getAdapter().addNewItems(ts);
                 getAdapter().notifyItemInserted(getAdapter().getItemCount() - ts.size());
                 if (ts.size() > 0) {
@@ -193,10 +188,24 @@ public class AutoLoadedRecyclerView<T> extends RecyclerView {
             }
         };
 
-        getLoadingObservable().getLoadingObservable(offsetAndLimit)
+        loadNewItemsSubscription = getLoadingObservable().getLoadingObservable(offsetAndLimit)
                 .subscribeOn(Schedulers.from(BackgroundExecutor.getSafeBackgroundExecutor()))
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(subscriber);
+                .subscribe(loadNewItemsSubscriber);
+    }
+
+    /**
+     * required method
+     * call in OnDestroy(or in OnDestroyView) method of Activity or Fragment
+     */
+    public void onDestroy() {
+        scrollLoadingChannel.onCompleted();
+        if (subscribeToLoadingChannelSubscription != null && !subscribeToLoadingChannelSubscription.isUnsubscribed()) {
+            subscribeToLoadingChannelSubscription.unsubscribe();
+        }
+        if (loadNewItemsSubscription != null && !loadNewItemsSubscription.isUnsubscribed()) {
+            loadNewItemsSubscription.unsubscribe();
+        }
     }
 
 }

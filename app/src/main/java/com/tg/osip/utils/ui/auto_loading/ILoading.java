@@ -1,4 +1,4 @@
-package com.tg.osip.utils.ui.auto_loaded_views;
+package com.tg.osip.utils.ui.auto_loading;
 
 import java.util.List;
 

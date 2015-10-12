@@ -1,6 +1,5 @@
 package com.tg.osip.ui.chat;
 
-import android.support.v4.content.res.ResourcesCompat;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,14 +9,14 @@ import android.widget.TextView;
 
 import com.tg.osip.R;
 import com.tg.osip.utils.time.TimeUtils;
-import com.tg.osip.utils.ui.auto_loaded_views.AutoLoadedAdapter;
+import com.tg.osip.utils.ui.auto_loading.AutoLoadingAdapter;
 
 import org.drinkless.td.libcore.telegram.TdApi;
 
 /**
  * @author e.matsyuk
  */
-public class ChatRecyclerAdapter extends AutoLoadedAdapter<TdApi.Message> {
+public class ChatRecyclerAdapter extends AutoLoadingAdapter<TdApi.Message> {
 
     private static final int MAIN_VIEW = 0;
     private static final int UNSUPPORTED_VIEW = 4;

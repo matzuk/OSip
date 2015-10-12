@@ -12,7 +12,7 @@ import android.view.ViewGroup;
 import com.tg.osip.R;
 import com.tg.osip.tdclient.TGProxy;
 import com.tg.osip.utils.log.Logger;
-import com.tg.osip.utils.ui.auto_loaded_views.AutoLoadedRecyclerView;
+import com.tg.osip.utils.ui.auto_loading.AutoLoadingRecyclerView;
 
 import org.drinkless.td.libcore.telegram.TdApi;
 
@@ -30,7 +30,7 @@ public class ChatFragment extends Fragment {
 
     private Toolbar toolbar;
     private GridLayoutManager recyclerViewLayoutManager;
-    private AutoLoadedRecyclerView<TdApi.Message> recyclerView;
+    private AutoLoadingRecyclerView<TdApi.Message> recyclerView;
     private ChatRecyclerAdapter chatRecyclerAdapter;
 
     private long chatId;
@@ -63,13 +63,13 @@ public class ChatFragment extends Fragment {
     }
 
     private void init(View view) {
-        recyclerView = (AutoLoadedRecyclerView) view.findViewById(R.id.RecyclerView);
+        recyclerView = (AutoLoadingRecyclerView) view.findViewById(R.id.RecyclerView);
         recyclerViewLayoutManager = new GridLayoutManager(getActivity(), 1);
         recyclerViewLayoutManager.supportsPredictiveItemAnimations();
         recyclerViewLayoutManager.setReverseLayout(true);
         chatRecyclerAdapter = new ChatRecyclerAdapter();
         recyclerView.setLayoutManager(recyclerViewLayoutManager);
-        recyclerView.setOnceDownloadsLimit(50);
+        recyclerView.setLimit(50);
         recyclerView.setAdapter(chatRecyclerAdapter);
         recyclerView.setLoadingObservable(offsetAndLimit -> TGProxy.getInstance().sendTD(new TdApi.GetChatHistory(chatId, topMessageId, offsetAndLimit.getOffset(), offsetAndLimit.getLimit()), TdApi.Messages.class)
                 .map(messages -> {
@@ -110,6 +110,12 @@ public class ChatFragment extends Fragment {
 
     private AppCompatActivity getSupportActivity() {
         return (AppCompatActivity)getActivity();
+    }
+
+    @Override
+    public void onDestroyView() {
+        recyclerView.onDestroy();
+        super.onDestroyView();
     }
 
 }
