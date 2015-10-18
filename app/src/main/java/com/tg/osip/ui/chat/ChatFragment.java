@@ -27,11 +27,9 @@ import rx.Subscriber;
 public class ChatFragment extends Fragment {
 
     public static final String CHAT_ID = "chat_id";
+    private static final int LIMIT = 50;
 
-    private Toolbar toolbar;
-    private GridLayoutManager recyclerViewLayoutManager;
     private AutoLoadingRecyclerView<TdApi.Message> recyclerView;
-    private ChatRecyclerAdapter chatRecyclerAdapter;
 
     private long chatId;
     private int topMessageId;
@@ -64,18 +62,24 @@ public class ChatFragment extends Fragment {
 
     private void init(View view) {
         recyclerView = (AutoLoadingRecyclerView) view.findViewById(R.id.RecyclerView);
-        recyclerViewLayoutManager = new GridLayoutManager(getActivity(), 1);
+        // init LayoutManager
+        GridLayoutManager recyclerViewLayoutManager = new GridLayoutManager(getActivity(), 1);
         recyclerViewLayoutManager.supportsPredictiveItemAnimations();
         recyclerViewLayoutManager.setReverseLayout(true);
-        chatRecyclerAdapter = new ChatRecyclerAdapter();
+        // init ChatRecyclerAdapter
+        ChatRecyclerAdapter chatRecyclerAdapter = new ChatRecyclerAdapter();
+        chatRecyclerAdapter.setHasStableIds(true);
+        // recyclerView setting
         recyclerView.setLayoutManager(recyclerViewLayoutManager);
-        recyclerView.setLimit(50);
+        recyclerView.setLimit(LIMIT);
         recyclerView.setAdapter(chatRecyclerAdapter);
-        recyclerView.setLoadingObservable(offsetAndLimit -> TGProxy.getInstance().sendTD(new TdApi.GetChatHistory(chatId, topMessageId, offsetAndLimit.getOffset(), offsetAndLimit.getLimit()), TdApi.Messages.class)
+        recyclerView.setLoadingObservable(
+                offsetAndLimit -> TGProxy.getInstance().sendTD(new TdApi.GetChatHistory(chatId, topMessageId, offsetAndLimit.getOffset(), offsetAndLimit.getLimit()), TdApi.Messages.class)
                 .map(messages -> {
                     TdApi.Message messageMas[] = messages.messages;
                     return new ArrayList<>(Arrays.asList(messageMas));
-                }));
+                })
+        );
 
         TGProxy.getInstance().sendTD(new TdApi.GetChat(chatId), TdApi.Chat.class)
                 .subscribe(new Subscriber<TdApi.Chat>() {
@@ -99,7 +103,7 @@ public class ChatFragment extends Fragment {
     }
 
     private void initToolbar(View rootView) {
-        toolbar = (Toolbar) rootView.findViewById(R.id.toolbar);
+        Toolbar toolbar = (Toolbar) rootView.findViewById(R.id.toolbar);
         if (getActivity() != null) {
             getSupportActivity().setSupportActionBar(toolbar);
             getSupportActivity().getSupportActionBar().setTitle("");

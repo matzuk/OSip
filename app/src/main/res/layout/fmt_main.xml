@@ -13,11 +13,11 @@
         android:background="?attr/colorPrimary"
         android:layout_gravity="center_horizontal|left"
         app:titleTextAppearance="@style/Toolbar.TitleText"
-        app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
         app:popupTheme="@style/ThemeOverlay.AppCompat.Light" />
 
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/RecyclerViewChat"
+    <com.tg.osip.ui.views.auto_loading.AutoLoadingRecyclerView
+        android:id="@+id/RecyclerView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@android:color/white"
@@ -26,4 +26,3 @@
         android:overScrollMode="always"/>
 
 </LinearLayout>
-

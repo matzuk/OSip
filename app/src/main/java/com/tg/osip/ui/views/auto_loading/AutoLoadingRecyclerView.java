@@ -20,6 +20,7 @@ import android.util.AttributeSet;
 import android.util.Log;
 
 import com.tg.osip.utils.BackgroundExecutor;
+import com.tg.osip.utils.log.Logger;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -196,9 +197,9 @@ public class AutoLoadingRecyclerView<T> extends RecyclerView {
 
             @Override
             public void onNext(List<T> ts) {
-                getAdapter().addNewItems(ts);
-                getAdapter().notifyItemInserted(getAdapter().getItemCount() - ts.size());
                 if (ts.size() > 0) {
+                    getAdapter().addNewItems(ts);
+                    getAdapter().notifyItemInserted(getAdapter().getItemCount() - ts.size());
                     subscribeToLoadingChannel();
                 }
             }

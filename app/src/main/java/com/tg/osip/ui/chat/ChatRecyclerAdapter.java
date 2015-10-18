@@ -63,10 +63,10 @@ public class ChatRecyclerAdapter extends AutoLoadingRecyclerViewAdapter<TdApi.Me
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         if (viewType == MAIN_VIEW) {
-            View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.chat_message_item_text, parent, false);
+            View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_chat_list_message_text, parent, false);
             return new MainViewHolder(v);
         } else if (viewType == UNSUPPORTED_VIEW) {
-            View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.chat_message_item_unsupport, parent, false);
+            View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_chat_list_message_unsupport, parent, false);
             return new UnsupportedViewHolder(v);
         }
         return null;
