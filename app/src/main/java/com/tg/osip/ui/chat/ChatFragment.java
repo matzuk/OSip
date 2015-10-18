@@ -11,14 +11,19 @@ import android.view.ViewGroup;
 
 import com.tg.osip.R;
 import com.tg.osip.tdclient.TGProxy;
+import com.tg.osip.ui.views.auto_loading.ILoading;
+import com.tg.osip.ui.views.auto_loading.OffsetAndLimit;
 import com.tg.osip.utils.log.Logger;
 import com.tg.osip.ui.views.auto_loading.AutoLoadingRecyclerView;
+import com.tg.osip.utils.ui.PreLoader;
 
 import org.drinkless.td.libcore.telegram.TdApi;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
+import rx.Observable;
 import rx.Subscriber;
 
 /**
@@ -30,6 +35,7 @@ public class ChatFragment extends Fragment {
     private static final int LIMIT = 50;
 
     private AutoLoadingRecyclerView<TdApi.Message> recyclerView;
+    private PreLoader preLoader;
 
     private long chatId;
     private int topMessageId;
@@ -61,6 +67,7 @@ public class ChatFragment extends Fragment {
     }
 
     private void init(View view) {
+        preLoader = (PreLoader) view.findViewById(R.id.pro_loader);
         recyclerView = (AutoLoadingRecyclerView) view.findViewById(R.id.RecyclerView);
         // init LayoutManager
         GridLayoutManager recyclerViewLayoutManager = new GridLayoutManager(getActivity(), 1);
@@ -73,13 +80,7 @@ public class ChatFragment extends Fragment {
         recyclerView.setLayoutManager(recyclerViewLayoutManager);
         recyclerView.setLimit(LIMIT);
         recyclerView.setAdapter(chatRecyclerAdapter);
-        recyclerView.setLoadingObservable(
-                offsetAndLimit -> TGProxy.getInstance().sendTD(new TdApi.GetChatHistory(chatId, topMessageId, offsetAndLimit.getOffset(), offsetAndLimit.getLimit()), TdApi.Messages.class)
-                .map(messages -> {
-                    TdApi.Message messageMas[] = messages.messages;
-                    return new ArrayList<>(Arrays.asList(messageMas));
-                })
-        );
+        recyclerView.setLoadingObservable(loading);
 
         TGProxy.getInstance().sendTD(new TdApi.GetChat(chatId), TdApi.Chat.class)
                 .subscribe(new Subscriber<TdApi.Chat>() {
@@ -101,6 +102,25 @@ public class ChatFragment extends Fragment {
                 });
 
     }
+
+    private ILoading<TdApi.Message> loading = new ILoading<TdApi.Message>() {
+        @Override
+        public Observable<List<TdApi.Message>> getLoadingObservable(OffsetAndLimit offsetAndLimit) {
+            return TGProxy.getInstance().sendTD(new TdApi.GetChatHistory(chatId, topMessageId, offsetAndLimit.getOffset(), offsetAndLimit.getLimit()), TdApi.Messages.class)
+                    .map(messages -> {
+                        TdApi.Message messageMas[] = messages.messages;
+                        return new ArrayList<>(Arrays.asList(messageMas));
+                    });
+        }
+        @Override
+        public void startLoadData() {
+
+        }
+        @Override
+        public void endLoadData() {
+            preLoader.setVisibility(View.GONE);
+        }
+    };
 
     private void initToolbar(View rootView) {
         Toolbar toolbar = (Toolbar) rootView.findViewById(R.id.toolbar);

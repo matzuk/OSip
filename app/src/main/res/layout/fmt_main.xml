@@ -1,4 +1,4 @@
-<LinearLayout
+<RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
@@ -11,7 +11,7 @@
         android:layout_width="match_parent"
         android:minHeight="?attr/actionBarSize"
         android:background="?attr/colorPrimary"
-        android:layout_gravity="center_horizontal|left"
+        android:layout_alignParentTop="true"
         app:titleTextAppearance="@style/Toolbar.TitleText"
         android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
         app:popupTheme="@style/ThemeOverlay.AppCompat.Light" />
@@ -23,6 +23,14 @@
         android:background="@android:color/white"
         android:layout_gravity="left"
         android:scrollbars="vertical"
-        android:overScrollMode="always"/>
+        android:overScrollMode="always"
+        android:layout_below="@+id/toolbar"/>
 
-</LinearLayout>
+    <com.tg.osip.utils.ui.PreLoader
+        android:id="@+id/pro_loader"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:visibility="visible"/>
+
+</RelativeLayout>
