@@ -1,14 +1,28 @@
-package com.tg.osip.utils.ui.auto_loading;
+/**
+ * Copyright 2015 Eugene Matsyuk (matzuk2@mail.ru)
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in
+ * compliance with the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software distributed under the License is
+ * distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See
+ * the License for the specific language governing permissions and limitations under the License.
+ */
+package com.tg.osip.ui.views.auto_loading;
 
 import android.content.Context;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.util.AttributeSet;
+import android.util.Log;
 
 import com.tg.osip.utils.BackgroundExecutor;
-import com.tg.osip.utils.log.Logger;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import rx.Subscriber;
@@ -22,6 +36,7 @@ import rx.subjects.PublishSubject;
  */
 public class AutoLoadingRecyclerView<T> extends RecyclerView {
 
+    private static final String TAG = "AutoLoadingRecyclerView";
     private static  final int START_OFFSET = 0;
 
     private PublishSubject<OffsetAndLimit> scrollLoadingChannel = PublishSubject.create();
@@ -29,7 +44,7 @@ public class AutoLoadingRecyclerView<T> extends RecyclerView {
     private Subscription subscribeToLoadingChannelSubscription;
     private int limit;
     private ILoading<T> iLoading;
-    private AutoLoadingAdapter<T> autoLoadingAdapter;
+    private AutoLoadingRecyclerViewAdapter<T> autoLoadingRecyclerViewAdapter;
 
     public AutoLoadingRecyclerView(Context context) {
         super(context);
@@ -63,7 +78,7 @@ public class AutoLoadingRecyclerView<T> extends RecyclerView {
         addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-                int position = getSupportLinearLayoutManager().findLastVisibleItemPosition();
+                int position = getLastVisibleItemPosition();
                 int limit = getLimit();
                 int updatePosition = getAdapter().getItemCount() - 1 - (limit / 2);
                 if (position >= updatePosition) {
@@ -75,18 +90,21 @@ public class AutoLoadingRecyclerView<T> extends RecyclerView {
         });
     }
 
-    @Override
-    public void setLayoutManager(LayoutManager layout) {
-        // FIXME temp restriction
-        // later add handling for StaggeredGridLayoutManager
-        if (layout instanceof StaggeredGridLayoutManager) {
-            throw new AutoLoadingRecyclerViewExceptions("Incorrect LayoutManager. Please set LinearLayoutManager!");
+    private int getLastVisibleItemPosition() {
+        Class recyclerViewLMClass = getLayoutManager().getClass();
+        if (recyclerViewLMClass == LinearLayoutManager.class || LinearLayoutManager.class.isAssignableFrom(recyclerViewLMClass)) {
+            LinearLayoutManager linearLayoutManager = (LinearLayoutManager)getLayoutManager();
+            return linearLayoutManager.findLastVisibleItemPosition();
+        } else if (recyclerViewLMClass == StaggeredGridLayoutManager.class || StaggeredGridLayoutManager.class.isAssignableFrom(recyclerViewLMClass)) {
+            StaggeredGridLayoutManager staggeredGridLayoutManager = (StaggeredGridLayoutManager)getLayoutManager();
+            int[] into = staggeredGridLayoutManager.findLastVisibleItemPositions(null);
+            List<Integer> intoList = new ArrayList<>();
+            for (int i : into) {
+                intoList.add(i);
+            }
+            return Collections.max(intoList);
         }
-        super.setLayoutManager(layout);
-    }
-
-    private LinearLayoutManager getSupportLinearLayoutManager() {
-        return (LinearLayoutManager)getLayoutManager();
+        throw new AutoLoadingRecyclerViewExceptions("Unknown LayoutManager class: " + recyclerViewLMClass.toString());
     }
 
     public int getLimit() {
@@ -106,7 +124,7 @@ public class AutoLoadingRecyclerView<T> extends RecyclerView {
     @Deprecated
     @Override
     public void setAdapter(Adapter adapter) {
-        if (adapter instanceof AutoLoadingAdapter) {
+        if (adapter instanceof AutoLoadingRecyclerViewAdapter) {
             super.setAdapter(adapter);
         } else {
             throw new AutoLoadingRecyclerViewExceptions("Adapter must be implement IAutoLoadedAdapter");
@@ -116,19 +134,19 @@ public class AutoLoadingRecyclerView<T> extends RecyclerView {
     /**
      * required method
      */
-    public void setAdapter(AutoLoadingAdapter<T> autoLoadingAdapter) {
-        if (autoLoadingAdapter == null) {
+    public void setAdapter(AutoLoadingRecyclerViewAdapter<T> autoLoadingRecyclerViewAdapter) {
+        if (autoLoadingRecyclerViewAdapter == null) {
             throw new AutoLoadingRecyclerViewExceptions("Null adapter. Please initialise adapter!");
         }
-        this.autoLoadingAdapter = autoLoadingAdapter;
-        super.setAdapter(autoLoadingAdapter);
+        this.autoLoadingRecyclerViewAdapter = autoLoadingRecyclerViewAdapter;
+        super.setAdapter(autoLoadingRecyclerViewAdapter);
     }
 
-    public AutoLoadingAdapter<T> getAdapter() {
-        if (autoLoadingAdapter == null) {
+    public AutoLoadingRecyclerViewAdapter<T> getAdapter() {
+        if (autoLoadingRecyclerViewAdapter == null) {
             throw new AutoLoadingRecyclerViewExceptions("Null adapter. Please initialise adapter!");
         }
-        return autoLoadingAdapter;
+        return autoLoadingRecyclerViewAdapter;
     }
 
     public void setLoadingObservable(ILoading<T> iLoading) {
@@ -150,7 +168,7 @@ public class AutoLoadingRecyclerView<T> extends RecyclerView {
 
             @Override
             public void onError(Throwable e) {
-                Logger.error(e);
+                Log.e(TAG, "subscribeToLoadingChannel error", e);
             }
 
             @Override
@@ -160,8 +178,6 @@ public class AutoLoadingRecyclerView<T> extends RecyclerView {
             }
         };
         subscribeToLoadingChannelSubscription = scrollLoadingChannel
-                .subscribeOn(Schedulers.from(BackgroundExecutor.getSafeBackgroundExecutor()))
-                .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(toLoadingChannelSubscriber);
     }
 
@@ -174,7 +190,7 @@ public class AutoLoadingRecyclerView<T> extends RecyclerView {
 
             @Override
             public void onError(Throwable e) {
-                Logger.error(e);
+                Log.e(TAG, "loadNewItems error", e);
                 subscribeToLoadingChannel();
             }
 

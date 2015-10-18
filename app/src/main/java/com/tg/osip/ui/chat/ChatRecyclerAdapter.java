@@ -9,14 +9,14 @@ import android.widget.TextView;
 
 import com.tg.osip.R;
 import com.tg.osip.utils.time.TimeUtils;
-import com.tg.osip.utils.ui.auto_loading.AutoLoadingAdapter;
+import com.tg.osip.ui.views.auto_loading.AutoLoadingRecyclerViewAdapter;
 
 import org.drinkless.td.libcore.telegram.TdApi;
 
 /**
  * @author e.matsyuk
  */
-public class ChatRecyclerAdapter extends AutoLoadingAdapter<TdApi.Message> {
+public class ChatRecyclerAdapter extends AutoLoadingRecyclerViewAdapter<TdApi.Message> {
 
     private static final int MAIN_VIEW = 0;
     private static final int UNSUPPORTED_VIEW = 4;
