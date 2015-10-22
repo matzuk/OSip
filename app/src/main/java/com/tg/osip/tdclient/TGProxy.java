@@ -1,5 +1,8 @@
 package com.tg.osip.tdclient;
 
+import android.support.v7.widget.LinearLayoutManager;
+
+import com.tg.osip.business.UpdateManager;
 import com.tg.osip.tdclient.exceptions.TdApiClassCastException;
 import com.tg.osip.tdclient.exceptions.TdApiErrorException;
 import com.tg.osip.utils.AndroidUtils;
@@ -12,7 +15,6 @@ import org.drinkless.td.libcore.telegram.TdApi;
 
 import rx.Observable;
 import rx.Subscriber;
-import rx.functions.Func1;
 
 /**
  * Proxy-singleton with RxJava for {@link org.drinkless.td.libcore.telegram.TG TG}
@@ -42,6 +44,16 @@ public class TGProxy {
         TG.setDir(AndroidUtils.getCacheDirPath());
         TG.setUpdatesHandler(updatesHandler);
     }
+
+    private Client.ResultHandler updatesHandler = object -> {
+        Class objectClass = object.getClass();
+        if (objectClass == TdApi.Update.class || TdApi.Update.class.isAssignableFrom(objectClass)) {
+            TdApi.Update update = (TdApi.Update)object;
+            UpdateManager.getInstance().sendUpdateEvent(update);
+        } else {
+            Logger.error("Incorrect update object class. Not TdApi.Update.");
+        }
+    };
 
     public Client getClientInstance() {
         return TG.getClientInstance();
@@ -78,13 +90,5 @@ public class TGProxy {
             subscriber.onError(new TdApiClassCastException(e));
         }
     }
-
-    // temp func
-    private Client.ResultHandler updatesHandler = new Client.ResultHandler() {
-        @Override
-        public void onResult(TdApi.TLObject object) {
-//            Logger.debug(object);
-        }
-    };
 
 }

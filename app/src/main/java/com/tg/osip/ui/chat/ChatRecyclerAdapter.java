@@ -134,7 +134,7 @@ public class ChatRecyclerAdapter extends AutoLoadingRecyclerViewAdapter<TdApi.Me
 //        if (message.date == TEMP_SEND_STATE_IS_ERROR) {
 //            mainHolder.chatMessageUnreadOutbox.setVisibility(View.VISIBLE);
 //            mainHolder.chatMessageUnreadOutbox.setImageDrawable(ResourcesCompat.getDrawable(ApplicationLoader.applicationContext.getResources(), R.drawable.ic_message_error, ApplicationLoader.applicationContext.getTheme()));
-//        } else if (TGProxy.getInstance().getAccountId() == message.fromId) {
+//        } else if (TGProxy.getInstance().getUserId() == message.fromId) {
 //            if (lastChatReadOutboxId >= message.id) {
 //                mainHolder.chatMessageUnreadOutbox.setVisibility(View.GONE);
 //            } else {

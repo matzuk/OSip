@@ -29,6 +29,7 @@ import java.util.List;
 
 import rx.Observable;
 import rx.Subscriber;
+import rx.android.schedulers.AndroidSchedulers;
 
 /**
  * Fragment show list of all chats
@@ -40,6 +41,7 @@ public class MainFragment extends Fragment {
     private static final int LIMIT = 50;
 
     private AutoLoadingRecyclerView<TdApi.Chat> recyclerView;
+    private MainRecyclerAdapter mainRecyclerAdapter;
     private PreLoader preLoader;
 
     @Override
@@ -58,7 +60,7 @@ public class MainFragment extends Fragment {
         GridLayoutManager recyclerViewLayoutManager = new GridLayoutManager(getActivity(), 1);
         recyclerViewLayoutManager.supportsPredictiveItemAnimations();
         // init ChatRecyclerAdapter
-        MainRecyclerAdapter mainRecyclerAdapter = new MainRecyclerAdapter();
+        mainRecyclerAdapter = new MainRecyclerAdapter();
         mainRecyclerAdapter.setHasStableIds(true);
         // recyclerView setting
         recyclerView.setLayoutManager(recyclerViewLayoutManager);
@@ -110,10 +112,32 @@ public class MainFragment extends Fragment {
         ((AppCompatActivity)getActivity()).getSupportActionBar().show();
     }
 
+    private void loadUserData() {
+        TGProxy.getInstance().sendTD(new TdApi.GetMe(), TdApi.User.class)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Subscriber<TdApi.User>() {
+                    @Override
+                    public void onCompleted() {
+
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        Logger.error(e);
+                    }
+
+                    @Override
+                    public void onNext(TdApi.User user) {
+                        mainRecyclerAdapter.setUserId(user.id);
+                        recyclerView.startLoading();
+                    }
+                });
+    }
+
     @Override
     public void onResume() {
         super.onResume();
-        recyclerView.startLoading();
+        loadUserData();
     }
 
 }
