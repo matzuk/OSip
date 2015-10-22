@@ -11,37 +11,29 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.tg.osip.R;
-import com.tg.osip.tdclient.TGProxy;
+import com.tg.osip.business.main.MainController;
 import com.tg.osip.ui.chat.ChatFragment;
-import com.tg.osip.ui.chat.ChatRecyclerAdapter;
+import com.tg.osip.ui.general.BaseFragment;
 import com.tg.osip.ui.views.auto_loading.AutoLoadingRecyclerView;
-import com.tg.osip.ui.views.auto_loading.ILoading;
-import com.tg.osip.ui.views.auto_loading.OffsetAndLimit;
 import com.tg.osip.utils.log.Logger;
 import com.tg.osip.utils.ui.PreLoader;
 import com.tg.osip.utils.ui.RecyclerItemClickListener;
 
 import org.drinkless.td.libcore.telegram.TdApi;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
-import rx.Observable;
-import rx.Subscriber;
-import rx.android.schedulers.AndroidSchedulers;
-
 /**
  * Fragment show list of all chats
  *
  * @author e.matsyuk
  */
-public class MainFragment extends Fragment {
+public class MainFragment extends BaseFragment {
 
     private static final int LIMIT = 50;
 
     private AutoLoadingRecyclerView<TdApi.Chat> recyclerView;
     private MainRecyclerAdapter mainRecyclerAdapter;
+    private MainController mainController;
+    // temp
     private PreLoader preLoader;
 
     @Override
@@ -56,6 +48,8 @@ public class MainFragment extends Fragment {
     private void init(View view) {
         preLoader = (PreLoader) view.findViewById(R.id.pro_loader);
         recyclerView = (AutoLoadingRecyclerView) view.findViewById(R.id.RecyclerView);
+        // init Controller
+        mainController = new MainController();
         // init LayoutManager
         GridLayoutManager recyclerViewLayoutManager = new GridLayoutManager(getActivity(), 1);
         recyclerViewLayoutManager.supportsPredictiveItemAnimations();
@@ -66,30 +60,12 @@ public class MainFragment extends Fragment {
         recyclerView.setLayoutManager(recyclerViewLayoutManager);
         recyclerView.setLimit(LIMIT);
         recyclerView.setAdapter(mainRecyclerAdapter);
-        recyclerView.setLoadingObservable(loading);
+        recyclerView.setLoadingObservable(mainController.getILoading(preLoader));
         recyclerView.addOnItemTouchListener(
                 new RecyclerItemClickListener(getActivity(), (view1, position) -> goToConcreteChat(position))
         );
+        mainController.startRecyclerView(recyclerView, mainRecyclerAdapter);
     }
-
-    private ILoading<TdApi.Chat> loading = new ILoading<TdApi.Chat>() {
-        @Override
-        public Observable<List<TdApi.Chat>> getLoadingObservable(OffsetAndLimit offsetAndLimit) {
-            return TGProxy.getInstance().sendTD(new TdApi.GetChats(offsetAndLimit.getOffset(), offsetAndLimit.getLimit()), TdApi.Chats.class)
-                    .map(chats -> {
-                        TdApi.Chat chatsMas[] = chats.chats;
-                        return new ArrayList<>(Arrays.asList(chatsMas));
-                    });
-        }
-        @Override
-        public void startLoadData() {
-
-        }
-        @Override
-        public void endLoadData() {
-            preLoader.setVisibility(View.GONE);
-        }
-    };
 
     private void goToConcreteChat(int position) {
         long chatId = recyclerView.getAdapter().getItem(position).id;
@@ -108,36 +84,15 @@ public class MainFragment extends Fragment {
         Toolbar toolbar = (Toolbar) view.findViewById(R.id.toolbar);
         ((AppCompatActivity)getActivity()).setSupportActionBar(toolbar);
         toolbar.setTitle(getResources().getString(R.string.chat_list_toolbar_title));
-        ((AppCompatActivity)getActivity()).getSupportActionBar().setDisplayShowHomeEnabled(true);
-        ((AppCompatActivity)getActivity()).getSupportActionBar().show();
-    }
-
-    private void loadUserData() {
-        TGProxy.getInstance().sendTD(new TdApi.GetMe(), TdApi.User.class)
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Subscriber<TdApi.User>() {
-                    @Override
-                    public void onCompleted() {
-
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                        Logger.error(e);
-                    }
-
-                    @Override
-                    public void onNext(TdApi.User user) {
-                        mainRecyclerAdapter.setUserId(user.id);
-                        recyclerView.startLoading();
-                    }
-                });
+        getSupportActivity().getSupportActionBar().setDisplayShowHomeEnabled(true);
+        getSupportActivity().getSupportActionBar().show();
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        loadUserData();
+        Logger.debug("start loading List");
+        mainController.startRecyclerView(recyclerView, mainRecyclerAdapter);
     }
 
 }
