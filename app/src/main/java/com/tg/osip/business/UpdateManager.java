@@ -1,5 +1,7 @@
 package com.tg.osip.business;
 
+import com.tg.osip.utils.log.Logger;
+
 import org.drinkless.td.libcore.telegram.TdApi;
 
 import rx.subjects.PublishSubject;

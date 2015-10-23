@@ -10,14 +10,19 @@ import android.widget.TextView;
 
 import com.tg.osip.ApplicationSIP;
 import com.tg.osip.R;
+import com.tg.osip.tdclient.TGProxy;
+import com.tg.osip.tdclient.models.MainListItem;
 import com.tg.osip.ui.views.auto_loading.AutoLoadingRecyclerViewAdapter;
+import com.tg.osip.utils.log.Logger;
 
 import org.drinkless.td.libcore.telegram.TdApi;
+
+import rx.functions.Action1;
 
 /**
  * @author e.matsyuk
  */
-public class MainRecyclerAdapter extends AutoLoadingRecyclerViewAdapter<TdApi.Chat>  {
+public class MainRecyclerAdapter extends AutoLoadingRecyclerViewAdapter<MainListItem>  {
 
     private static final int TEMP_SEND_STATE_IS_ERROR = 0;
     private static final int TEMP_SEND_STATE_IS_SENDING = 1000000000;
@@ -54,13 +59,13 @@ public class MainRecyclerAdapter extends AutoLoadingRecyclerViewAdapter<TdApi.Ch
 
     @Override
     public long getItemId(int position) {
-        return getItem(position).id;
+        return getItem(position).getApiChat().id;
     }
 
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
         ViewHolder mainHolder = (ViewHolder) holder;
-        TdApi.Chat concreteChat = getItem(position);
+        TdApi.Chat concreteChat = getItem(position).getApiChat();
         if (concreteChat == null) {
             return;
         }
@@ -86,8 +91,7 @@ public class MainRecyclerAdapter extends AutoLoadingRecyclerViewAdapter<TdApi.Ch
             }
 
             // very heavy operation for list
-//            String dataString = TimeUtils.stringForMessageListDate(message.date);
-            String dataString = "";
+            String dataString = getItem(position).getLastMessageDate();
             mainHolder.chatMessageSendingTime.setText(dataString);
             // get message content and set last message
             mainHolder.chatUserLastMessage.setText(textYou + " " + getChatLastMessage(message));
@@ -98,6 +102,20 @@ public class MainRecyclerAdapter extends AutoLoadingRecyclerViewAdapter<TdApi.Ch
             //  Set name
             mainHolder.chatUserName.setText(getName(chatInfo));
             // Set avatar
+
+
+
+//            if (chatInfo instanceof TdApi.PrivateChatInfo) {
+//                TdApi.PrivateChatInfo pr = ((TdApi.PrivateChatInfo) chatInfo);
+//                TGProxy.getInstance().sendTD(new TdApi.DownloadFile(1), TdApi.UpdateFile.class)
+//                        .subscribe(new Action1<TdApi.UpdateFile>() {
+//                            @Override
+//                            public void call(TdApi.UpdateFile updateFile) {
+//                                Logger.debug(updateFile);
+//                            }
+//                        });
+//            }
+
 //            TDLibUtils.setLetterDrawable(holder.avatar, chatInfo);
 //            if (PicassoProxy.getInstance().containInCache(chatInfo)) {
 //                Picasso.with(

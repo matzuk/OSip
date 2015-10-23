@@ -198,6 +198,7 @@ public class AutoLoadingRecyclerView<T> extends RecyclerView {
 
             @Override
             public void onNext(List<T> ts) {
+                Logger.debug("Loaded new data portion");
                 iLoading.endLoadData();
                 if (ts.size() > 0) {
                     getAdapter().addNewItems(ts);

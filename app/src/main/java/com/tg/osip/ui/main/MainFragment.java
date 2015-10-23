@@ -12,6 +12,7 @@ import android.view.ViewGroup;
 
 import com.tg.osip.R;
 import com.tg.osip.business.main.MainController;
+import com.tg.osip.tdclient.models.MainListItem;
 import com.tg.osip.ui.chat.ChatFragment;
 import com.tg.osip.ui.general.BaseFragment;
 import com.tg.osip.ui.views.auto_loading.AutoLoadingRecyclerView;
@@ -30,7 +31,7 @@ public class MainFragment extends BaseFragment {
 
     private static final int LIMIT = 50;
 
-    private AutoLoadingRecyclerView<TdApi.Chat> recyclerView;
+    private AutoLoadingRecyclerView<MainListItem> recyclerView;
     private MainRecyclerAdapter mainRecyclerAdapter;
     private MainController mainController;
     // temp
@@ -64,11 +65,10 @@ public class MainFragment extends BaseFragment {
         recyclerView.addOnItemTouchListener(
                 new RecyclerItemClickListener(getActivity(), (view1, position) -> goToConcreteChat(position))
         );
-        mainController.startRecyclerView(recyclerView, mainRecyclerAdapter);
     }
 
     private void goToConcreteChat(int position) {
-        long chatId = recyclerView.getAdapter().getItem(position).id;
+        long chatId = recyclerView.getAdapter().getItem(position).getApiChat().id;
         ChatFragment chatFragment = ChatFragment.newInstance(chatId);
         startFragment(chatFragment);
     }
