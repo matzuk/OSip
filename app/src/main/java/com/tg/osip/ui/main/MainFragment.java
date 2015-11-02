@@ -11,16 +11,15 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.tg.osip.R;
+import com.tg.osip.business.FileDownloaderManager;
 import com.tg.osip.business.main.MainController;
 import com.tg.osip.tdclient.models.MainListItem;
 import com.tg.osip.ui.chat.ChatFragment;
 import com.tg.osip.ui.general.BaseFragment;
-import com.tg.osip.ui.views.auto_loading.AutoLoadingRecyclerView;
+import com.tg.osip.utils.ui.auto_loading.AutoLoadingRecyclerView;
 import com.tg.osip.utils.log.Logger;
 import com.tg.osip.utils.ui.PreLoader;
 import com.tg.osip.utils.ui.RecyclerItemClickListener;
-
-import org.drinkless.td.libcore.telegram.TdApi;
 
 /**
  * Fragment show list of all chats
@@ -65,6 +64,8 @@ public class MainFragment extends BaseFragment {
         recyclerView.addOnItemTouchListener(
                 new RecyclerItemClickListener(getActivity(), (view1, position) -> goToConcreteChat(position))
         );
+        // start FileDownloaderManager
+        FileDownloaderManager.getInstance().subscribeToUpdateChannel();
     }
 
     private void goToConcreteChat(int position) {

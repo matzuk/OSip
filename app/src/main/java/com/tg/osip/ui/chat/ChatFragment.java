@@ -11,10 +11,10 @@ import android.view.ViewGroup;
 
 import com.tg.osip.R;
 import com.tg.osip.tdclient.TGProxy;
-import com.tg.osip.ui.views.auto_loading.ILoading;
-import com.tg.osip.ui.views.auto_loading.OffsetAndLimit;
+import com.tg.osip.utils.ui.auto_loading.ILoading;
+import com.tg.osip.utils.ui.auto_loading.OffsetAndLimit;
 import com.tg.osip.utils.log.Logger;
-import com.tg.osip.ui.views.auto_loading.AutoLoadingRecyclerView;
+import com.tg.osip.utils.ui.auto_loading.AutoLoadingRecyclerView;
 import com.tg.osip.utils.ui.PreLoader;
 
 import org.drinkless.td.libcore.telegram.TdApi;

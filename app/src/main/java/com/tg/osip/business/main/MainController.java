@@ -5,9 +5,10 @@ import android.view.View;
 import com.tg.osip.tdclient.TGProxy;
 import com.tg.osip.tdclient.models.MainListItem;
 import com.tg.osip.ui.main.MainRecyclerAdapter;
-import com.tg.osip.ui.views.auto_loading.AutoLoadingRecyclerView;
-import com.tg.osip.ui.views.auto_loading.ILoading;
-import com.tg.osip.ui.views.auto_loading.OffsetAndLimit;
+import com.tg.osip.utils.ui.auto_loading.AutoLoadingRecyclerView;
+import com.tg.osip.utils.ui.auto_loading.ILoading;
+import com.tg.osip.utils.ui.auto_loading.OffsetAndLimit;
+import com.tg.osip.utils.BackgroundExecutor;
 import com.tg.osip.utils.log.Logger;
 import com.tg.osip.utils.time.TimeUtils;
 import com.tg.osip.utils.ui.PreLoader;
@@ -21,8 +22,7 @@ import java.util.List;
 import rx.Observable;
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
-import rx.functions.Func1;
-import rx.functions.Func2;
+import rx.schedulers.Schedulers;
 
 /**
  * Controller for Main screen (MainFragment)
@@ -30,6 +30,8 @@ import rx.functions.Func2;
  * @author e.matsyuk
  */
 public class MainController {
+
+    private final static int EMPTY_FILE_ID = 0;
 
     // temp argument - preLoader, later to move in RecyclerView
     public ILoading<MainListItem> getILoading(PreLoader preLoader) {
@@ -45,10 +47,10 @@ public class MainController {
                         .map(chat -> {
                             MainListItem mainListItem = new MainListItem(chat);
                             mainListItem.setLastMessageDate(TimeUtils.stringForMessageListDate(chat.topMessage.date));
-//                            mainListItem.setLastMessageDate(String.valueOf(chat.topMessage.date));
                             return mainListItem;
                         })
-                        .toList();
+                        .toList()
+                        .doOnNext(MainController.this::startFileDownloading);
             }
             @Override
             public void startLoadData() {
@@ -57,8 +59,28 @@ public class MainController {
             @Override
             public void endLoadData() {
                 preLoader.setVisibility(View.GONE);
+
             }
         };
+    }
+
+    public void startFileDownloading(List<MainListItem> mainListItems) {
+        Observable.from(mainListItems)
+                .subscribeOn(Schedulers.from(BackgroundExecutor.getSafeBackgroundExecutor()))
+                .map(mainListItem -> getFileId(mainListItem.getApiChat().type))
+                .filter(integer -> integer != EMPTY_FILE_ID)
+                .concatMap(integer -> TGProxy.getInstance().sendTD(new TdApi.DownloadFile(integer), TdApi.Ok.class))
+                .subscribe();
+    }
+
+    private Integer getFileId(TdApi.ChatInfo chatInfo) {
+        if (chatInfo instanceof TdApi.GroupChatInfo) {
+            return ((TdApi.GroupChatInfo)chatInfo).groupChat.photo.small.id;
+        } else if (chatInfo instanceof TdApi.PrivateChatInfo) {
+            return ((TdApi.PrivateChatInfo)chatInfo).user.profilePhoto.small.id;
+        } else {
+            return EMPTY_FILE_ID;
+        }
     }
 
     public <T> void startRecyclerView(AutoLoadingRecyclerView<T> autoLoadingRecyclerView, MainRecyclerAdapter mainRecyclerAdapter) {

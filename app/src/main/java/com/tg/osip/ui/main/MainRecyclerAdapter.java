@@ -10,14 +10,11 @@ import android.widget.TextView;
 
 import com.tg.osip.ApplicationSIP;
 import com.tg.osip.R;
-import com.tg.osip.tdclient.TGProxy;
 import com.tg.osip.tdclient.models.MainListItem;
-import com.tg.osip.ui.views.auto_loading.AutoLoadingRecyclerViewAdapter;
-import com.tg.osip.utils.log.Logger;
+import com.tg.osip.utils.ui.SIPAvatar;
+import com.tg.osip.utils.ui.auto_loading.AutoLoadingRecyclerViewAdapter;
 
 import org.drinkless.td.libcore.telegram.TdApi;
-
-import rx.functions.Action1;
 
 /**
  * @author e.matsyuk
@@ -31,7 +28,7 @@ public class MainRecyclerAdapter extends AutoLoadingRecyclerViewAdapter<MainList
 
     static class ViewHolder extends RecyclerView.ViewHolder {
 
-        ImageView avatar;
+        SIPAvatar avatar;
         TextView chatUserName;
         ImageView chatGroupIcon;
         TextView chatUserLastMessage;
@@ -41,7 +38,7 @@ public class MainRecyclerAdapter extends AutoLoadingRecyclerViewAdapter<MainList
 
         public ViewHolder(View itemView) {
             super(itemView);
-            avatar = (ImageView) itemView.findViewById(R.id.avatar);
+            avatar = (SIPAvatar) itemView.findViewById(R.id.avatar);
             chatUserName = (TextView) itemView.findViewById(R.id.chat_user_name);
             chatGroupIcon = (ImageView) itemView.findViewById(R.id.chat_group_icon);
             chatUserLastMessage = (TextView) itemView.findViewById(R.id.chat_user_last_message);
@@ -102,32 +99,7 @@ public class MainRecyclerAdapter extends AutoLoadingRecyclerViewAdapter<MainList
             //  Set name
             mainHolder.chatUserName.setText(getName(chatInfo));
             // Set avatar
-
-
-
-//            if (chatInfo instanceof TdApi.PrivateChatInfo) {
-//                TdApi.PrivateChatInfo pr = ((TdApi.PrivateChatInfo) chatInfo);
-//                TGProxy.getInstance().sendTD(new TdApi.DownloadFile(1), TdApi.UpdateFile.class)
-//                        .subscribe(new Action1<TdApi.UpdateFile>() {
-//                            @Override
-//                            public void call(TdApi.UpdateFile updateFile) {
-//                                Logger.debug(updateFile);
-//                            }
-//                        });
-//            }
-
-//            TDLibUtils.setLetterDrawable(holder.avatar, chatInfo);
-//            if (PicassoProxy.getInstance().containInCache(chatInfo)) {
-//                Picasso.with(
-//                        ApplicationLoader.applicationContext).
-//                        load(PicassoProxy.getInstance().getFilePath(chatInfo)).
-//                        placeholder(holder.avatar.getDrawable()).
-//                        transform(new CirclePicassoTransformation()).
-//                        into(holder.avatar
-//                        );
-//            } else {
-//                PicassoProxy.getInstance().downloadFile(chatInfo);
-//            }
+            mainHolder.avatar.setChatInfo(chatInfo);
         }
         // is chat group?
         mainHolder.chatGroupIcon.setVisibility(isChatGroup(concreteChat.type)? View.VISIBLE : View.GONE);

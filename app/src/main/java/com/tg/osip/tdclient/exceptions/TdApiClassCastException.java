@@ -9,6 +9,10 @@ import org.drinkless.td.libcore.telegram.TdApi;
  */
 public class TdApiClassCastException extends RuntimeException {
 
+    public TdApiClassCastException(String message) {
+        super(message);
+    }
+
     public TdApiClassCastException(ClassCastException classCastException) {
         super("TdApiClassCastException{" + "message = " + classCastException.getMessage() + '}');
     }

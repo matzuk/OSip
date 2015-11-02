@@ -16,7 +16,7 @@
         android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
         app:popupTheme="@style/ThemeOverlay.AppCompat.Light" />
 
-    <com.tg.osip.ui.views.auto_loading.AutoLoadingRecyclerView
+    <com.tg.osip.utils.ui.auto_loading.AutoLoadingRecyclerView
         android:id="@+id/RecyclerView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
