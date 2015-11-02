@@ -16,6 +16,7 @@ import com.tg.osip.R;
 import com.tg.osip.business.FileDownloaderManager;
 import com.tg.osip.business.UpdateManager;
 import com.tg.osip.tdclient.TGProxy;
+import com.tg.osip.tdclient.models.MainListItem;
 import com.tg.osip.utils.BackgroundExecutor;
 import com.tg.osip.utils.log.Logger;
 import com.tg.osip.utils.ui.CirclePicassoTransformation;
@@ -39,7 +40,6 @@ import rx.schedulers.Schedulers;
  */
 public class SIPAvatar extends ImageView {
 
-    private final static int EMPTY_FILE_ID = 0;
     private final static String ADD_TO_PATH = "file://";
 
     private int fileId;
@@ -57,21 +57,15 @@ public class SIPAvatar extends ImageView {
         super(context, attrs, defStyleAttr);
     }
 
-    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
-    public SIPAvatar(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
-        super(context, attrs, defStyleAttr, defStyleRes);
+    public void setMainListItem(MainListItem mainListItem) {
+        startImageLoading(mainListItem);
     }
 
-    public void setChatInfo(TdApi.ChatInfo chatInfo) {
-        startImageLoading(chatInfo);
-    }
-
-    private void startImageLoading(TdApi.ChatInfo chatInfo) {
+    private void startImageLoading(MainListItem mainListItem) {
         unSubscribe();
-        String filePath = getFilePath(chatInfo);
-        if (filePath.equals(FileDownloaderManager.FILE_PATH_EMPTY)) {
-            setFileId(chatInfo);
-            setLetterDrawable(this, chatInfo);
+        if (!mainListItem.isSmallPhotoFilePathValid()) {
+            fileId = mainListItem.getSmallPhotoFileId();
+            setLetterDrawable(this, mainListItem);
             String filePathFromCache = FileDownloaderManager.getInstance().getFilePath(fileId);
             if (filePathFromCache.equals(FileDownloaderManager.FILE_PATH_EMPTY)) {
                 subscribeToUpdateChannel();
@@ -79,28 +73,29 @@ public class SIPAvatar extends ImageView {
                 setFileToView(filePathFromCache);
             }
         } else {
-            setFileToView(filePath);
+            setFileToView(mainListItem.getSmallPhotoFilePath());
         }
     }
 
-    private void setLetterDrawable(ImageView imageView, TdApi.ChatInfo chatInfo) {
-        LetterDrawable letterDrawable = getLetterDrawable(imageView, chatInfo);
+    private void setLetterDrawable(ImageView imageView, MainListItem mainListItem) {
+        LetterDrawable letterDrawable = getLetterDrawable(imageView, mainListItem);
         imageView.setImageDrawable(letterDrawable);
     }
 
-    private LetterDrawable getLetterDrawable(ImageView imageView, TdApi.ChatInfo chatInfo) {
+    private LetterDrawable getLetterDrawable(ImageView imageView, MainListItem mainListItem) {
         int id = 0;
         String firstName = null;
         String lastName = null;
 
-        if (chatInfo instanceof TdApi.GroupChatInfo) {
-            id = ((TdApi.GroupChatInfo)chatInfo).groupChat.id;
-            firstName = ((TdApi.GroupChatInfo)chatInfo).groupChat.title;
-        }
-        if (chatInfo instanceof TdApi.PrivateChatInfo) {
-            id = ((TdApi.PrivateChatInfo)chatInfo).user.id;
-            firstName = ((TdApi.PrivateChatInfo)chatInfo).user.firstName;
-            lastName = ((TdApi.PrivateChatInfo)chatInfo).user.lastName;
+        if (mainListItem.isGroupChat()) {
+            TdApi.GroupChatInfo groupChatInfo = ((TdApi.GroupChatInfo)mainListItem.getApiChat().type);
+            id = groupChatInfo.groupChat.id;
+            firstName = groupChatInfo.groupChat.title;
+        } else {
+            TdApi.PrivateChatInfo privateChatInfo = ((TdApi.PrivateChatInfo)mainListItem.getApiChat().type);
+            id = privateChatInfo.user.id;
+            firstName = privateChatInfo.user.firstName;
+            lastName = privateChatInfo.user.lastName;
         }
         // setImageDrawable for not null Rect rect!
         if (imageView.getDrawable() == null) {
@@ -108,19 +103,6 @@ public class SIPAvatar extends ImageView {
         }
         Rect rect = imageView.getDrawable().getBounds();
         return new LetterDrawable(rect, id, firstName, lastName);
-    }
-
-    private String getFilePath(TdApi.ChatInfo chatInfo) {
-        String filePath = "";
-        if (chatInfo instanceof TdApi.GroupChatInfo) {
-            filePath = ((TdApi.GroupChatInfo)chatInfo).groupChat.photo.small.path;
-        } else if (chatInfo instanceof TdApi.PrivateChatInfo) {
-            filePath = ((TdApi.PrivateChatInfo)chatInfo).user.profilePhoto.small.path;
-        }
-        if (!TextUtils.isEmpty(filePath)) {
-            return ADD_TO_PATH + filePath;
-        }
-        return FileDownloaderManager.FILE_PATH_EMPTY;
     }
 
     private void setFileToView(String fileToPath) {
@@ -131,23 +113,6 @@ public class SIPAvatar extends ImageView {
                 transform(new CirclePicassoTransformation()).
                 into(this
                 );
-    }
-
-    private void setFileId(TdApi.ChatInfo chatInfo) {
-        if (chatInfo instanceof TdApi.GroupChatInfo) {
-            fileId = ((TdApi.GroupChatInfo)chatInfo).groupChat.photo.small.id;
-        } else if (chatInfo instanceof TdApi.PrivateChatInfo) {
-            fileId = ((TdApi.PrivateChatInfo)chatInfo).user.profilePhoto.small.id;
-        } else {
-            fileId = EMPTY_FILE_ID;
-        }
-    }
-
-    private void downloadFile() {
-        if (fileId > EMPTY_FILE_ID) {
-            TGProxy.getInstance().sendTD(new TdApi.DownloadFile(fileId), TdApi.Ok.class)
-                    .subscribe();
-        }
     }
 
     private void subscribeToUpdateChannel() {

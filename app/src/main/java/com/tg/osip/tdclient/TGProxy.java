@@ -71,7 +71,7 @@ public class TGProxy {
 
     private <T> void resultHandling(Subscriber<? super T> subscriber, TdApi.TLObject object, Class<T> clazz) {
         if (subscriber != null && !subscriber.isUnsubscribed()) {
-            if (object instanceof TdApi.Error) {
+            if (object.getClass() == TdApi.Error.class) {
                 TdApi.Error error = (TdApi.Error)object;
                 subscriber.onError(new TdApiErrorException(error));
             } else {

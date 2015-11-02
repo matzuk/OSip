@@ -69,4 +69,8 @@ public class FileDownloaderManager {
         return FILE_PATH_EMPTY;
     }
 
+    public boolean isFileInCache(int fileId) {
+        return !getFilePath(fileId).equals(FILE_PATH_EMPTY);
+    }
+
 }

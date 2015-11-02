@@ -1,5 +1,12 @@
 package com.tg.osip.tdclient.models;
 
+import android.text.TextUtils;
+
+import com.tg.osip.ApplicationSIP;
+import com.tg.osip.R;
+import com.tg.osip.business.FileDownloaderManager;
+import com.tg.osip.utils.time.TimeUtils;
+
 import org.drinkless.td.libcore.telegram.TdApi;
 
 /**
@@ -9,11 +16,30 @@ import org.drinkless.td.libcore.telegram.TdApi;
  */
 public class MainListItem {
 
+    private final static int EMPTY_FILE_ID = 0;
+    private final static String ADD_TO_PATH = "file://";
+    private final static String FILE_PATH_EMPTY = "";
+
     private TdApi.Chat apiChat;
     private String lastMessageDate;
+    private String lastMessageText;
+    private String userName;
+    private boolean groupChat;
+    private int smallPhotoFileId;
+    private String smallPhotoFilePath;
 
     public MainListItem(TdApi.Chat apiChat) {
         this.apiChat = apiChat;
+        init(apiChat);
+    }
+
+    private void init(TdApi.Chat chat) {
+        groupChat = determineIsChatGroupType(chat.type);
+        lastMessageDate = TimeUtils.stringForMessageListDate(chat.topMessage.date);
+        lastMessageText = getChatLastMessage(chat.topMessage);
+        userName = getName(chat.type);
+        smallPhotoFileId = getFileId(chat.type);
+        smallPhotoFilePath = getFilePath(chat.type);
     }
 
     public TdApi.Chat getApiChat() {
@@ -24,7 +50,91 @@ public class MainListItem {
         return lastMessageDate;
     }
 
-    public void setLastMessageDate(String lastMessageDate) {
-        this.lastMessageDate = lastMessageDate;
+    public String getLastMessageText() {
+        return lastMessageText;
     }
+
+    public String getUserName() {
+        return userName;
+    }
+
+    public boolean isGroupChat() {
+        return groupChat;
+    }
+
+    public int getSmallPhotoFileId() {
+        return smallPhotoFileId;
+    }
+
+    public boolean isSmallPhotoFileIdValid() {
+        return smallPhotoFileId != EMPTY_FILE_ID;
+    }
+
+    public String getSmallPhotoFilePath() {
+        return smallPhotoFilePath;
+    }
+
+    public boolean isSmallPhotoFilePathValid() {
+        return !smallPhotoFilePath.equals(FILE_PATH_EMPTY);
+    }
+
+    private String getChatLastMessage(TdApi.Message message) {
+        TdApi.MessageContent messageContent = message.message;
+        if (messageContent == null) {
+            return "";
+        }
+        if (messageContent.getClass() == TdApi.MessageText.class) {
+            return ((TdApi.MessageText)messageContent).text;
+        }
+        if (messageContent.getClass() == TdApi.MessageAudio.class) {
+            return ApplicationSIP.applicationContext.getResources().getString(R.string.chat_list_message_type_audio);
+        }
+        if (messageContent.getClass() == TdApi.MessageVideo.class) {
+            return ApplicationSIP.applicationContext.getResources().getString(R.string.chat_list_message_type_video);
+        }
+        if (messageContent.getClass() == TdApi.MessagePhoto.class) {
+            return ApplicationSIP.applicationContext.getResources().getString(R.string.chat_list_message_type_photo);
+        }
+        if (messageContent.getClass() == TdApi.MessageSticker.class) {
+            return ApplicationSIP.applicationContext.getResources().getString(R.string.chat_list_message_type_sticker);
+        }
+        return ApplicationSIP.applicationContext.getResources().getString(R.string.chat_list_message_type_other);
+    }
+
+    private String getName(TdApi.ChatInfo chatInfo) {
+        if (groupChat) {
+            return ((TdApi.GroupChatInfo)chatInfo).groupChat.title;
+        } else {
+            return ((TdApi.PrivateChatInfo)chatInfo).user.firstName + " " + ((TdApi.PrivateChatInfo)chatInfo).user.lastName;
+        }
+    }
+
+    private boolean determineIsChatGroupType(TdApi.ChatInfo chatInfo) {
+        if (chatInfo instanceof TdApi.GroupChatInfo) {
+            return true;
+        }
+        return false;
+    }
+
+    private Integer getFileId(TdApi.ChatInfo chatInfo) {
+        if (groupChat) {
+            return ((TdApi.GroupChatInfo)chatInfo).groupChat.photo.small.id;
+        } else {
+            return ((TdApi.PrivateChatInfo)chatInfo).user.profilePhoto.small.id;
+        }
+    }
+    private String getFilePath(TdApi.ChatInfo chatInfo) {
+        String filePath = "";
+        if (groupChat) {
+            filePath = ((TdApi.GroupChatInfo)chatInfo).groupChat.photo.small.path;
+        } else {
+            filePath = ((TdApi.PrivateChatInfo)chatInfo).user.profilePhoto.small.path;
+        }
+        if (!TextUtils.isEmpty(filePath)) {
+            return ADD_TO_PATH + filePath;
+        }
+        return FILE_PATH_EMPTY;
+    }
+
+
 }

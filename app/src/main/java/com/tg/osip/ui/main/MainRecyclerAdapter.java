@@ -62,7 +62,8 @@ public class MainRecyclerAdapter extends AutoLoadingRecyclerViewAdapter<MainList
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
         ViewHolder mainHolder = (ViewHolder) holder;
-        TdApi.Chat concreteChat = getItem(position).getApiChat();
+        MainListItem mainListItem = getItem(position);
+        TdApi.Chat concreteChat = mainListItem.getApiChat();
         if (concreteChat == null) {
             return;
         }
@@ -91,18 +92,18 @@ public class MainRecyclerAdapter extends AutoLoadingRecyclerViewAdapter<MainList
             String dataString = getItem(position).getLastMessageDate();
             mainHolder.chatMessageSendingTime.setText(dataString);
             // get message content and set last message
-            mainHolder.chatUserLastMessage.setText(textYou + " " + getChatLastMessage(message));
+            mainHolder.chatUserLastMessage.setText(textYou + " " + mainListItem.getLastMessageText());
         }
         // get ChatInfo
         TdApi.ChatInfo chatInfo = concreteChat.type;
         if (chatInfo != null) {
             //  Set name
-            mainHolder.chatUserName.setText(getName(chatInfo));
+            mainHolder.chatUserName.setText(mainListItem.getUserName());
             // Set avatar
-            mainHolder.avatar.setChatInfo(chatInfo);
+            mainHolder.avatar.setMainListItem(mainListItem);
         }
         // is chat group?
-        mainHolder.chatGroupIcon.setVisibility(isChatGroup(concreteChat.type)? View.VISIBLE : View.GONE);
+        mainHolder.chatGroupIcon.setVisibility(mainListItem.isGroupChat()? View.VISIBLE : View.GONE);
         // set unread outbox image
         if (getUserId() == concreteChat.topMessage.fromId) {
             if (concreteChat.lastReadOutboxMessageId >= concreteChat.topMessage.id) {
@@ -115,47 +116,6 @@ public class MainRecyclerAdapter extends AutoLoadingRecyclerViewAdapter<MainList
             mainHolder.chatUnreadOutboxMessage.setVisibility(View.GONE);
         }
 
-    }
-
-    // FIXME: add another message types
-    private String getChatLastMessage(TdApi.Message message) {
-        TdApi.MessageContent messageContent = message.message;
-        if (messageContent == null) {
-            return "";
-        }
-        if (messageContent instanceof TdApi.MessageText) {
-            return ((TdApi.MessageText)messageContent).text;
-        }
-        if (messageContent instanceof TdApi.MessageAudio) {
-            return ApplicationSIP.applicationContext.getResources().getString(R.string.chat_list_message_type_audio);
-        }
-        if (messageContent instanceof TdApi.MessageVideo) {
-            return ApplicationSIP.applicationContext.getResources().getString(R.string.chat_list_message_type_video);
-        }
-        if (messageContent instanceof TdApi.MessagePhoto) {
-            return ApplicationSIP.applicationContext.getResources().getString(R.string.chat_list_message_type_photo);
-        }
-        if (messageContent instanceof TdApi.MessageSticker) {
-            return ApplicationSIP.applicationContext.getResources().getString(R.string.chat_list_message_type_sticker);
-        }
-        return ApplicationSIP.applicationContext.getResources().getString(R.string.chat_list_message_type_other);
-    }
-
-    private String getName(TdApi.ChatInfo chatInfo) {
-        if (chatInfo instanceof TdApi.GroupChatInfo) {
-            return ((TdApi.GroupChatInfo)chatInfo).groupChat.title;
-        }
-        if (chatInfo instanceof TdApi.PrivateChatInfo) {
-            return ((TdApi.PrivateChatInfo)chatInfo).user.firstName + " " + ((TdApi.PrivateChatInfo)chatInfo).user.lastName;
-        }
-        return "";
-    }
-
-    private boolean isChatGroup(TdApi.ChatInfo chatInfo) {
-        if (chatInfo instanceof TdApi.GroupChatInfo) {
-            return true;
-        }
-        return false;
     }
 
     private void setSendStateMessage(TdApi.Chat chat, ImageView imageView) {

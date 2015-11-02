@@ -32,8 +32,6 @@ import rx.schedulers.Schedulers;
  */
 public class MainController {
 
-    private final static int EMPTY_FILE_ID = 0;
-
     // temp argument - preLoader, later to move in RecyclerView
     public ILoading<MainListItem> getILoading(PreLoader preLoader) {
         return new ILoading<MainListItem>() {
@@ -45,11 +43,7 @@ public class MainController {
                             return new ArrayList<>(Arrays.asList(chatsMas));
                         })
                         .concatMap(Observable::from)
-                        .map(chat -> {
-                            MainListItem mainListItem = new MainListItem(chat);
-                            mainListItem.setLastMessageDate(TimeUtils.stringForMessageListDate(chat.topMessage.date));
-                            return mainListItem;
-                        })
+                        .map(MainListItem::new)
                         .toList()
                         .doOnNext(MainController.this::startFileDownloading);
             }
@@ -68,20 +62,9 @@ public class MainController {
     public void startFileDownloading(List<MainListItem> mainListItems) {
         Observable.from(mainListItems)
                 .subscribeOn(Schedulers.from(BackgroundExecutor.getSafeBackgroundExecutor()))
-                .map(mainListItem -> getFileId(mainListItem.getApiChat().type))
-                .filter(integer -> (integer != EMPTY_FILE_ID) && (FileDownloaderManager.getInstance().getFilePath(integer).equals(FileDownloaderManager.FILE_PATH_EMPTY)))
-                .concatMap(integer -> TGProxy.getInstance().sendTD(new TdApi.DownloadFile(integer), TdApi.Ok.class))
+                .filter(mainListItem -> mainListItem.isSmallPhotoFileIdValid() && !FileDownloaderManager.getInstance().isFileInCache(mainListItem.getSmallPhotoFileId()))
+                .concatMap(mainListItem -> TGProxy.getInstance().sendTD(new TdApi.DownloadFile(mainListItem.getSmallPhotoFileId()), TdApi.Ok.class))
                 .subscribe();
-    }
-
-    private Integer getFileId(TdApi.ChatInfo chatInfo) {
-        if (chatInfo instanceof TdApi.GroupChatInfo) {
-            return ((TdApi.GroupChatInfo)chatInfo).groupChat.photo.small.id;
-        } else if (chatInfo instanceof TdApi.PrivateChatInfo) {
-            return ((TdApi.PrivateChatInfo)chatInfo).user.profilePhoto.small.id;
-        } else {
-            return EMPTY_FILE_ID;
-        }
     }
 
     public <T> void startRecyclerView(AutoLoadingRecyclerView<T> autoLoadingRecyclerView, MainRecyclerAdapter mainRecyclerAdapter) {
