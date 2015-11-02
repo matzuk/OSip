@@ -39,7 +39,6 @@ import rx.schedulers.Schedulers;
  */
 public class SIPAvatar extends ImageView {
 
-    private final static String FILE_PATH_EMPTY = "";
     private final static int EMPTY_FILE_ID = 0;
     private final static String ADD_TO_PATH = "file://";
 
@@ -70,11 +69,11 @@ public class SIPAvatar extends ImageView {
     private void startImageLoading(TdApi.ChatInfo chatInfo) {
         unSubscribe();
         String filePath = getFilePath(chatInfo);
-        if (filePath.equals(FILE_PATH_EMPTY)) {
+        if (filePath.equals(FileDownloaderManager.FILE_PATH_EMPTY)) {
             setFileId(chatInfo);
             setLetterDrawable(this, chatInfo);
             String filePathFromCache = FileDownloaderManager.getInstance().getFilePath(fileId);
-            if (filePathFromCache.equals(FILE_PATH_EMPTY)) {
+            if (filePathFromCache.equals(FileDownloaderManager.FILE_PATH_EMPTY)) {
                 subscribeToUpdateChannel();
             } else {
                 setFileToView(filePathFromCache);
@@ -121,7 +120,7 @@ public class SIPAvatar extends ImageView {
         if (!TextUtils.isEmpty(filePath)) {
             return ADD_TO_PATH + filePath;
         }
-        return FILE_PATH_EMPTY;
+        return FileDownloaderManager.FILE_PATH_EMPTY;
     }
 
     private void setFileToView(String fileToPath) {

@@ -19,6 +19,7 @@ import rx.subjects.PublishSubject;
 public class FileDownloaderManager {
 
     private final static String ADD_TO_PATH = "file://";
+    public final static String FILE_PATH_EMPTY = "";
 
     private static volatile FileDownloaderManager instance;
 
@@ -65,7 +66,7 @@ public class FileDownloaderManager {
         if (file != null) {
             return ADD_TO_PATH + file.path;
         }
-        return "";
+        return FILE_PATH_EMPTY;
     }
 
 }

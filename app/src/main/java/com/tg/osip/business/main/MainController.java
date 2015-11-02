@@ -2,6 +2,7 @@ package com.tg.osip.business.main;
 
 import android.view.View;
 
+import com.tg.osip.business.FileDownloaderManager;
 import com.tg.osip.tdclient.TGProxy;
 import com.tg.osip.tdclient.models.MainListItem;
 import com.tg.osip.ui.main.MainRecyclerAdapter;
@@ -68,7 +69,7 @@ public class MainController {
         Observable.from(mainListItems)
                 .subscribeOn(Schedulers.from(BackgroundExecutor.getSafeBackgroundExecutor()))
                 .map(mainListItem -> getFileId(mainListItem.getApiChat().type))
-                .filter(integer -> integer != EMPTY_FILE_ID)
+                .filter(integer -> (integer != EMPTY_FILE_ID) && (FileDownloaderManager.getInstance().getFilePath(integer).equals(FileDownloaderManager.FILE_PATH_EMPTY)))
                 .concatMap(integer -> TGProxy.getInstance().sendTD(new TdApi.DownloadFile(integer), TdApi.Ok.class))
                 .subscribe();
     }
