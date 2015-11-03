@@ -62,7 +62,7 @@ public class MainController {
     public void startFileDownloading(List<MainListItem> mainListItems) {
         Observable.from(mainListItems)
                 .subscribeOn(Schedulers.from(BackgroundExecutor.getSafeBackgroundExecutor()))
-                .filter(mainListItem -> mainListItem.isSmallPhotoFileIdValid() && !FileDownloaderManager.getInstance().isFileInCache(mainListItem.getSmallPhotoFileId()))
+                .filter(mainListItem -> mainListItem.isSmallPhotoFileIdValid() && !mainListItem.isSmallPhotoFilePathValid() && !FileDownloaderManager.getInstance().isFileInCache(mainListItem.getSmallPhotoFileId()))
                 .concatMap(mainListItem -> TGProxy.getInstance().sendTD(new TdApi.DownloadFile(mainListItem.getSmallPhotoFileId()), TdApi.Ok.class))
                 .subscribe();
     }

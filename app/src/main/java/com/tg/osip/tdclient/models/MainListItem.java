@@ -124,7 +124,7 @@ public class MainListItem {
         }
     }
     private String getFilePath(TdApi.ChatInfo chatInfo) {
-        String filePath = "";
+        String filePath;
         if (groupChat) {
             filePath = ((TdApi.GroupChatInfo)chatInfo).groupChat.photo.small.path;
         } else {
