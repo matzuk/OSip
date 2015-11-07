@@ -9,6 +9,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 
 import com.tg.osip.R;
 import com.tg.osip.business.FileDownloaderManager;
@@ -64,8 +65,20 @@ public class MainFragment extends BaseFragment {
         recyclerView.addOnItemTouchListener(
                 new RecyclerItemClickListener(getActivity(), (view1, position) -> goToConcreteChat(position))
         );
+        recyclerView.setVisibility(View.INVISIBLE);
         // start FileDownloaderManager
         FileDownloaderManager.getInstance().subscribeToUpdateChannel();
+
+        ViewTreeObserver textViewTreeObserver=recyclerView.getViewTreeObserver();
+        textViewTreeObserver.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+
+            public void onGlobalLayout() {
+
+                recyclerView.setVisibility(View.VISIBLE);
+
+
+            }
+        });
     }
 
     private void goToConcreteChat(int position) {

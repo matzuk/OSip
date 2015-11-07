@@ -50,7 +50,7 @@ public class MainRecyclerAdapter extends AutoLoadingRecyclerViewAdapter<MainList
 
     @Override
     public MainRecyclerAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_main_list, parent, false);
+        View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_main_list_3, parent, false);
         return new ViewHolder(v);
     }
 
