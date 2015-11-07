@@ -83,7 +83,7 @@ public class AutoLoadingRecyclerView<T> extends RecyclerView {
                 int limit = getLimit();
                 int updatePosition = getAdapter().getItemCount() - 1 - (limit / 2);
                 if (position >= updatePosition) {
-                    int offset = getAdapter().getItemCount() - 1;
+                    int offset = getAdapter().getItemCount();
                     OffsetAndLimit offsetAndLimit = new OffsetAndLimit(offset, limit);
                     scrollLoadingChannel.onNext(offsetAndLimit);
                 }
