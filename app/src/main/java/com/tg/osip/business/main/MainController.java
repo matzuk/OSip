@@ -1,6 +1,7 @@
 package com.tg.osip.business.main;
 
 import android.view.View;
+import android.widget.ProgressBar;
 
 import com.tg.osip.business.FileDownloaderManager;
 import com.tg.osip.tdclient.TGProxy;
@@ -11,20 +12,16 @@ import com.tg.osip.utils.ui.auto_loading.ILoading;
 import com.tg.osip.utils.ui.auto_loading.OffsetAndLimit;
 import com.tg.osip.utils.BackgroundExecutor;
 import com.tg.osip.utils.log.Logger;
-import com.tg.osip.utils.time.TimeUtils;
-import com.tg.osip.utils.ui.PreLoader;
 
 import org.drinkless.td.libcore.telegram.TdApi;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 import rx.Observable;
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
-import rx.functions.Action1;
 import rx.schedulers.Schedulers;
 
 /**
@@ -34,8 +31,8 @@ import rx.schedulers.Schedulers;
  */
 public class MainController {
 
-    // temp argument - preLoader, later to move in RecyclerView
-    public ILoading<MainListItem> getILoading(PreLoader preLoader) {
+    // temp argument - progressBar, later to move in RecyclerView
+    public ILoading<MainListItem> getILoading(ProgressBar progressBar) {
         return new ILoading<MainListItem>() {
             @Override
             public Observable<List<MainListItem>> getLoadingObservable(OffsetAndLimit offsetAndLimit) {
@@ -55,7 +52,7 @@ public class MainController {
             }
             @Override
             public void endLoadData() {
-                preLoader.setVisibility(View.GONE);
+                progressBar.setVisibility(View.GONE);
             }
         };
     }
