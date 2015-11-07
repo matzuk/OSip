@@ -186,7 +186,7 @@ abstract class FormatCache<F extends Format> {
      * @return a localized standard date/time format
      * @throws IllegalArgumentException if the Locale has no date/time pattern defined
      */
-    // package protected, for access from test code; do not make public or protected
+    // package protected, for access from item_loader_list code; do not make public or protected
     static String getPatternForStyle(final Integer dateStyle, final Integer timeStyle, final Locale locale) {
         final MultipartKey key = new MultipartKey(dateStyle, timeStyle, locale);
 

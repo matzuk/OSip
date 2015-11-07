@@ -6,6 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.tg.osip.ApplicationSIP;
@@ -16,6 +17,8 @@ import com.tg.osip.utils.ui.auto_loading.AutoLoadingRecyclerViewAdapter;
 
 import org.drinkless.td.libcore.telegram.TdApi;
 
+import java.util.List;
+
 /**
  * @author e.matsyuk
  */
@@ -23,10 +26,16 @@ public class MainRecyclerAdapter extends AutoLoadingRecyclerViewAdapter<MainList
 
     private static final int TEMP_SEND_STATE_IS_ERROR = 0;
     private static final int TEMP_SEND_STATE_IS_SENDING = 1000000000;
+    private static final int DEFAULT_VALUE = 0;
+    private static final int COUNT_FOR_LOADER_VIEW = 1;
+
+    private static final int MAIN_VIEW = 0;
+    private static final int LOADER_VIEW = 1;
 
     private int userId;
+    private boolean loaded;
 
-    static class ViewHolder extends RecyclerView.ViewHolder {
+    static class MainViewHolder extends RecyclerView.ViewHolder {
 
         SIPAvatar avatar;
         TextView chatUserName;
@@ -36,7 +45,7 @@ public class MainRecyclerAdapter extends AutoLoadingRecyclerViewAdapter<MainList
         ImageView chatUnreadOutboxMessage;
         TextView chatUnreadMessageCount;
 
-        public ViewHolder(View itemView) {
+        public MainViewHolder(View itemView) {
             super(itemView);
             avatar = (SIPAvatar) itemView.findViewById(R.id.avatar);
             chatUserName = (TextView) itemView.findViewById(R.id.chat_user_name);
@@ -48,20 +57,76 @@ public class MainRecyclerAdapter extends AutoLoadingRecyclerViewAdapter<MainList
         }
     }
 
+    static class LoaderViewHolder extends RecyclerView.ViewHolder {
+        RelativeLayout layout;
+        public LoaderViewHolder(View itemView) {
+            super(itemView);
+            layout = (RelativeLayout) itemView.findViewById(R.id.layout);
+        }
+    }
+
     @Override
-    public MainRecyclerAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_main_list, parent, false);
-        return new ViewHolder(v);
+    public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        if (viewType == MAIN_VIEW) {
+            View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_main_list, parent, false);
+            return new MainViewHolder(v);
+        } else {
+            View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_loader_list, parent, false);
+            return new LoaderViewHolder(v);
+        }
+    }
+
+    @Override
+    public int getItemViewType(int position) {
+        if (loaded) {
+            return MAIN_VIEW;
+        } else {
+            return LOADER_VIEW;
+        }
     }
 
     @Override
     public long getItemId(int position) {
-        return getItem(position).getApiChat().id;
+        if (getItemViewType(position) == MAIN_VIEW) {
+            return getItem(position).getApiChat().id;
+        } else {
+            return DEFAULT_VALUE;
+        }
+    }
+
+    @Override
+    public int getItemCount() {
+        if (getItemViewType(DEFAULT_VALUE) == MAIN_VIEW) {
+            return super.getItemCount();
+        } else {
+            return COUNT_FOR_LOADER_VIEW;
+        }
+    }
+
+    @Override
+    public void addNewItems(List<MainListItem> items) {
+        loaded = true;
+        super.addNewItems(items);
     }
 
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
-        ViewHolder mainHolder = (ViewHolder) holder;
+        switch (getItemViewType(position)) {
+            case MAIN_VIEW:
+                onBindMainHolder(holder, position);
+                break;
+            case LOADER_VIEW:
+                onBindLoaderHolder(holder, position);
+                break;
+        }
+    }
+
+    public void onBindLoaderHolder(RecyclerView.ViewHolder holder, int position) {
+        LoaderViewHolder loaderViewHolder = (LoaderViewHolder) holder;
+    }
+
+    public void onBindMainHolder(RecyclerView.ViewHolder holder, int position) {
+        MainViewHolder mainHolder = (MainViewHolder) holder;
         MainListItem mainListItem = getItem(position);
         TdApi.Chat concreteChat = mainListItem.getApiChat();
         if (concreteChat == null) {

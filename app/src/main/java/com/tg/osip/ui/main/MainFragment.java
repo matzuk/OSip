@@ -6,6 +6,7 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.Toolbar;
+import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -32,10 +33,6 @@ public class MainFragment extends BaseFragment {
     private static final int LIMIT = 50;
 
     private AutoLoadingRecyclerView<MainListItem> recyclerView;
-    private MainRecyclerAdapter mainRecyclerAdapter;
-    private MainController mainController;
-    // temp
-    private ProgressBar progressBar;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -47,38 +44,27 @@ public class MainFragment extends BaseFragment {
     }
 
     private void init(View view) {
-        progressBar = (ProgressBar) view.findViewById(R.id.progressBar);
         recyclerView = (AutoLoadingRecyclerView) view.findViewById(R.id.RecyclerView);
         // init Controller
-        mainController = new MainController();
+        MainController mainController = new MainController();
         // init LayoutManager
         GridLayoutManager recyclerViewLayoutManager = new GridLayoutManager(getActivity(), 1);
         recyclerViewLayoutManager.supportsPredictiveItemAnimations();
         // init ChatRecyclerAdapter
-        mainRecyclerAdapter = new MainRecyclerAdapter();
+        MainRecyclerAdapter mainRecyclerAdapter = new MainRecyclerAdapter();
         mainRecyclerAdapter.setHasStableIds(true);
         // recyclerView setting
         recyclerView.setLayoutManager(recyclerViewLayoutManager);
         recyclerView.setLimit(LIMIT);
         recyclerView.setAdapter(mainRecyclerAdapter);
-        recyclerView.setLoadingObservable(mainController.getILoading(progressBar));
+        recyclerView.setLoadingObservable(mainController.getILoading());
         recyclerView.addOnItemTouchListener(
                 new RecyclerItemClickListener(getActivity(), (view1, position) -> goToConcreteChat(position))
         );
-        recyclerView.setVisibility(View.INVISIBLE);
         // start FileDownloaderManager
         FileDownloaderManager.getInstance().subscribeToUpdateChannel();
-
-        ViewTreeObserver textViewTreeObserver=recyclerView.getViewTreeObserver();
-        textViewTreeObserver.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
-
-            public void onGlobalLayout() {
-
-                recyclerView.setVisibility(View.VISIBLE);
-
-
-            }
-        });
+        Logger.debug("start loading List");
+        mainController.startRecyclerView(recyclerView, mainRecyclerAdapter);
     }
 
     private void goToConcreteChat(int position) {
@@ -100,13 +86,6 @@ public class MainFragment extends BaseFragment {
         toolbar.setTitle(getResources().getString(R.string.chat_list_toolbar_title));
         getSupportActivity().getSupportActionBar().setDisplayShowHomeEnabled(true);
         getSupportActivity().getSupportActionBar().show();
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        Logger.debug("start loading List");
-        mainController.startRecyclerView(recyclerView, mainRecyclerAdapter);
     }
 
 }

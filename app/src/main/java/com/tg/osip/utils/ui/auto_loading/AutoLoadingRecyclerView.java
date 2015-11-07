@@ -183,7 +183,6 @@ public class AutoLoadingRecyclerView<T> extends RecyclerView {
     }
 
     private void loadNewItems(OffsetAndLimit offsetAndLimit) {
-        iLoading.startLoadData();
         Subscriber<List<T>> loadNewItemsSubscriber = new Subscriber<List<T>>() {
             @Override
             public void onCompleted() {
@@ -199,7 +198,6 @@ public class AutoLoadingRecyclerView<T> extends RecyclerView {
             @Override
             public void onNext(List<T> ts) {
                 Logger.debug("Loaded new data portion");
-                iLoading.endLoadData();
                 if (ts.size() > 0) {
                     getAdapter().addNewItems(ts);
                     getAdapter().notifyItemInserted(getAdapter().getItemCount() - ts.size());

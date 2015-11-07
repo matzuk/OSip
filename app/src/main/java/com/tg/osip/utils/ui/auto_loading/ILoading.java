@@ -20,9 +20,5 @@ import rx.Observable;
  * @author e.matsyuk
  */
 public interface ILoading<T> {
-
     Observable<List<T>> getLoadingObservable(OffsetAndLimit offsetAndLimit);
-    void startLoadData();
-    void endLoadData();
-
 }

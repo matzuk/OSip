@@ -1,15 +1,11 @@
 package com.tg.osip.business.main;
 
-import android.view.View;
-import android.widget.ProgressBar;
-
 import com.tg.osip.business.FileDownloaderManager;
 import com.tg.osip.tdclient.TGProxy;
 import com.tg.osip.tdclient.models.MainListItem;
 import com.tg.osip.ui.main.MainRecyclerAdapter;
 import com.tg.osip.utils.ui.auto_loading.AutoLoadingRecyclerView;
 import com.tg.osip.utils.ui.auto_loading.ILoading;
-import com.tg.osip.utils.ui.auto_loading.OffsetAndLimit;
 import com.tg.osip.utils.BackgroundExecutor;
 import com.tg.osip.utils.log.Logger;
 
@@ -31,30 +27,16 @@ import rx.schedulers.Schedulers;
  */
 public class MainController {
 
-    // temp argument - progressBar, later to move in RecyclerView
-    public ILoading<MainListItem> getILoading(ProgressBar progressBar) {
-        return new ILoading<MainListItem>() {
-            @Override
-            public Observable<List<MainListItem>> getLoadingObservable(OffsetAndLimit offsetAndLimit) {
-                return TGProxy.getInstance().sendTD(new TdApi.GetChats(offsetAndLimit.getOffset(), offsetAndLimit.getLimit()), TdApi.Chats.class)
-                        .map(chats -> {
-                            TdApi.Chat chatsMas[] = chats.chats;
-                            return new ArrayList<>(Arrays.asList(chatsMas));
-                        })
-                        .concatMap(Observable::from)
-                        .map(MainListItem::new)
-                        .toList()
-                        .doOnNext(MainController.this::startFileDownloading);
-            }
-            @Override
-            public void startLoadData() {
-
-            }
-            @Override
-            public void endLoadData() {
-                progressBar.setVisibility(View.GONE);
-            }
-        };
+    public ILoading<MainListItem> getILoading() {
+        return offsetAndLimit -> TGProxy.getInstance().sendTD(new TdApi.GetChats(offsetAndLimit.getOffset(), offsetAndLimit.getLimit()), TdApi.Chats.class)
+                .map(chats -> {
+                    TdApi.Chat chatsMas[] = chats.chats;
+                    return new ArrayList<>(Arrays.asList(chatsMas));
+                })
+                .concatMap(Observable::from)
+                .map(MainListItem::new)
+                .toList()
+                .doOnNext(MainController.this::startFileDownloading);
     }
 
     public void startFileDownloading(List<MainListItem> mainListItems) {
@@ -65,6 +47,7 @@ public class MainController {
                 .subscribe();
     }
 
+    // get my user.id and start loading
     public <T> void startRecyclerView(AutoLoadingRecyclerView<T> autoLoadingRecyclerView, MainRecyclerAdapter mainRecyclerAdapter) {
         TGProxy.getInstance().sendTD(new TdApi.GetMe(), TdApi.User.class)
                 .observeOn(AndroidSchedulers.mainThread())
