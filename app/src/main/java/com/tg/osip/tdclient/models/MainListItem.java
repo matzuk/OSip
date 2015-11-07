@@ -1,14 +1,13 @@
 package com.tg.osip.tdclient.models;
 
-import android.graphics.Color;
 import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.text.TextUtils;
 
 import com.amulyakhare.textdrawable.TextDrawable;
 import com.amulyakhare.textdrawable.util.ColorGenerator;
 import com.tg.osip.ApplicationSIP;
 import com.tg.osip.R;
-import com.tg.osip.business.FileDownloaderManager;
 import com.tg.osip.utils.time.TimeUtils;
 
 import org.drinkless.td.libcore.telegram.TdApi;
@@ -121,10 +120,7 @@ public class MainListItem {
     }
 
     private boolean determineIsChatGroupType(TdApi.ChatInfo chatInfo) {
-        if (chatInfo instanceof TdApi.GroupChatInfo) {
-            return true;
-        }
-        return false;
+        return chatInfo.getClass() == TdApi.GroupChatInfo.class;
     }
 
     private Integer getFileId(TdApi.ChatInfo chatInfo) {
@@ -149,22 +145,59 @@ public class MainListItem {
 
     private Drawable setPlug() {
         int id;
-        StringBuilder name = new StringBuilder();
+        String name;
         if (isGroupChat()) {
             TdApi.GroupChatInfo groupChatInfo = ((TdApi.GroupChatInfo)getApiChat().type);
             id = groupChatInfo.groupChat.id;
-            name.append(groupChatInfo.groupChat.title.substring(0, 1));
+//            name.append(groupChatInfo.groupChat.title.substring(0, 1));
+            name = getLettersForPlug(groupChatInfo.groupChat.title, null);
         } else {
             TdApi.PrivateChatInfo privateChatInfo = ((TdApi.PrivateChatInfo)getApiChat().type);
             id = privateChatInfo.user.id;
-            name.append(privateChatInfo.user.firstName.substring(0, 1));
+            name = getLettersForPlug(privateChatInfo.user.firstName, privateChatInfo.user.lastName);
+//            name.append(privateChatInfo.user.firstName.substring(0, 1));
 //            name.append(privateChatInfo.user.lastName.substring(0, 1));
         }
         ColorGenerator generator = ColorGenerator.MATERIAL;
         int color = generator.getColor(id);
 
         return TextDrawable.builder()
-                .buildRoundRect(name.toString(), color, 100);
+                .buildRoundRect(name, color, 100);
+    }
+
+    private String getLettersForPlug(String firstName, String lastName) {
+        String text = "";
+        if (firstName != null && firstName.length() > 0) {
+            text += firstName.substring(0, 1);
+        }
+        if (lastName != null && lastName.length() > 0) {
+            String lastch = null;
+            for (int a = lastName.length() - 1; a >= 0; a--) {
+                if (lastch != null && lastName.charAt(a) == ' ') {
+                    break;
+                }
+                lastch = lastName.substring(a, a + 1);
+            }
+            if (Build.VERSION.SDK_INT >= 16) {
+                text += "\u200C" + lastch;
+            } else {
+                text += lastch;
+            }
+        } else if (firstName != null && firstName.length() > 0) {
+            for (int a = firstName.length() - 1; a >= 0; a--) {
+                if (firstName.charAt(a) == ' ') {
+                    if (a != firstName.length() - 1 && firstName.charAt(a + 1) != ' ') {
+                        if (Build.VERSION.SDK_INT >= 16) {
+                            text += "\u200C" + firstName.substring(a + 1, a + 2);
+                        } else {
+                            text += firstName.substring(a + 1, a + 2);
+                        }
+                        break;
+                    }
+                }
+            }
+        }
+        return text;
     }
 
 

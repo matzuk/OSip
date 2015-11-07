@@ -112,14 +112,6 @@ public class ChatFragment extends Fragment {
                         return new ArrayList<>(Arrays.asList(messageMas));
                     });
         }
-        @Override
-        public void startLoadData() {
-
-        }
-        @Override
-        public void endLoadData() {
-            progressBar.setVisibility(View.GONE);
-        }
     };
 
     private void initToolbar(View rootView) {

@@ -1,6 +1,6 @@
 package com.tg.osip.business.main;
 
-import com.tg.osip.business.FileDownloaderManager;
+import com.tg.osip.business.update_managers.FileDownloaderManager;
 import com.tg.osip.tdclient.TGProxy;
 import com.tg.osip.tdclient.models.MainListItem;
 import com.tg.osip.ui.main.MainRecyclerAdapter;

@@ -1,19 +1,19 @@
-package com.tg.osip.business;
+package com.tg.osip.business.update_managers;
 
 import com.tg.osip.utils.BackgroundExecutor;
+import com.tg.osip.utils.log.Logger;
 
 import org.drinkless.td.libcore.telegram.TdApi;
 
-import java.util.ConcurrentModificationException;
 import java.util.concurrent.ConcurrentHashMap;
 
 import rx.Subscriber;
-import rx.Subscription;
-import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 import rx.subjects.PublishSubject;
 
 /**
+ * Manager for file downloads
+ *
  * @author e.matsyuk
  */
 public class FileDownloaderManager {
@@ -22,8 +22,6 @@ public class FileDownloaderManager {
     public final static String FILE_PATH_EMPTY = "";
 
     private static volatile FileDownloaderManager instance;
-
-    private Subscription updateChannelSubscription;
 
     private ConcurrentHashMap<Integer, TdApi.File> fileHashMap = new ConcurrentHashMap<>();
 
@@ -38,20 +36,18 @@ public class FileDownloaderManager {
         return instance;
     }
 
-    public void subscribeToUpdateChannel() {
-        updateChannelSubscription = UpdateManager.getInstance().getUpdateChannel()
-                .filter(update -> update instanceof TdApi.UpdateFile)
+    void subscribeToUpdateChannel(PublishSubject<TdApi.Update> updateChannel) {
+        updateChannel
+                .filter(update -> update.getClass() == TdApi.UpdateFile.class)
                 .map(update -> (TdApi.UpdateFile) update)
                 .subscribeOn(Schedulers.from(BackgroundExecutor.getSafeBackgroundExecutor()))
                 .subscribe(new Subscriber<TdApi.UpdateFile>() {
                     @Override
-                    public void onCompleted() {
-
-                    }
+                    public void onCompleted() { }
 
                     @Override
                     public void onError(Throwable e) {
-
+                        Logger.error(e);
                     }
 
                     @Override

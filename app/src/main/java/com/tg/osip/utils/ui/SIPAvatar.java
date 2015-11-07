@@ -1,38 +1,22 @@
 package com.tg.osip.utils.ui;
 
-import android.annotation.TargetApi;
 import android.content.Context;
-import android.graphics.Color;
-import android.graphics.Rect;
-import android.graphics.drawable.ColorDrawable;
-import android.os.Build;
-import android.support.v4.content.ContextCompat;
-import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.widget.ImageView;
 
-import com.amulyakhare.textdrawable.TextDrawable;
 import com.squareup.picasso.Picasso;
 import com.tg.osip.ApplicationSIP;
-import com.tg.osip.R;
-import com.tg.osip.business.FileDownloaderManager;
-import com.tg.osip.business.UpdateManager;
-import com.tg.osip.tdclient.TGProxy;
+import com.tg.osip.business.update_managers.FileDownloaderManager;
+import com.tg.osip.business.update_managers.UpdateManager;
 import com.tg.osip.tdclient.models.MainListItem;
 import com.tg.osip.utils.BackgroundExecutor;
 import com.tg.osip.utils.log.Logger;
-import com.tg.osip.utils.ui.CirclePicassoTransformation;
 
 import org.drinkless.td.libcore.telegram.TdApi;
-
-import java.util.Observable;
-import java.util.concurrent.TimeUnit;
 
 import rx.Subscriber;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
-import rx.functions.Action1;
-import rx.functions.Func1;
 import rx.schedulers.Schedulers;
 
 /**
@@ -65,52 +49,22 @@ public class SIPAvatar extends ImageView {
 
     private void startImageLoading(MainListItem mainListItem) {
         unSubscribe();
-        if (!mainListItem.isSmallPhotoFilePathValid()) {
-            fileId = mainListItem.getSmallPhotoFileId();
+        if (!mainListItem.isSmallPhotoFileIdValid()) {
             setImageDrawable(mainListItem.getPlug());
-//            setLetterDrawable(this, mainListItem);
-//            setImageDrawable(null);
-//            TextDrawable drawable = TextDrawable.builder()
-//                    .buildRoundRect("A", Color.RED, 100);
-//            setImageDrawable(drawable);
-            String filePathFromCache = FileDownloaderManager.getInstance().getFilePath(fileId);
-            if (filePathFromCache.equals(FileDownloaderManager.FILE_PATH_EMPTY)) {
-                subscribeToUpdateChannel();
-            } else {
-                setFileToView(filePathFromCache);
-            }
-        } else {
+            return;
+        }
+        if (mainListItem.isSmallPhotoFilePathValid()) {
             setFileToView(mainListItem.getSmallPhotoFilePath());
+            return;
         }
-    }
-
-    private void setLetterDrawable(ImageView imageView, MainListItem mainListItem) {
-        LetterDrawable letterDrawable = getLetterDrawable(imageView, mainListItem);
-        imageView.setImageDrawable(letterDrawable);
-    }
-
-    private LetterDrawable getLetterDrawable(ImageView imageView, MainListItem mainListItem) {
-        int id = 0;
-        String firstName = null;
-        String lastName = null;
-
-        if (mainListItem.isGroupChat()) {
-            TdApi.GroupChatInfo groupChatInfo = ((TdApi.GroupChatInfo)mainListItem.getApiChat().type);
-            id = groupChatInfo.groupChat.id;
-            firstName = groupChatInfo.groupChat.title;
-        } else {
-            TdApi.PrivateChatInfo privateChatInfo = ((TdApi.PrivateChatInfo)mainListItem.getApiChat().type);
-            id = privateChatInfo.user.id;
-            firstName = privateChatInfo.user.firstName;
-            lastName = privateChatInfo.user.lastName;
+        // test file downloaded cache
+        if (FileDownloaderManager.getInstance().isFileInCache(mainListItem.getSmallPhotoFileId())) {
+            setFileToView(mainListItem.getSmallPhotoFilePath());
+            return;
         }
-        // setImageDrawable for not null Rect rect!
-        if (imageView.getDrawable() == null) {
-            imageView.setImageDrawable(new ColorDrawable(ContextCompat.getColor(getContext(), android.R.color.white)));
-        }
-        Rect rect = imageView.getDrawable().getBounds();
-        Logger.debug("rect", rect);
-        return new LetterDrawable(rect, id, firstName, lastName);
+        // start update manager listening
+        fileId = mainListItem.getSmallPhotoFileId();
+        subscribeToUpdateChannel();
     }
 
     private void setFileToView(String fileToPath) {
@@ -125,19 +79,17 @@ public class SIPAvatar extends ImageView {
 
     private void subscribeToUpdateChannel() {
         updateChannelSubscription = UpdateManager.getInstance().getUpdateChannel()
-                .filter(update -> update instanceof TdApi.UpdateFile && ((TdApi.UpdateFile)update).file.id == fileId)
+                .filter(update -> update.getClass() == TdApi.UpdateFile.class && ((TdApi.UpdateFile)update).file.id == fileId)
                 .map(update -> (TdApi.UpdateFile)update)
                 .subscribeOn(Schedulers.from(BackgroundExecutor.getSafeBackgroundExecutor()))
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Subscriber<TdApi.UpdateFile>() {
                     @Override
-                    public void onCompleted() {
-
-                    }
+                    public void onCompleted() { }
 
                     @Override
                     public void onError(Throwable e) {
-
+                        Logger.error(e);
                     }
 
                     @Override

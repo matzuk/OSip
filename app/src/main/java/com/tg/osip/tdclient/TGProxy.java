@@ -1,8 +1,6 @@
 package com.tg.osip.tdclient;
 
-import android.support.v7.widget.LinearLayoutManager;
-
-import com.tg.osip.business.UpdateManager;
+import com.tg.osip.business.update_managers.UpdateManager;
 import com.tg.osip.tdclient.exceptions.TdApiClassCastException;
 import com.tg.osip.tdclient.exceptions.TdApiErrorException;
 import com.tg.osip.utils.AndroidUtils;

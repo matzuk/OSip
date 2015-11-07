@@ -1,6 +1,4 @@
-package com.tg.osip.business;
-
-import com.tg.osip.utils.log.Logger;
+package com.tg.osip.business.update_managers;
 
 import org.drinkless.td.libcore.telegram.TdApi;
 
@@ -25,6 +23,11 @@ public class UpdateManager {
             }
         }
         return instance;
+    }
+
+    private UpdateManager() {
+        // init helper classes
+        FileDownloaderManager.getInstance().subscribeToUpdateChannel(updateChannel);
     }
 
     public void sendUpdateEvent(TdApi.Update update) {

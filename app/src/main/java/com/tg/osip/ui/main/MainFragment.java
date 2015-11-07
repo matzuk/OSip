@@ -6,15 +6,12 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.Toolbar;
-import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewTreeObserver;
-import android.widget.ProgressBar;
 
 import com.tg.osip.R;
-import com.tg.osip.business.FileDownloaderManager;
+import com.tg.osip.business.update_managers.FileDownloaderManager;
 import com.tg.osip.business.main.MainController;
 import com.tg.osip.tdclient.models.MainListItem;
 import com.tg.osip.ui.chat.ChatFragment;
@@ -61,8 +58,6 @@ public class MainFragment extends BaseFragment {
         recyclerView.addOnItemTouchListener(
                 new RecyclerItemClickListener(getActivity(), (view1, position) -> goToConcreteChat(position))
         );
-        // start FileDownloaderManager
-        FileDownloaderManager.getInstance().subscribeToUpdateChannel();
         Logger.debug("start loading List");
         mainController.startRecyclerView(recyclerView, mainRecyclerAdapter);
     }
