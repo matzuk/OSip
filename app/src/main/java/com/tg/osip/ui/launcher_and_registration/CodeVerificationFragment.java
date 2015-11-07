@@ -14,12 +14,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 
 import com.tg.osip.R;
 import com.tg.osip.business.AuthManager;
 import com.tg.osip.utils.AndroidUtils;
 import com.tg.osip.utils.log.Logger;
-import com.tg.osip.utils.ui.PreLoader;
 import com.tg.osip.utils.ui.ScalableImageView;
 import com.tg.osip.utils.ui.TransitionTextView;
 
@@ -36,7 +36,7 @@ public class CodeVerificationFragment extends Fragment {
     private ScalableImageView nextButton;
     private TransitionTextView resultTextView;
     private ScalableImageView verificationCodeImage;
-    private PreLoader preLoader;
+    private ProgressBar progressBar;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -50,8 +50,8 @@ public class CodeVerificationFragment extends Fragment {
 
     private void init(View view) {
         if (AndroidUtils.isNewAndroid()) {
-            preLoader = (PreLoader) view.findViewById(R.id.pro_loader);
-            preLoader.setVisibility(View.GONE);
+            progressBar = (ProgressBar) view.findViewById(R.id.progressBar);
+            progressBar.setVisibility(View.GONE);
         }
         resultTextView = (TransitionTextView)view.findViewById(R.id.verification_wrong_number);
         nextButton = (ScalableImageView)view.findViewById(R.id.next_button);

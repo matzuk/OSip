@@ -10,6 +10,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
+import android.widget.ProgressBar;
 
 import com.tg.osip.R;
 import com.tg.osip.business.FileDownloaderManager;
@@ -19,7 +20,6 @@ import com.tg.osip.ui.chat.ChatFragment;
 import com.tg.osip.ui.general.BaseFragment;
 import com.tg.osip.utils.ui.auto_loading.AutoLoadingRecyclerView;
 import com.tg.osip.utils.log.Logger;
-import com.tg.osip.utils.ui.PreLoader;
 import com.tg.osip.utils.ui.RecyclerItemClickListener;
 
 /**
@@ -35,7 +35,7 @@ public class MainFragment extends BaseFragment {
     private MainRecyclerAdapter mainRecyclerAdapter;
     private MainController mainController;
     // temp
-    private PreLoader preLoader;
+    private ProgressBar progressBar;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -47,7 +47,7 @@ public class MainFragment extends BaseFragment {
     }
 
     private void init(View view) {
-        preLoader = (PreLoader) view.findViewById(R.id.pro_loader);
+        progressBar = (ProgressBar) view.findViewById(R.id.progressBar);
         recyclerView = (AutoLoadingRecyclerView) view.findViewById(R.id.RecyclerView);
         // init Controller
         mainController = new MainController();
@@ -61,7 +61,7 @@ public class MainFragment extends BaseFragment {
         recyclerView.setLayoutManager(recyclerViewLayoutManager);
         recyclerView.setLimit(LIMIT);
         recyclerView.setAdapter(mainRecyclerAdapter);
-        recyclerView.setLoadingObservable(mainController.getILoading(preLoader));
+        recyclerView.setLoadingObservable(mainController.getILoading(progressBar));
         recyclerView.addOnItemTouchListener(
                 new RecyclerItemClickListener(getActivity(), (view1, position) -> goToConcreteChat(position))
         );

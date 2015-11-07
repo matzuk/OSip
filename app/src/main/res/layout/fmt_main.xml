@@ -25,11 +25,13 @@
         android:overScrollMode="always"
         android:layout_below="@+id/toolbar"/>
 
-    <com.tg.osip.utils.ui.PreLoader
-        android:id="@+id/pro_loader"
-        android:layout_width="wrap_content"
+    <ProgressBar
+        android:id="@+id/progressBar"
+        android:indeterminateDrawable="@drawable/pre_loader"
         android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
         android:layout_centerInParent="true"
-        android:visibility="visible"/>
+        android:visibility="visible">
+    </ProgressBar>
 
 </RelativeLayout>

@@ -8,6 +8,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 
 import com.tg.osip.R;
 import com.tg.osip.tdclient.TGProxy;
@@ -15,7 +16,6 @@ import com.tg.osip.utils.ui.auto_loading.ILoading;
 import com.tg.osip.utils.ui.auto_loading.OffsetAndLimit;
 import com.tg.osip.utils.log.Logger;
 import com.tg.osip.utils.ui.auto_loading.AutoLoadingRecyclerView;
-import com.tg.osip.utils.ui.PreLoader;
 
 import org.drinkless.td.libcore.telegram.TdApi;
 
@@ -35,7 +35,7 @@ public class ChatFragment extends Fragment {
     private static final int LIMIT = 50;
 
     private AutoLoadingRecyclerView<TdApi.Message> recyclerView;
-    private PreLoader preLoader;
+    private ProgressBar progressBar;
 
     private long chatId;
     private int topMessageId;
@@ -67,7 +67,7 @@ public class ChatFragment extends Fragment {
     }
 
     private void init(View view) {
-        preLoader = (PreLoader) view.findViewById(R.id.pro_loader);
+        progressBar = (ProgressBar) view.findViewById(R.id.progressBar);
         recyclerView = (AutoLoadingRecyclerView) view.findViewById(R.id.RecyclerView);
         // init LayoutManager
         GridLayoutManager recyclerViewLayoutManager = new GridLayoutManager(getActivity(), 1);
@@ -118,7 +118,7 @@ public class ChatFragment extends Fragment {
         }
         @Override
         public void endLoadData() {
-            preLoader.setVisibility(View.GONE);
+            progressBar.setVisibility(View.GONE);
         }
     };
 
