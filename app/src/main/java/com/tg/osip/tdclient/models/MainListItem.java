@@ -1,7 +1,11 @@
 package com.tg.osip.tdclient.models;
 
+import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.text.TextUtils;
 
+import com.amulyakhare.textdrawable.TextDrawable;
+import com.amulyakhare.textdrawable.util.ColorGenerator;
 import com.tg.osip.ApplicationSIP;
 import com.tg.osip.R;
 import com.tg.osip.business.FileDownloaderManager;
@@ -27,6 +31,8 @@ public class MainListItem {
     private boolean groupChat;
     private int smallPhotoFileId;
     private String smallPhotoFilePath;
+    //
+    private Drawable plug;
 
     public MainListItem(TdApi.Chat apiChat) {
         this.apiChat = apiChat;
@@ -40,6 +46,7 @@ public class MainListItem {
         userName = getName(chat.type);
         smallPhotoFileId = getFileId(chat.type);
         smallPhotoFilePath = getFilePath(chat.type);
+        plug = setPlug();
     }
 
     public TdApi.Chat getApiChat() {
@@ -76,6 +83,10 @@ public class MainListItem {
 
     public boolean isSmallPhotoFilePathValid() {
         return !smallPhotoFilePath.equals(FILE_PATH_EMPTY);
+    }
+
+    public Drawable getPlug() {
+        return plug;
     }
 
     private String getChatLastMessage(TdApi.Message message) {
@@ -134,6 +145,26 @@ public class MainListItem {
             return ADD_TO_PATH + filePath;
         }
         return FILE_PATH_EMPTY;
+    }
+
+    private Drawable setPlug() {
+        int id;
+        StringBuilder name = new StringBuilder();
+        if (isGroupChat()) {
+            TdApi.GroupChatInfo groupChatInfo = ((TdApi.GroupChatInfo)getApiChat().type);
+            id = groupChatInfo.groupChat.id;
+            name.append(groupChatInfo.groupChat.title.substring(0, 1));
+        } else {
+            TdApi.PrivateChatInfo privateChatInfo = ((TdApi.PrivateChatInfo)getApiChat().type);
+            id = privateChatInfo.user.id;
+            name.append(privateChatInfo.user.firstName.substring(0, 1));
+//            name.append(privateChatInfo.user.lastName.substring(0, 1));
+        }
+        ColorGenerator generator = ColorGenerator.MATERIAL;
+        int color = generator.getColor(id);
+
+        return TextDrawable.builder()
+                .buildRoundRect(name.toString(), color, 100);
     }
 
 

@@ -19,10 +19,12 @@ import org.drinkless.td.libcore.telegram.TdApi;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import rx.Observable;
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
+import rx.functions.Action1;
 import rx.schedulers.Schedulers;
 
 /**
@@ -54,7 +56,6 @@ public class MainController {
             @Override
             public void endLoadData() {
                 preLoader.setVisibility(View.GONE);
-
             }
         };
     }

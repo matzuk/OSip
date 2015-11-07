@@ -2,6 +2,7 @@ package com.tg.osip.utils.ui;
 
 import android.annotation.TargetApi;
 import android.content.Context;
+import android.graphics.Color;
 import android.graphics.Rect;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Build;
@@ -10,6 +11,7 @@ import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.widget.ImageView;
 
+import com.amulyakhare.textdrawable.TextDrawable;
 import com.squareup.picasso.Picasso;
 import com.tg.osip.ApplicationSIP;
 import com.tg.osip.R;
@@ -65,7 +67,12 @@ public class SIPAvatar extends ImageView {
         unSubscribe();
         if (!mainListItem.isSmallPhotoFilePathValid()) {
             fileId = mainListItem.getSmallPhotoFileId();
-            setLetterDrawable(this, mainListItem);
+            setImageDrawable(mainListItem.getPlug());
+//            setLetterDrawable(this, mainListItem);
+//            setImageDrawable(null);
+//            TextDrawable drawable = TextDrawable.builder()
+//                    .buildRoundRect("A", Color.RED, 100);
+//            setImageDrawable(drawable);
             String filePathFromCache = FileDownloaderManager.getInstance().getFilePath(fileId);
             if (filePathFromCache.equals(FileDownloaderManager.FILE_PATH_EMPTY)) {
                 subscribeToUpdateChannel();
@@ -102,6 +109,7 @@ public class SIPAvatar extends ImageView {
             imageView.setImageDrawable(new ColorDrawable(ContextCompat.getColor(getContext(), android.R.color.white)));
         }
         Rect rect = imageView.getDrawable().getBounds();
+        Logger.debug("rect", rect);
         return new LetterDrawable(rect, id, firstName, lastName);
     }
 
