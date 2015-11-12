@@ -1,4 +1,4 @@
-package com.tg.osip.utils;
+package com.tg.osip.utils.common;
 
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Executor;

@@ -12,7 +12,7 @@ import android.widget.TextView;
 import com.tg.osip.ApplicationSIP;
 import com.tg.osip.R;
 import com.tg.osip.tdclient.models.MainListItem;
-import com.tg.osip.utils.ui.SIPAvatar;
+import com.tg.osip.utils.ui.images.SIPAvatar;
 import com.tg.osip.utils.ui.auto_loading.AutoLoadingRecyclerViewAdapter;
 
 import org.drinkless.td.libcore.telegram.TdApi;

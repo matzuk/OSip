@@ -18,7 +18,7 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.tg.osip.utils.AndroidUtils;
+import com.tg.osip.utils.common.AndroidUtils;
 
 public class TextSettingsCell extends FrameLayout {
 

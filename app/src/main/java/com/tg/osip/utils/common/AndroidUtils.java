@@ -1,4 +1,4 @@
-package com.tg.osip.utils;
+package com.tg.osip.utils.common;
 
 import android.app.Activity;
 import android.content.Context;

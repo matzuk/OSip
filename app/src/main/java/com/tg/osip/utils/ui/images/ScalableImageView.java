@@ -1,4 +1,4 @@
-package com.tg.osip.utils.ui;
+package com.tg.osip.utils.ui.images;
 
 import android.animation.Animator;
 import android.animation.AnimatorSet;

@@ -13,7 +13,7 @@ import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.view.View;
 
-import com.tg.osip.utils.AndroidUtils;
+import com.tg.osip.utils.common.AndroidUtils;
 
 
 public class DividerCell extends BaseCell {

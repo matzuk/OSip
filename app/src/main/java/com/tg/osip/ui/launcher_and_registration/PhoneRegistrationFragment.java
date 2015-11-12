@@ -22,10 +22,10 @@ import com.tg.osip.business.AuthManager;
 import com.tg.osip.ui.launcher_and_registration.country.ui.CountryRegistrationFragment;
 import com.tg.osip.ui.launcher_and_registration.country.utils.Country;
 import com.tg.osip.ui.launcher_and_registration.country.utils.CountryUtils;
-import com.tg.osip.utils.AndroidUtils;
+import com.tg.osip.utils.common.AndroidUtils;
 import com.tg.osip.utils.PhoneFormat.PhoneFormat;
 import com.tg.osip.utils.log.Logger;
-import com.tg.osip.utils.ui.ScalableImageView;
+import com.tg.osip.utils.ui.images.ScalableImageView;
 import com.tg.osip.utils.ui.SimpleAlertDialog;
 
 import java.util.HashMap;

@@ -13,7 +13,7 @@ import com.tg.osip.R;
 import com.tg.osip.ui.launcher_and_registration.PhoneRegistrationFragment;
 import com.tg.osip.ui.launcher_and_registration.country.adapters.CountryAdapter;
 import com.tg.osip.ui.launcher_and_registration.country.utils.Country;
-import com.tg.osip.utils.AndroidUtils;
+import com.tg.osip.utils.common.AndroidUtils;
 
 /**
  * @author e.matsyuk

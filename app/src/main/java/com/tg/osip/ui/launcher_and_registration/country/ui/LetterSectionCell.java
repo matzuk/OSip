@@ -15,7 +15,7 @@ import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 
-import com.tg.osip.utils.AndroidUtils;
+import com.tg.osip.utils.common.AndroidUtils;
 
 
 public class LetterSectionCell extends FrameLayout {

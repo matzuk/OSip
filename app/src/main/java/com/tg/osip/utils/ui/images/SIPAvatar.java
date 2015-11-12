@@ -1,4 +1,4 @@
-package com.tg.osip.utils.ui;
+package com.tg.osip.utils.ui.images;
 
 import android.content.Context;
 import android.util.AttributeSet;
@@ -9,7 +9,7 @@ import com.tg.osip.ApplicationSIP;
 import com.tg.osip.business.update_managers.FileDownloaderManager;
 import com.tg.osip.business.update_managers.UpdateManager;
 import com.tg.osip.tdclient.models.MainListItem;
-import com.tg.osip.utils.BackgroundExecutor;
+import com.tg.osip.utils.common.BackgroundExecutor;
 import com.tg.osip.utils.log.Logger;
 
 import org.drinkless.td.libcore.telegram.TdApi;

@@ -18,9 +18,9 @@ import android.widget.ProgressBar;
 
 import com.tg.osip.R;
 import com.tg.osip.business.AuthManager;
-import com.tg.osip.utils.AndroidUtils;
+import com.tg.osip.utils.common.AndroidUtils;
 import com.tg.osip.utils.log.Logger;
-import com.tg.osip.utils.ui.ScalableImageView;
+import com.tg.osip.utils.ui.images.ScalableImageView;
 import com.tg.osip.utils.ui.TransitionTextView;
 
 import rx.Subscriber;

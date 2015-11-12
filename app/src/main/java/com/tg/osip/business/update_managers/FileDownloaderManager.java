@@ -1,6 +1,6 @@
 package com.tg.osip.business.update_managers;
 
-import com.tg.osip.utils.BackgroundExecutor;
+import com.tg.osip.utils.common.BackgroundExecutor;
 import com.tg.osip.utils.log.Logger;
 
 import org.drinkless.td.libcore.telegram.TdApi;

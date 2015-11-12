@@ -6,7 +6,7 @@ import com.tg.osip.tdclient.models.MainListItem;
 import com.tg.osip.ui.main_screen.MainRecyclerAdapter;
 import com.tg.osip.utils.ui.auto_loading.AutoLoadingRecyclerView;
 import com.tg.osip.utils.ui.auto_loading.ILoading;
-import com.tg.osip.utils.BackgroundExecutor;
+import com.tg.osip.utils.common.BackgroundExecutor;
 import com.tg.osip.utils.log.Logger;
 
 import org.drinkless.td.libcore.telegram.TdApi;

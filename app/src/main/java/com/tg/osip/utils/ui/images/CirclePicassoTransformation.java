@@ -1,4 +1,4 @@
-package com.tg.osip.utils.ui;
+package com.tg.osip.utils.ui.images;
 
 import android.graphics.Bitmap;
 import android.graphics.Canvas;

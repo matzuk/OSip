@@ -17,7 +17,7 @@ import com.tg.osip.ui.launcher_and_registration.country.ui.LetterSectionCell;
 import com.tg.osip.ui.launcher_and_registration.country.ui.TextSettingsCell;
 import com.tg.osip.ui.launcher_and_registration.country.utils.Country;
 import com.tg.osip.ui.launcher_and_registration.country.utils.CountryUtils;
-import com.tg.osip.utils.AndroidUtils;
+import com.tg.osip.utils.common.AndroidUtils;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;

@@ -19,7 +19,7 @@ import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.util.AttributeSet;
 import android.util.Log;
 
-import com.tg.osip.utils.BackgroundExecutor;
+import com.tg.osip.utils.common.BackgroundExecutor;
 import com.tg.osip.utils.log.Logger;
 
 import java.util.ArrayList;

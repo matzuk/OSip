@@ -18,7 +18,7 @@ import android.widget.ListAdapter;
 import android.widget.ListView;
 
 import com.tg.osip.ui.launcher_and_registration.country.adapters.BaseSectionsAdapter;
-import com.tg.osip.utils.AndroidUtils;
+import com.tg.osip.utils.common.AndroidUtils;
 
 import java.util.ArrayList;
 

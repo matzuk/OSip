@@ -16,12 +16,9 @@ import android.widget.EditText;
 
 import com.tg.osip.R;
 import com.tg.osip.business.AuthManager;
-import com.tg.osip.tdclient.TGProxy;
-import com.tg.osip.utils.AndroidUtils;
-import com.tg.osip.utils.ui.ScalableImageView;
+import com.tg.osip.utils.common.AndroidUtils;
+import com.tg.osip.utils.ui.images.ScalableImageView;
 import com.tg.osip.utils.ui.SimpleAlertDialog;
-
-import org.drinkless.td.libcore.telegram.TdApi;
 
 /**
  * @author e.matsyuk
