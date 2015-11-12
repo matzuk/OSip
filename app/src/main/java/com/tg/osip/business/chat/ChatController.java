@@ -1,19 +1,15 @@
 package com.tg.osip.business.chat;
 
-import com.tg.osip.business.main.MainListItem;
 import com.tg.osip.tdclient.TGProxy;
-import com.tg.osip.ui.chat.ChatRecyclerAdapter;
-import com.tg.osip.ui.main_screen.MainRecyclerAdapter;
 import com.tg.osip.utils.log.Logger;
-import com.tg.osip.utils.ui.auto_loading.AutoLoadingRecyclerView;
-import com.tg.osip.utils.ui.auto_loading.ILoading;
+import com.tg.osip.ui.views.auto_loading.AutoLoadingRecyclerView;
+import com.tg.osip.ui.views.auto_loading.ILoading;
 
 import org.drinkless.td.libcore.telegram.TdApi;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import rx.Observable;
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
 

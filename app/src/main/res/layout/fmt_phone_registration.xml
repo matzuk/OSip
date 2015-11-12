@@ -24,7 +24,7 @@
             android:layout_gravity="right"
             android:orientation="horizontal">
 
-            <com.tg.osip.utils.ui.images.ScalableImageView
+            <com.tg.osip.ui.views.images.ScalableImageView
                 android:id="@+id/next_button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

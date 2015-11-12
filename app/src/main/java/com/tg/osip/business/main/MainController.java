@@ -3,8 +3,8 @@ package com.tg.osip.business.main;
 import com.tg.osip.business.update_managers.FileDownloaderManager;
 import com.tg.osip.tdclient.TGProxy;
 import com.tg.osip.ui.main_screen.MainRecyclerAdapter;
-import com.tg.osip.utils.ui.auto_loading.AutoLoadingRecyclerView;
-import com.tg.osip.utils.ui.auto_loading.ILoading;
+import com.tg.osip.ui.views.auto_loading.AutoLoadingRecyclerView;
+import com.tg.osip.ui.views.auto_loading.ILoading;
 import com.tg.osip.utils.common.BackgroundExecutor;
 import com.tg.osip.utils.log.Logger;
 

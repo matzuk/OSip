@@ -3,6 +3,7 @@ package com.tg.osip.ui.launcher_and_registration;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.content.res.ResourcesCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -20,8 +21,8 @@ import com.tg.osip.R;
 import com.tg.osip.business.AuthManager;
 import com.tg.osip.utils.common.AndroidUtils;
 import com.tg.osip.utils.log.Logger;
-import com.tg.osip.utils.ui.images.ScalableImageView;
-import com.tg.osip.utils.ui.TransitionTextView;
+import com.tg.osip.ui.views.images.ScalableImageView;
+import com.tg.osip.ui.views.TransitionTextView;
 
 import rx.Subscriber;
 import rx.Subscription;
@@ -115,7 +116,7 @@ public class CodeVerificationFragment extends Fragment {
         verificationCodeImage.setVisibility(View.GONE);
 
         resultTextView.setText(getResources().getString(R.string.reg_verification_wrong_number));
-        resultTextView.setTextColor(getResources().getColor(R.color.registration_no_color));
+        resultTextView.setTextColor(ContextCompat.getColor(getContext(), R.color.registration_no_color));
         verificationCodeImage.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.register_no, null));
 
         resultTextView.setVisibility(View.VISIBLE);
@@ -127,7 +128,7 @@ public class CodeVerificationFragment extends Fragment {
         verificationCodeImage.setVisibility(View.GONE);
 
         resultTextView.setText(getResources().getString(R.string.reg_verification_right_number));
-        resultTextView.setTextColor(getResources().getColor(R.color.registration_yes_color));
+        resultTextView.setTextColor(ContextCompat.getColor(getContext(), R.color.registration_yes_color));
         verificationCodeImage.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.register_yes, null));
 
         resultTextView.setVisibility(View.VISIBLE);

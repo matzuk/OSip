@@ -1,14 +1,12 @@
-package com.tg.osip.utils.ui.images;
+package com.tg.osip.ui.views.images;
 
-import android.animation.Animator;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.content.Context;
+import android.support.annotation.NonNull;
 import android.util.AttributeSet;
 import android.view.View;
 import android.widget.ImageView;
-
-import com.tg.osip.utils.log.Logger;
 
 /**
  * @author e.matsyuk
@@ -40,7 +38,7 @@ public class ScalableImageView extends ImageView {
     }
 
     @Override
-    protected void onVisibilityChanged(View changedView, int visibility) {
+    protected void onVisibilityChanged(@NonNull View changedView, int visibility) {
         if (visibility == View.VISIBLE) {
             setAlpha(0f);
             super.onVisibilityChanged(changedView, visibility);

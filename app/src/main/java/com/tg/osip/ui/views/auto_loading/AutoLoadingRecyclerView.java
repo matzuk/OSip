@@ -10,7 +10,7 @@
  * distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See
  * the License for the specific language governing permissions and limitations under the License.
  */
-package com.tg.osip.utils.ui.auto_loading;
+package com.tg.osip.ui.views.auto_loading;
 
 import android.content.Context;
 import android.os.Parcel;
@@ -22,7 +22,6 @@ import android.util.AttributeSet;
 import android.util.Log;
 
 import com.tg.osip.utils.common.BackgroundExecutor;
-import com.tg.osip.utils.log.Logger;
 
 import java.util.ArrayList;
 import java.util.Collections;

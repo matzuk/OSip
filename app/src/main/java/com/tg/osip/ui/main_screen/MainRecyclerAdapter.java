@@ -12,17 +12,16 @@ import android.widget.TextView;
 import com.tg.osip.ApplicationSIP;
 import com.tg.osip.R;
 import com.tg.osip.business.main.MainListItem;
-import com.tg.osip.utils.ui.images.SIPAvatar;
-import com.tg.osip.utils.ui.auto_loading.AutoLoadingRecyclerViewAdapter;
+import com.tg.osip.ui.views.common_adapters.CommonRecyclerViewAdapter;
+import com.tg.osip.ui.views.images.SIPAvatar;
+import com.tg.osip.ui.views.auto_loading.AutoLoadingRecyclerViewAdapter;
 
 import org.drinkless.td.libcore.telegram.TdApi;
-
-import java.util.List;
 
 /**
  * @author e.matsyuk
  */
-public class MainRecyclerAdapter extends AutoLoadingRecyclerViewAdapter<MainListItem>  {
+public class MainRecyclerAdapter extends CommonRecyclerViewAdapter<MainListItem> {
 
     private static final int TEMP_SEND_STATE_IS_ERROR = 0;
     private static final int TEMP_SEND_STATE_IS_SENDING = 1000000000;

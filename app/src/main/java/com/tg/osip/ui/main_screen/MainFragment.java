@@ -16,9 +16,9 @@ import com.tg.osip.business.main.MainController;
 import com.tg.osip.business.main.MainListItem;
 import com.tg.osip.ui.chat.ChatFragment;
 import com.tg.osip.ui.general.BaseFragment;
-import com.tg.osip.utils.ui.auto_loading.AutoLoadingRecyclerView;
+import com.tg.osip.ui.views.auto_loading.AutoLoadingRecyclerView;
 import com.tg.osip.utils.log.Logger;
-import com.tg.osip.utils.ui.RecyclerItemClickListener;
+import com.tg.osip.ui.views.RecyclerItemClickListener;
 
 /**
  * Fragment show list of all chats

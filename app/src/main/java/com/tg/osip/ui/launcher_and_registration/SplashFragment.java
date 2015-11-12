@@ -8,7 +8,7 @@ import android.view.ViewGroup;
 
 import com.tg.osip.R;
 import com.tg.osip.business.AuthManager;
-import com.tg.osip.utils.ui.images.ScalableImageView;
+import com.tg.osip.ui.views.images.ScalableImageView;
 
 /**
  * @author e.matsyuk

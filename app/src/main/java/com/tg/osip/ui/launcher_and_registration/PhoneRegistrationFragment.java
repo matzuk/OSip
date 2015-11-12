@@ -25,8 +25,8 @@ import com.tg.osip.ui.launcher_and_registration.country.utils.CountryUtils;
 import com.tg.osip.utils.common.AndroidUtils;
 import com.tg.osip.utils.PhoneFormat.PhoneFormat;
 import com.tg.osip.utils.log.Logger;
-import com.tg.osip.utils.ui.images.ScalableImageView;
-import com.tg.osip.utils.ui.SimpleAlertDialog;
+import com.tg.osip.ui.views.images.ScalableImageView;
+import com.tg.osip.ui.views.SimpleAlertDialog;
 
 import java.util.HashMap;
 
