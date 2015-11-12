@@ -1,4 +1,4 @@
-package com.tg.osip.ui.main;
+package com.tg.osip.ui.main_screen;
 
 import android.support.v4.content.res.ResourcesCompat;
 import android.support.v7.widget.RecyclerView;

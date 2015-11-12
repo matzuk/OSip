@@ -13,7 +13,7 @@ import com.tg.osip.utils.time.TimeUtils;
 import org.drinkless.td.libcore.telegram.TdApi;
 
 /**
- * Comfortable model for {@link com.tg.osip.ui.main.MainRecyclerAdapter MainRecyclerAdapter}
+ * Comfortable model for {@link com.tg.osip.ui.main_screen.MainRecyclerAdapter MainRecyclerAdapter}
  *
  * @author e.matsyuk
  */
@@ -149,14 +149,11 @@ public class MainListItem {
         if (isGroupChat()) {
             TdApi.GroupChatInfo groupChatInfo = ((TdApi.GroupChatInfo)getApiChat().type);
             id = groupChatInfo.groupChat.id;
-//            name.append(groupChatInfo.groupChat.title.substring(0, 1));
             name = getLettersForPlug(groupChatInfo.groupChat.title, null);
         } else {
             TdApi.PrivateChatInfo privateChatInfo = ((TdApi.PrivateChatInfo)getApiChat().type);
             id = privateChatInfo.user.id;
             name = getLettersForPlug(privateChatInfo.user.firstName, privateChatInfo.user.lastName);
-//            name.append(privateChatInfo.user.firstName.substring(0, 1));
-//            name.append(privateChatInfo.user.lastName.substring(0, 1));
         }
         ColorGenerator generator = ColorGenerator.MATERIAL;
         int color = generator.getColor(id);

@@ -1,4 +1,4 @@
-package com.tg.osip.ui.main;
+package com.tg.osip.ui.main_screen;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -11,7 +11,6 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.tg.osip.R;
-import com.tg.osip.business.update_managers.FileDownloaderManager;
 import com.tg.osip.business.main.MainController;
 import com.tg.osip.tdclient.models.MainListItem;
 import com.tg.osip.ui.chat.ChatFragment;

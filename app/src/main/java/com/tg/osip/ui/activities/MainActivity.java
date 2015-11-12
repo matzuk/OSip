@@ -6,7 +6,7 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 
 import com.tg.osip.R;
-import com.tg.osip.ui.main.MainFragment;
+import com.tg.osip.ui.main_screen.MainFragment;
 
 /**
  *
