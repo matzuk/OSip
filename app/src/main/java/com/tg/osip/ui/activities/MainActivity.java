@@ -17,7 +17,9 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.ac_login);
-        startFragment(new MainFragment(), false);
+        if (savedInstanceState == null) {
+            startFragment(new MainFragment(), false);
+        }
     }
 
     private void startFragment(Fragment fragment, boolean withBackStack) {

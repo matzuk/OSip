@@ -29,12 +29,19 @@ public class MainFragment extends BaseFragment {
     private static final int LIMIT = 50;
 
     private AutoLoadingRecyclerView<MainListItem> recyclerView;
+    private MainController mainController;
+    private MainRecyclerAdapter mainRecyclerAdapter;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fmt_main, container, false);
-        init(rootView);
+        setRetainInstance(true);
+        if (savedInstanceState == null || mainController == null || mainRecyclerAdapter == null) {
+            init(rootView);
+        } else {
+            lightInit(rootView);
+        }
         initToolbar(rootView);
         return rootView;
     }
@@ -42,12 +49,12 @@ public class MainFragment extends BaseFragment {
     private void init(View view) {
         recyclerView = (AutoLoadingRecyclerView) view.findViewById(R.id.RecyclerView);
         // init Controller
-        MainController mainController = new MainController();
+        mainController = new MainController();
         // init LayoutManager
         GridLayoutManager recyclerViewLayoutManager = new GridLayoutManager(getActivity(), 1);
         recyclerViewLayoutManager.supportsPredictiveItemAnimations();
         // init ChatRecyclerAdapter
-        MainRecyclerAdapter mainRecyclerAdapter = new MainRecyclerAdapter();
+        mainRecyclerAdapter = new MainRecyclerAdapter();
         mainRecyclerAdapter.setHasStableIds(true);
         // recyclerView setting
         recyclerView.setLayoutManager(recyclerViewLayoutManager);
@@ -59,6 +66,22 @@ public class MainFragment extends BaseFragment {
         );
         Logger.debug("start loading List");
         mainController.startRecyclerView(recyclerView, mainRecyclerAdapter);
+    }
+
+    // init after reorientation
+    private void lightInit(View view) {
+        recyclerView = (AutoLoadingRecyclerView) view.findViewById(R.id.RecyclerView);
+        // init LayoutManager
+        GridLayoutManager recyclerViewLayoutManager = new GridLayoutManager(getActivity(), 1);
+        recyclerViewLayoutManager.supportsPredictiveItemAnimations();
+        // recyclerView setting
+        recyclerView.setLayoutManager(recyclerViewLayoutManager);
+        recyclerView.setLimit(LIMIT);
+        recyclerView.setAdapter(mainRecyclerAdapter);
+        recyclerView.setLoadingObservable(mainController.getILoading());
+        recyclerView.addOnItemTouchListener(
+                new RecyclerItemClickListener(getActivity(), (view1, position) -> goToConcreteChat(position))
+        );
     }
 
     private void goToConcreteChat(int position) {
