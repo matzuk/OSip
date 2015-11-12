@@ -1,6 +1,7 @@
 package com.tg.osip.ui.chat;
 
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
@@ -8,23 +9,13 @@ import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ProgressBar;
 
 import com.tg.osip.R;
-import com.tg.osip.tdclient.TGProxy;
-import com.tg.osip.utils.ui.auto_loading.ILoading;
-import com.tg.osip.utils.ui.auto_loading.OffsetAndLimit;
+import com.tg.osip.business.chat.ChatController;
 import com.tg.osip.utils.log.Logger;
 import com.tg.osip.utils.ui.auto_loading.AutoLoadingRecyclerView;
 
 import org.drinkless.td.libcore.telegram.TdApi;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
-import rx.Observable;
-import rx.Subscriber;
 
 /**
  * @author e.matsyuk
@@ -35,10 +26,10 @@ public class ChatFragment extends Fragment {
     private static final int LIMIT = 50;
 
     private AutoLoadingRecyclerView<TdApi.Message> recyclerView;
-    private ProgressBar progressBar;
+    private ChatRecyclerAdapter chatRecyclerAdapter;
+    private ChatController chatController;
 
     private long chatId;
-    private int topMessageId;
 
     public static ChatFragment newInstance(long chatId) {
         ChatFragment f = new ChatFragment();
@@ -61,58 +52,56 @@ public class ChatFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fmt_chat, container, false);
-        init(rootView);
+        setRetainInstance(true);
+        if (savedInstanceState == null || chatRecyclerAdapter == null || chatController == null) {
+            init(rootView);
+        } else {
+            lightInit(rootView);
+        }
         initToolbar(rootView);
         return rootView;
     }
 
     private void init(View view) {
-        progressBar = (ProgressBar) view.findViewById(R.id.progressBar);
         recyclerView = (AutoLoadingRecyclerView) view.findViewById(R.id.RecyclerView);
         // init LayoutManager
         GridLayoutManager recyclerViewLayoutManager = new GridLayoutManager(getActivity(), 1);
         recyclerViewLayoutManager.supportsPredictiveItemAnimations();
         recyclerViewLayoutManager.setReverseLayout(true);
+        // init ChatController
+        chatController = new ChatController();
         // init ChatRecyclerAdapter
-        ChatRecyclerAdapter chatRecyclerAdapter = new ChatRecyclerAdapter();
+        chatRecyclerAdapter = new ChatRecyclerAdapter();
         chatRecyclerAdapter.setHasStableIds(true);
         // recyclerView setting
         recyclerView.setLayoutManager(recyclerViewLayoutManager);
         recyclerView.setLimit(LIMIT);
         recyclerView.setAdapter(chatRecyclerAdapter);
-        recyclerView.setLoadingObservable(loading);
-
-        TGProxy.getInstance().sendTD(new TdApi.GetChat(chatId), TdApi.Chat.class)
-                .subscribe(new Subscriber<TdApi.Chat>() {
-                    @Override
-                    public void onCompleted() {
-
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                        Logger.error(e);
-                    }
-
-                    @Override
-                    public void onNext(TdApi.Chat chat) {
-                        topMessageId = chat.topMessage.id;
-                        recyclerView.startLoading();
-                    }
-                });
-
+        Logger.debug("start loading List");
+        chatController.firstStartRecyclerView(recyclerView, chatId);
     }
 
-    private ILoading<TdApi.Message> loading = new ILoading<TdApi.Message>() {
-        @Override
-        public Observable<List<TdApi.Message>> getLoadingObservable(OffsetAndLimit offsetAndLimit) {
-            return TGProxy.getInstance().sendTD(new TdApi.GetChatHistory(chatId, topMessageId, offsetAndLimit.getOffset(), offsetAndLimit.getLimit()), TdApi.Messages.class)
-                    .map(messages -> {
-                        TdApi.Message messageMas[] = messages.messages;
-                        return new ArrayList<>(Arrays.asList(messageMas));
-                    });
+    // init after reorientation
+    private void lightInit(View view) {
+        recyclerView = (AutoLoadingRecyclerView) view.findViewById(R.id.RecyclerView);
+        // init LayoutManager
+        GridLayoutManager recyclerViewLayoutManager = new GridLayoutManager(getActivity(), 1);
+        recyclerViewLayoutManager.supportsPredictiveItemAnimations();
+        recyclerViewLayoutManager.setReverseLayout(true);
+        // recyclerView setting
+        recyclerView.setLayoutManager(recyclerViewLayoutManager);
+        recyclerView.setLimit(LIMIT);
+        recyclerView.setAdapter(chatRecyclerAdapter);
+    }
+
+    @Override
+    public void onViewStateRestored(@Nullable Bundle savedInstanceState) {
+        super.onViewStateRestored(savedInstanceState);
+        // start loading after reorientation
+        if (savedInstanceState != null) {
+            chatController.startRecyclerView(recyclerView, chatId);
         }
-    };
+    }
 
     private void initToolbar(View rootView) {
         Toolbar toolbar = (Toolbar) rootView.findViewById(R.id.toolbar);

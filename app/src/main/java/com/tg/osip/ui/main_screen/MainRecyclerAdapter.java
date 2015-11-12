@@ -11,7 +11,7 @@ import android.widget.TextView;
 
 import com.tg.osip.ApplicationSIP;
 import com.tg.osip.R;
-import com.tg.osip.tdclient.models.MainListItem;
+import com.tg.osip.business.main.MainListItem;
 import com.tg.osip.utils.ui.images.SIPAvatar;
 import com.tg.osip.utils.ui.auto_loading.AutoLoadingRecyclerViewAdapter;
 
@@ -33,7 +33,6 @@ public class MainRecyclerAdapter extends AutoLoadingRecyclerViewAdapter<MainList
     private static final int LOADER_VIEW = 1;
 
     private int userId;
-    private boolean loaded;
 
     static class MainViewHolder extends RecyclerView.ViewHolder {
 
@@ -78,7 +77,7 @@ public class MainRecyclerAdapter extends AutoLoadingRecyclerViewAdapter<MainList
 
     @Override
     public int getItemViewType(int position) {
-        if (loaded) {
+        if (isFirstPortionLoaded()) {
             return MAIN_VIEW;
         } else {
             return LOADER_VIEW;
@@ -101,12 +100,6 @@ public class MainRecyclerAdapter extends AutoLoadingRecyclerViewAdapter<MainList
         } else {
             return COUNT_FOR_LOADER_VIEW;
         }
-    }
-
-    @Override
-    public void addNewItems(List<MainListItem> items) {
-        loaded = true;
-        super.addNewItems(items);
     }
 
     @Override
@@ -150,14 +143,14 @@ public class MainRecyclerAdapter extends AutoLoadingRecyclerViewAdapter<MainList
             // set is last message from account
             String textYou = "";
             if (getUserId() == concreteChat.topMessage.fromId) {
-                textYou = ApplicationSIP.applicationContext.getResources().getString(R.string.chat_list_message_text_you);
+                textYou = ApplicationSIP.applicationContext.getResources().getString(R.string.chat_list_message_text_you) + " ";
             }
 
             // very heavy operation for list
             String dataString = getItem(position).getLastMessageDate();
             mainHolder.chatMessageSendingTime.setText(dataString);
             // get message content and set last message
-            mainHolder.chatUserLastMessage.setText(textYou + " " + mainListItem.getLastMessageText());
+            mainHolder.chatUserLastMessage.setText(textYou + mainListItem.getLastMessageText());
         }
         // get ChatInfo
         TdApi.ChatInfo chatInfo = concreteChat.type;

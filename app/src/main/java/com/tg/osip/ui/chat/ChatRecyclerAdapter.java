@@ -8,6 +8,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.tg.osip.R;
+import com.tg.osip.utils.log.Logger;
 import com.tg.osip.utils.time.TimeUtils;
 import com.tg.osip.utils.ui.auto_loading.AutoLoadingRecyclerViewAdapter;
 

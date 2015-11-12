@@ -2,7 +2,6 @@ package com.tg.osip.business.main;
 
 import com.tg.osip.business.update_managers.FileDownloaderManager;
 import com.tg.osip.tdclient.TGProxy;
-import com.tg.osip.tdclient.models.MainListItem;
 import com.tg.osip.ui.main_screen.MainRecyclerAdapter;
 import com.tg.osip.utils.ui.auto_loading.AutoLoadingRecyclerView;
 import com.tg.osip.utils.ui.auto_loading.ILoading;
@@ -27,7 +26,7 @@ import rx.schedulers.Schedulers;
  */
 public class MainController {
 
-    public ILoading<MainListItem> getILoading() {
+    private ILoading<MainListItem> getILoading() {
         return offsetAndLimit -> TGProxy.getInstance().sendTD(new TdApi.GetChats(offsetAndLimit.getOffset(), offsetAndLimit.getLimit()), TdApi.Chats.class)
                 .map(chats -> {
                     TdApi.Chat chatsMas[] = chats.chats;
@@ -47,8 +46,10 @@ public class MainController {
                 .subscribe();
     }
 
-    // get my user.id and start loading
-    public <T> void startRecyclerView(AutoLoadingRecyclerView<T> autoLoadingRecyclerView, MainRecyclerAdapter mainRecyclerAdapter) {
+    /**
+     * load fresh my user.id id and start RecyclerView for first one
+     */
+    public void firstStartRecyclerView(AutoLoadingRecyclerView<com.tg.osip.business.main.MainListItem> autoLoadingRecyclerView, MainRecyclerAdapter mainRecyclerAdapter) {
         TGProxy.getInstance().sendTD(new TdApi.GetMe(), TdApi.User.class)
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Subscriber<TdApi.User>() {
@@ -66,9 +67,19 @@ public class MainController {
                     public void onNext(TdApi.User user) {
                         Logger.debug("user data loaded, recyclerview is next");
                         mainRecyclerAdapter.setUserId(user.id);
+                        autoLoadingRecyclerView.setLoadingObservable(getILoading());
                         autoLoadingRecyclerView.startLoading();
                     }
                 });
+    }
+
+    /**
+     * set parameters to RecyclerView after screen reorientation
+     * so we should not load my user.id for ILoading of RecyclerView
+     */
+    public void startRecyclerView(AutoLoadingRecyclerView<com.tg.osip.business.main.MainListItem> autoLoadingRecyclerView) {
+        autoLoadingRecyclerView.setLoadingObservable(getILoading());
+        autoLoadingRecyclerView.startLoading();
     }
 
 }

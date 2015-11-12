@@ -1,4 +1,4 @@
-package com.tg.osip.tdclient.models;
+package com.tg.osip.business.main;
 
 import android.graphics.drawable.Drawable;
 import android.os.Build;

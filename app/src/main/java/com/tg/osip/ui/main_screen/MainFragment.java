@@ -1,6 +1,7 @@
 package com.tg.osip.ui.main_screen;
 
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
@@ -12,7 +13,7 @@ import android.view.ViewGroup;
 
 import com.tg.osip.R;
 import com.tg.osip.business.main.MainController;
-import com.tg.osip.tdclient.models.MainListItem;
+import com.tg.osip.business.main.MainListItem;
 import com.tg.osip.ui.chat.ChatFragment;
 import com.tg.osip.ui.general.BaseFragment;
 import com.tg.osip.utils.ui.auto_loading.AutoLoadingRecyclerView;
@@ -60,12 +61,11 @@ public class MainFragment extends BaseFragment {
         recyclerView.setLayoutManager(recyclerViewLayoutManager);
         recyclerView.setLimit(LIMIT);
         recyclerView.setAdapter(mainRecyclerAdapter);
-        recyclerView.setLoadingObservable(mainController.getILoading());
         recyclerView.addOnItemTouchListener(
                 new RecyclerItemClickListener(getActivity(), (view1, position) -> goToConcreteChat(position))
         );
         Logger.debug("start loading List");
-        mainController.startRecyclerView(recyclerView, mainRecyclerAdapter);
+        mainController.firstStartRecyclerView(recyclerView, mainRecyclerAdapter);
     }
 
     // init after reorientation
@@ -78,10 +78,18 @@ public class MainFragment extends BaseFragment {
         recyclerView.setLayoutManager(recyclerViewLayoutManager);
         recyclerView.setLimit(LIMIT);
         recyclerView.setAdapter(mainRecyclerAdapter);
-        recyclerView.setLoadingObservable(mainController.getILoading());
         recyclerView.addOnItemTouchListener(
                 new RecyclerItemClickListener(getActivity(), (view1, position) -> goToConcreteChat(position))
         );
+    }
+
+    @Override
+    public void onViewStateRestored(@Nullable Bundle savedInstanceState) {
+        super.onViewStateRestored(savedInstanceState);
+        // start loading after reorientation
+        if (savedInstanceState != null) {
+            mainController.startRecyclerView(recyclerView);
+        }
     }
 
     private void goToConcreteChat(int position) {

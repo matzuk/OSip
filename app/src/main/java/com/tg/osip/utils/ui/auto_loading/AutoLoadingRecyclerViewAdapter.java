@@ -25,9 +25,14 @@ import java.util.List;
 public abstract class AutoLoadingRecyclerViewAdapter<T> extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     private List<T> listElements = new ArrayList<>();
+    private boolean firstPortionLoaded;
 
     public void addNewItems(List<T> items) {
+        firstPortionLoaded = true;
         listElements.addAll(items);
+    }
+    protected boolean isFirstPortionLoaded() {
+        return firstPortionLoaded;
     }
 
     public List<T> getItems() {

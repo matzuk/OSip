@@ -8,7 +8,7 @@ import com.squareup.picasso.Picasso;
 import com.tg.osip.ApplicationSIP;
 import com.tg.osip.business.update_managers.FileDownloaderManager;
 import com.tg.osip.business.update_managers.UpdateManager;
-import com.tg.osip.tdclient.models.MainListItem;
+import com.tg.osip.business.main.MainListItem;
 import com.tg.osip.utils.common.BackgroundExecutor;
 import com.tg.osip.utils.log.Logger;
 
