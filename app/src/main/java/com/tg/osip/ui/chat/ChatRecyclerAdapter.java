@@ -1,5 +1,6 @@
 package com.tg.osip.ui.chat;
 
+import android.support.v4.content.res.ResourcesCompat;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -8,6 +9,7 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.tg.osip.ApplicationSIP;
 import com.tg.osip.R;
 import com.tg.osip.ui.views.common_adapters.CommonRecyclerViewAdapter;
 import com.tg.osip.utils.time.TimeUtils;
@@ -19,12 +21,18 @@ import org.drinkless.td.libcore.telegram.TdApi;
  */
 public class ChatRecyclerAdapter extends CommonRecyclerViewAdapter<TdApi.Message> {
 
+    private static final int TEMP_SEND_STATE_IS_SENDING = 1000000000;
+    private static final int TEMP_SEND_STATE_IS_ERROR = 0;
+
     private static final int MAIN_VIEW = 0;
     private static final int UNSUPPORTED_VIEW = 4;
     private static final int LOADER_VIEW = 5;
 
     private static final int DEFAULT_VALUE = 0;
     private static final int COUNT_FOR_LOADER_VIEW = 1;
+
+    private int myUserId;
+    private int lastChatReadOutboxId;
 
     static class MainViewHolder extends RecyclerView.ViewHolder {
 
@@ -106,7 +114,7 @@ public class ChatRecyclerAdapter extends CommonRecyclerViewAdapter<TdApi.Message
         if (!isFirstPortionLoaded()) {
             return LOADER_VIEW;
         }
-        if (getItem(position).message instanceof TdApi.MessageText) {
+        if (getItem(position).message.getClass() == TdApi.MessageText.class) {
             return MAIN_VIEW;
         }
         return UNSUPPORTED_VIEW;
@@ -166,19 +174,27 @@ public class ChatRecyclerAdapter extends CommonRecyclerViewAdapter<TdApi.Message
         mainHolder.chatMessageSendingTime.setText(dataString);
 
         // set unread outbox image
-//        if (message.date == TEMP_SEND_STATE_IS_ERROR) {
-//            mainHolder.chatMessageUnreadOutbox.setVisibility(View.VISIBLE);
-//            mainHolder.chatMessageUnreadOutbox.setImageDrawable(ResourcesCompat.getDrawable(ApplicationLoader.applicationContext.getResources(), R.drawable.ic_message_error, ApplicationLoader.applicationContext.getTheme()));
-//        } else if (TGProxy.getInstance().getUserId() == message.fromId) {
-//            if (lastChatReadOutboxId >= message.id) {
-//                mainHolder.chatMessageUnreadOutbox.setVisibility(View.GONE);
-//            } else {
-//                mainHolder.chatMessageUnreadOutbox.setVisibility(View.VISIBLE);
-//                setSendStateMessage(message, mainHolder.chatMessageUnreadOutbox);
-//            }
-//        } else {
-//            mainHolder.chatMessageUnreadOutbox.setVisibility(View.GONE);
-//        }
+        if (message.date == TEMP_SEND_STATE_IS_ERROR) {
+            mainHolder.chatMessageUnreadOutbox.setVisibility(View.VISIBLE);
+            mainHolder.chatMessageUnreadOutbox.setImageDrawable(ResourcesCompat.getDrawable(ApplicationSIP.applicationContext.getResources(), R.drawable.ic_message_error, ApplicationSIP.applicationContext.getTheme()));
+        } else if (myUserId == message.fromId) {
+            if (lastChatReadOutboxId >= message.id) {
+                mainHolder.chatMessageUnreadOutbox.setVisibility(View.GONE);
+            } else {
+                mainHolder.chatMessageUnreadOutbox.setVisibility(View.VISIBLE);
+                setSendStateMessage(message, mainHolder.chatMessageUnreadOutbox);
+            }
+        } else {
+            mainHolder.chatMessageUnreadOutbox.setVisibility(View.GONE);
+        }
+    }
+
+    private void setSendStateMessage(TdApi.Message message, ImageView imageView) {
+        if (message.id >= TEMP_SEND_STATE_IS_SENDING) {
+            imageView.setImageDrawable(ResourcesCompat.getDrawable(ApplicationSIP.applicationContext.getResources(), R.drawable.ic_clock, ApplicationSIP.applicationContext.getTheme()));
+        } else {
+            imageView.setImageDrawable(ResourcesCompat.getDrawable(ApplicationSIP.applicationContext.getResources(), R.drawable.ic_not_read, ApplicationSIP.applicationContext.getTheme()));
+        }
     }
 
     public void onBindLoaderHolder(RecyclerView.ViewHolder holder, int position) {
@@ -200,7 +216,7 @@ public class ChatRecyclerAdapter extends CommonRecyclerViewAdapter<TdApi.Message
 //        if (user == null) {
 //            return;
 //        }
-
+//
 //        TDLibUtils.setLetterDrawable(mainHolder.avatar, user);
 //        if (PicassoProxy.getInstance().containInCache(user)) {
 //            Picasso.with(
@@ -213,12 +229,24 @@ public class ChatRecyclerAdapter extends CommonRecyclerViewAdapter<TdApi.Message
 //        } else {
 //            PicassoProxy.getInstance().downloadFile(user);
 //        }
-//
+
 //        mainHolder.chatMessageName.setText(user.firstName + " " + user.lastName);
 
         String dataString = TimeUtils.stringForMessageListDate(message.date);
         mainHolder.chatMessageSendingTime.setText(dataString);
 
+    }
+
+    public void setMyUserId(int myUserId) {
+        this.myUserId = myUserId;
+    }
+
+    public int getMyUserId() {
+        return myUserId;
+    }
+
+    public void setLastChatReadOutboxId(int lastChatReadOutboxId) {
+        this.lastChatReadOutboxId = lastChatReadOutboxId;
     }
 
 }

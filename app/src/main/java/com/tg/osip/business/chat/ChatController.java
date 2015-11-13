@@ -1,6 +1,7 @@
 package com.tg.osip.business.chat;
 
 import com.tg.osip.tdclient.TGProxy;
+import com.tg.osip.ui.chat.ChatRecyclerAdapter;
 import com.tg.osip.utils.log.Logger;
 import com.tg.osip.ui.views.auto_loading.AutoLoadingRecyclerView;
 import com.tg.osip.ui.views.auto_loading.ILoading;
@@ -33,14 +34,16 @@ public class ChatController {
     /**
      * load fresh top message id and start RecyclerView for first one
     */
-    public void firstStartRecyclerView(AutoLoadingRecyclerView<TdApi.Message> autoLoadingRecyclerView, long chatId) {
-        TGProxy.getInstance().sendTD(new TdApi.GetChat(chatId), TdApi.Chat.class)
+    public void firstStartRecyclerView(AutoLoadingRecyclerView<TdApi.Message> autoLoadingRecyclerView, ChatRecyclerAdapter chatRecyclerAdapter, long chatId) {
+        TGProxy.getInstance()
+                .sendTD(new TdApi.GetMe(), TdApi.User.class)
+                .observeOn(AndroidSchedulers.mainThread())
+                .doOnNext(user -> chatRecyclerAdapter.setMyUserId(user.id))
+                .concatMap(user -> TGProxy.getInstance().sendTD(new TdApi.GetChat(chatId), TdApi.Chat.class))
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Subscriber<TdApi.Chat>() {
                     @Override
-                    public void onCompleted() {
-
-                    }
+                    public void onCompleted() { }
 
                     @Override
                     public void onError(Throwable e) {
@@ -51,6 +54,7 @@ public class ChatController {
                     public void onNext(TdApi.Chat chat) {
                         Logger.debug("user data loaded, recyclerview is next");
                         topMessageId = chat.topMessage.id;
+                        chatRecyclerAdapter.setLastChatReadOutboxId(chat.lastReadOutboxMessageId);
                         autoLoadingRecyclerView.setLoadingObservable(getILoading(chatId, topMessageId));
                         autoLoadingRecyclerView.startLoading();
                     }

@@ -78,7 +78,7 @@ public class ChatFragment extends Fragment {
         recyclerView.setLimit(LIMIT);
         recyclerView.setAdapter(chatRecyclerAdapter);
         Logger.debug("start loading List");
-        chatController.firstStartRecyclerView(recyclerView, chatId);
+        chatController.firstStartRecyclerView(recyclerView, chatRecyclerAdapter, chatId);
     }
 
     // init after reorientation

@@ -14,7 +14,6 @@ import com.tg.osip.R;
 import com.tg.osip.business.main.MainListItem;
 import com.tg.osip.ui.views.common_adapters.CommonRecyclerViewAdapter;
 import com.tg.osip.ui.views.images.SIPAvatar;
-import com.tg.osip.ui.views.auto_loading.AutoLoadingRecyclerViewAdapter;
 
 import org.drinkless.td.libcore.telegram.TdApi;
 
@@ -31,7 +30,7 @@ public class MainRecyclerAdapter extends CommonRecyclerViewAdapter<MainListItem>
     private static final int MAIN_VIEW = 0;
     private static final int LOADER_VIEW = 1;
 
-    private int userId;
+    private int myUserId;
 
     static class MainViewHolder extends RecyclerView.ViewHolder {
 
@@ -141,7 +140,7 @@ public class MainRecyclerAdapter extends CommonRecyclerViewAdapter<MainListItem>
         if (message != null) {
             // set is last message from account
             String textYou = "";
-            if (getUserId() == concreteChat.topMessage.fromId) {
+            if (getMyUserId() == concreteChat.topMessage.fromId) {
                 textYou = ApplicationSIP.applicationContext.getResources().getString(R.string.chat_list_message_text_you) + " ";
             }
 
@@ -162,7 +161,7 @@ public class MainRecyclerAdapter extends CommonRecyclerViewAdapter<MainListItem>
         // is chat group?
         mainHolder.chatGroupIcon.setVisibility(mainListItem.isGroupChat()? View.VISIBLE : View.GONE);
         // set unread outbox image
-        if (getUserId() == concreteChat.topMessage.fromId) {
+        if (getMyUserId() == concreteChat.topMessage.fromId) {
             if (concreteChat.lastReadOutboxMessageId >= concreteChat.topMessage.id) {
                 mainHolder.chatUnreadOutboxMessage.setVisibility(View.GONE);
             } else {
@@ -183,12 +182,12 @@ public class MainRecyclerAdapter extends CommonRecyclerViewAdapter<MainListItem>
         }
     }
 
-    public void setUserId(int userId) {
-        this.userId = userId;
+    public void setMyUserId(int myUserId) {
+        this.myUserId = myUserId;
     }
 
-    public int getUserId() {
-        return userId;
+    public int getMyUserId() {
+        return myUserId;
     }
 
 }

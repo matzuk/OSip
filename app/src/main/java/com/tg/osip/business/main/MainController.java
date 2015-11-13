@@ -50,7 +50,8 @@ public class MainController {
      * load fresh my user.id id and start RecyclerView for first one
      */
     public void firstStartRecyclerView(AutoLoadingRecyclerView<com.tg.osip.business.main.MainListItem> autoLoadingRecyclerView, MainRecyclerAdapter mainRecyclerAdapter) {
-        TGProxy.getInstance().sendTD(new TdApi.GetMe(), TdApi.User.class)
+        TGProxy.getInstance()
+                .sendTD(new TdApi.GetMe(), TdApi.User.class)
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Subscriber<TdApi.User>() {
                     @Override
@@ -66,7 +67,7 @@ public class MainController {
                     @Override
                     public void onNext(TdApi.User user) {
                         Logger.debug("user data loaded, recyclerview is next");
-                        mainRecyclerAdapter.setUserId(user.id);
+                        mainRecyclerAdapter.setMyUserId(user.id);
                         autoLoadingRecyclerView.setLoadingObservable(getILoading());
                         autoLoadingRecyclerView.startLoading();
                     }
