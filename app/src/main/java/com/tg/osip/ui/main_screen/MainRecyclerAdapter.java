@@ -94,7 +94,7 @@ public class MainRecyclerAdapter extends CommonRecyclerViewAdapter<MainListItem>
 
     @Override
     public int getItemCount() {
-        if (getItemViewType(DEFAULT_VALUE) == MAIN_VIEW) {
+        if (isFirstPortionLoaded()) {
             return super.getItemCount();
         } else {
             return COUNT_FOR_LOADER_VIEW;

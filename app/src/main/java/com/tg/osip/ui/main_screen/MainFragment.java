@@ -38,7 +38,7 @@ public class MainFragment extends BaseFragment {
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fmt_main, container, false);
         setRetainInstance(true);
-        if (savedInstanceState == null || mainController == null || mainRecyclerAdapter == null) {
+        if (mainController == null || mainRecyclerAdapter == null) {
             init(rootView);
         } else {
             lightInit(rootView);
@@ -79,8 +79,10 @@ public class MainFragment extends BaseFragment {
         recyclerView.setLimit(LIMIT);
         recyclerView.setAdapter(mainRecyclerAdapter);
         recyclerView.addOnItemTouchListener(
-                new RecyclerItemClickListener(getActivity(), (view1, position) -> goToConcreteChat(position))
-        );
+                new RecyclerItemClickListener(getActivity(), (view1, position) -> {
+                    goToConcreteChat(position);
+                }
+        ));
     }
 
     @Override

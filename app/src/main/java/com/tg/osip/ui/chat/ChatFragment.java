@@ -53,7 +53,7 @@ public class ChatFragment extends Fragment {
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fmt_chat, container, false);
         setRetainInstance(true);
-        if (savedInstanceState == null || chatRecyclerAdapter == null || chatController == null) {
+        if (chatRecyclerAdapter == null || chatController == null) {
             init(rootView);
         } else {
             lightInit(rootView);
