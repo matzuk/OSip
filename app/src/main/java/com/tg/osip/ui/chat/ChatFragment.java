@@ -53,11 +53,7 @@ public class ChatFragment extends Fragment {
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fmt_chat, container, false);
         setRetainInstance(true);
-        if (chatRecyclerAdapter == null || chatController == null) {
-            init(rootView);
-        } else {
-            lightInit(rootView);
-        }
+        init(rootView);
         initToolbar(rootView);
         return rootView;
     }
@@ -68,30 +64,22 @@ public class ChatFragment extends Fragment {
         GridLayoutManager recyclerViewLayoutManager = new GridLayoutManager(getActivity(), 1);
         recyclerViewLayoutManager.supportsPredictiveItemAnimations();
         recyclerViewLayoutManager.setReverseLayout(true);
-        // init ChatController
-        chatController = new ChatController();
-        // init ChatRecyclerAdapter
-        chatRecyclerAdapter = new ChatRecyclerAdapter();
-        chatRecyclerAdapter.setHasStableIds(true);
         // recyclerView setting
         recyclerView.setLayoutManager(recyclerViewLayoutManager);
         recyclerView.setLimit(LIMIT);
-        recyclerView.setAdapter(chatRecyclerAdapter);
-        Logger.debug("start loading List");
-        chatController.firstStartRecyclerView(recyclerView, chatRecyclerAdapter, chatId);
-    }
-
-    // init after reorientation
-    private void lightInit(View view) {
-        recyclerView = (AutoLoadingRecyclerView) view.findViewById(R.id.RecyclerView);
-        // init LayoutManager
-        GridLayoutManager recyclerViewLayoutManager = new GridLayoutManager(getActivity(), 1);
-        recyclerViewLayoutManager.supportsPredictiveItemAnimations();
-        recyclerViewLayoutManager.setReverseLayout(true);
-        // recyclerView setting
-        recyclerView.setLayoutManager(recyclerViewLayoutManager);
-        recyclerView.setLimit(LIMIT);
-        recyclerView.setAdapter(chatRecyclerAdapter);
+        // for first start
+        if (chatRecyclerAdapter == null || chatController == null) {
+            // init ChatController
+            chatController = new ChatController();
+            // init ChatRecyclerAdapter
+            chatRecyclerAdapter = new ChatRecyclerAdapter();
+            chatRecyclerAdapter.setHasStableIds(true);
+            recyclerView.setAdapter(chatRecyclerAdapter);
+            Logger.debug("start loading List");
+            chatController.firstStartRecyclerView(recyclerView, chatRecyclerAdapter, chatId);
+        } else {
+            recyclerView.setAdapter(chatRecyclerAdapter);
+        }
     }
 
     @Override
@@ -119,7 +107,9 @@ public class ChatFragment extends Fragment {
 
     @Override
     public void onDestroyView() {
-        recyclerView.onDestroy();
+        if (chatController != null) {
+            chatController.onDestroy();
+        }
         super.onDestroyView();
     }
 

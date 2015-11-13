@@ -1,5 +1,8 @@
 package com.tg.osip.business.main;
 
+import android.view.View;
+import android.widget.ProgressBar;
+
 import com.tg.osip.business.update_managers.FileDownloaderManager;
 import com.tg.osip.tdclient.TGProxy;
 import com.tg.osip.ui.main_screen.MainRecyclerAdapter;
@@ -10,13 +13,16 @@ import com.tg.osip.utils.log.Logger;
 
 import org.drinkless.td.libcore.telegram.TdApi;
 
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 import rx.Observable;
 import rx.Subscriber;
+import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
+import rx.functions.Action1;
 import rx.schedulers.Schedulers;
 
 /**
@@ -25,6 +31,10 @@ import rx.schedulers.Schedulers;
  * @author e.matsyuk
  */
 public class MainController {
+
+    WeakReference<ProgressBar> progressBarWeakReference;
+    Subscription startFileDownloadingSubscription;
+    Subscription firstStartRecyclerViewSubscription;
 
     private ILoading<MainListItem> getILoading() {
         return offsetAndLimit -> TGProxy.getInstance().sendTD(new TdApi.GetChats(offsetAndLimit.getOffset(), offsetAndLimit.getLimit()), TdApi.Chats.class)
@@ -35,11 +45,17 @@ public class MainController {
                 .concatMap(Observable::from)
                 .map(MainListItem::new)
                 .toList()
-                .doOnNext(MainController.this::startFileDownloading);
+                .observeOn(AndroidSchedulers.mainThread())
+                .doOnNext(mainListItems -> {
+                    if (progressBarWeakReference != null && progressBarWeakReference.get() != null) {
+                        progressBarWeakReference.get().setVisibility(View.GONE);
+                    }
+                    startFileDownloading(mainListItems);
+                });
     }
 
     public void startFileDownloading(List<MainListItem> mainListItems) {
-        Observable.from(mainListItems)
+        startFileDownloadingSubscription = Observable.from(mainListItems)
                 .subscribeOn(Schedulers.from(BackgroundExecutor.getSafeBackgroundExecutor()))
                 .filter(mainListItem -> mainListItem.isSmallPhotoFileIdValid() && !mainListItem.isSmallPhotoFilePathValid() && !FileDownloaderManager.getInstance().isFileInCache(mainListItem.getSmallPhotoFileId()))
                 .concatMap(mainListItem -> TGProxy.getInstance().sendTD(new TdApi.DownloadFile(mainListItem.getSmallPhotoFileId()), TdApi.Ok.class))
@@ -49,8 +65,9 @@ public class MainController {
     /**
      * load fresh my user.id id and start RecyclerView for first one
      */
-    public void firstStartRecyclerView(AutoLoadingRecyclerView<com.tg.osip.business.main.MainListItem> autoLoadingRecyclerView, MainRecyclerAdapter mainRecyclerAdapter) {
-        TGProxy.getInstance()
+    public void firstStartRecyclerView(AutoLoadingRecyclerView<MainListItem> autoLoadingRecyclerView, MainRecyclerAdapter mainRecyclerAdapter, ProgressBar progressBar) {
+        progressBarWeakReference = new WeakReference<>(progressBar);
+        firstStartRecyclerViewSubscription = TGProxy.getInstance()
                 .sendTD(new TdApi.GetMe(), TdApi.User.class)
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Subscriber<TdApi.User>() {
@@ -81,6 +98,18 @@ public class MainController {
     public void startRecyclerView(AutoLoadingRecyclerView<com.tg.osip.business.main.MainListItem> autoLoadingRecyclerView) {
         autoLoadingRecyclerView.setLoadingObservable(getILoading());
         autoLoadingRecyclerView.startLoading();
+    }
+
+    /**
+     * Required method for memory leaks preventing
+     */
+    public void onDestroy() {
+        if (startFileDownloadingSubscription != null && !startFileDownloadingSubscription.isUnsubscribed()) {
+            startFileDownloadingSubscription.unsubscribe();
+        }
+        if (firstStartRecyclerViewSubscription != null && !firstStartRecyclerViewSubscription.isUnsubscribed()) {
+            firstStartRecyclerViewSubscription.unsubscribe();
+        }
     }
 
 }

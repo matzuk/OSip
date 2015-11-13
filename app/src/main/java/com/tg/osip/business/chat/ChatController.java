@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 import rx.Subscriber;
+import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
 
 /**
@@ -22,6 +23,7 @@ import rx.android.schedulers.AndroidSchedulers;
 public class ChatController {
 
     private int topMessageId;
+    private Subscription firstStartRecyclerViewSubscription;
 
     ILoading<TdApi.Message> getILoading(long chatId, int topMessageId) {
         return offsetAndLimit -> TGProxy.getInstance().sendTD(new TdApi.GetChatHistory(chatId, topMessageId, offsetAndLimit.getOffset(), offsetAndLimit.getLimit()), TdApi.Messages.class)
@@ -35,7 +37,7 @@ public class ChatController {
      * load fresh top message id and start RecyclerView for first one
     */
     public void firstStartRecyclerView(AutoLoadingRecyclerView<TdApi.Message> autoLoadingRecyclerView, ChatRecyclerAdapter chatRecyclerAdapter, long chatId) {
-        TGProxy.getInstance()
+        firstStartRecyclerViewSubscription = TGProxy.getInstance()
                 .sendTD(new TdApi.GetMe(), TdApi.User.class)
                 .observeOn(AndroidSchedulers.mainThread())
                 .doOnNext(user -> chatRecyclerAdapter.setMyUserId(user.id))
@@ -68,6 +70,15 @@ public class ChatController {
     public void startRecyclerView(AutoLoadingRecyclerView<TdApi.Message> autoLoadingRecyclerView, long chatId) {
         autoLoadingRecyclerView.setLoadingObservable(getILoading(chatId, topMessageId));
         autoLoadingRecyclerView.startLoading();
+    }
+
+    /**
+     * Required method for memory leaks preventing
+     */
+    public void onDestroy() {
+        if (firstStartRecyclerViewSubscription != null && !firstStartRecyclerViewSubscription.isUnsubscribed()) {
+            firstStartRecyclerViewSubscription.unsubscribe();
+        }
     }
 
 

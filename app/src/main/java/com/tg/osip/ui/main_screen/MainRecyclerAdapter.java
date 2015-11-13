@@ -12,7 +12,7 @@ import android.widget.TextView;
 import com.tg.osip.ApplicationSIP;
 import com.tg.osip.R;
 import com.tg.osip.business.main.MainListItem;
-import com.tg.osip.ui.views.common_adapters.CommonRecyclerViewAdapter;
+import com.tg.osip.ui.views.auto_loading.AutoLoadingRecyclerViewAdapter;
 import com.tg.osip.ui.views.images.SIPAvatar;
 
 import org.drinkless.td.libcore.telegram.TdApi;
@@ -20,15 +20,12 @@ import org.drinkless.td.libcore.telegram.TdApi;
 /**
  * @author e.matsyuk
  */
-public class MainRecyclerAdapter extends CommonRecyclerViewAdapter<MainListItem> {
+public class MainRecyclerAdapter extends AutoLoadingRecyclerViewAdapter<MainListItem> {
 
     private static final int TEMP_SEND_STATE_IS_ERROR = 0;
     private static final int TEMP_SEND_STATE_IS_SENDING = 1000000000;
-    private static final int DEFAULT_VALUE = 0;
-    private static final int COUNT_FOR_LOADER_VIEW = 1;
 
     private static final int MAIN_VIEW = 0;
-    private static final int LOADER_VIEW = 1;
 
     private int myUserId;
 
@@ -75,29 +72,12 @@ public class MainRecyclerAdapter extends CommonRecyclerViewAdapter<MainListItem>
 
     @Override
     public int getItemViewType(int position) {
-        if (isFirstPortionLoaded()) {
-            return MAIN_VIEW;
-        } else {
-            return LOADER_VIEW;
-        }
+        return MAIN_VIEW;
     }
 
     @Override
     public long getItemId(int position) {
-        if (getItemViewType(position) == MAIN_VIEW) {
-            return getItem(position).getApiChat().id;
-        } else {
-            return DEFAULT_VALUE;
-        }
-    }
-
-    @Override
-    public int getItemCount() {
-        if (isFirstPortionLoaded()) {
-            return super.getItemCount();
-        } else {
-            return COUNT_FOR_LOADER_VIEW;
-        }
+        return getItem(position).getApiChat().id;
     }
 
     @Override
@@ -106,14 +86,7 @@ public class MainRecyclerAdapter extends CommonRecyclerViewAdapter<MainListItem>
             case MAIN_VIEW:
                 onBindMainHolder(holder, position);
                 break;
-            case LOADER_VIEW:
-                onBindLoaderHolder(holder, position);
-                break;
         }
-    }
-
-    public void onBindLoaderHolder(RecyclerView.ViewHolder holder, int position) {
-        LoaderViewHolder loaderViewHolder = (LoaderViewHolder) holder;
     }
 
     public void onBindMainHolder(RecyclerView.ViewHolder holder, int position) {
@@ -148,7 +121,8 @@ public class MainRecyclerAdapter extends CommonRecyclerViewAdapter<MainListItem>
             String dataString = getItem(position).getLastMessageDate();
             mainHolder.chatMessageSendingTime.setText(dataString);
             // get message content and set last message
-            mainHolder.chatUserLastMessage.setText(textYou + mainListItem.getLastMessageText());
+            String lastMessageText = textYou + mainListItem.getLastMessageText();
+            mainHolder.chatUserLastMessage.setText(lastMessageText);
         }
         // get ChatInfo
         TdApi.ChatInfo chatInfo = concreteChat.type;

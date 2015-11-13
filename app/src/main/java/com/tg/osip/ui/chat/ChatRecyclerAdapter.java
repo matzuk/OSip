@@ -6,12 +6,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.tg.osip.ApplicationSIP;
 import com.tg.osip.R;
-import com.tg.osip.ui.views.common_adapters.CommonRecyclerViewAdapter;
+import com.tg.osip.ui.views.auto_loading.AutoLoadingRecyclerViewAdapter;
 import com.tg.osip.utils.time.TimeUtils;
 
 import org.drinkless.td.libcore.telegram.TdApi;
@@ -19,17 +18,13 @@ import org.drinkless.td.libcore.telegram.TdApi;
 /**
  * @author e.matsyuk
  */
-public class ChatRecyclerAdapter extends CommonRecyclerViewAdapter<TdApi.Message> {
+public class ChatRecyclerAdapter extends AutoLoadingRecyclerViewAdapter<TdApi.Message> {
 
     private static final int TEMP_SEND_STATE_IS_SENDING = 1000000000;
     private static final int TEMP_SEND_STATE_IS_ERROR = 0;
 
     private static final int MAIN_VIEW = 0;
     private static final int UNSUPPORTED_VIEW = 4;
-    private static final int LOADER_VIEW = 5;
-
-    private static final int DEFAULT_VALUE = 0;
-    private static final int COUNT_FOR_LOADER_VIEW = 1;
 
     private int myUserId;
     private int lastChatReadOutboxId;
@@ -68,30 +63,9 @@ public class ChatRecyclerAdapter extends CommonRecyclerViewAdapter<TdApi.Message
         }
     }
 
-    static class LoaderViewHolder extends RecyclerView.ViewHolder {
-        RelativeLayout layout;
-        public LoaderViewHolder(View itemView) {
-            super(itemView);
-            layout = (RelativeLayout) itemView.findViewById(R.id.layout);
-        }
-    }
-
     @Override
     public long getItemId(int position) {
-        if (getItemViewType(position) == MAIN_VIEW) {
-            return getItem(position).id;
-        } else {
-            return DEFAULT_VALUE;
-        }
-    }
-
-    @Override
-    public int getItemCount() {
-        if (isFirstPortionLoaded()) {
-            return super.getItemCount();
-        } else {
-            return COUNT_FOR_LOADER_VIEW;
-        }
+        return getItem(position).id;
     }
 
     @Override
@@ -99,9 +73,6 @@ public class ChatRecyclerAdapter extends CommonRecyclerViewAdapter<TdApi.Message
         if (viewType == MAIN_VIEW) {
             View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_chat_list_message_text, parent, false);
             return new MainViewHolder(v);
-        } else if (viewType == LOADER_VIEW) {
-            View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_loader_list, parent, false);
-            return new LoaderViewHolder(v);
         } else if (viewType == UNSUPPORTED_VIEW) {
             View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_chat_list_message_unsupport, parent, false);
             return new UnsupportedViewHolder(v);
@@ -111,9 +82,6 @@ public class ChatRecyclerAdapter extends CommonRecyclerViewAdapter<TdApi.Message
 
     @Override
     public int getItemViewType(int position) {
-        if (!isFirstPortionLoaded()) {
-            return LOADER_VIEW;
-        }
         if (getItem(position).message.getClass() == TdApi.MessageText.class) {
             return MAIN_VIEW;
         }
@@ -125,9 +93,6 @@ public class ChatRecyclerAdapter extends CommonRecyclerViewAdapter<TdApi.Message
         switch (getItemViewType(position)) {
             case MAIN_VIEW:
                 onBindTextHolder(holder, position);
-                break;
-            case LOADER_VIEW:
-                onBindLoaderHolder(holder, position);
                 break;
             case UNSUPPORTED_VIEW:
                 onBindUnsupportedHolder(holder, position);
@@ -195,10 +160,6 @@ public class ChatRecyclerAdapter extends CommonRecyclerViewAdapter<TdApi.Message
         } else {
             imageView.setImageDrawable(ResourcesCompat.getDrawable(ApplicationSIP.applicationContext.getResources(), R.drawable.ic_not_read, ApplicationSIP.applicationContext.getTheme()));
         }
-    }
-
-    public void onBindLoaderHolder(RecyclerView.ViewHolder holder, int position) {
-        LoaderViewHolder loaderViewHolder = (LoaderViewHolder) holder;
     }
 
     private void onBindUnsupportedHolder(RecyclerView.ViewHolder holder, int position) {

@@ -10,6 +10,8 @@ import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
+import android.widget.ProgressBar;
 
 import com.tg.osip.R;
 import com.tg.osip.business.main.MainController;
@@ -38,51 +40,43 @@ public class MainFragment extends BaseFragment {
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fmt_main, container, false);
         setRetainInstance(true);
-        if (mainController == null || mainRecyclerAdapter == null) {
-            init(rootView);
-        } else {
-            lightInit(rootView);
-        }
+        init(rootView);
         initToolbar(rootView);
         return rootView;
     }
 
     private void init(View view) {
         recyclerView = (AutoLoadingRecyclerView) view.findViewById(R.id.RecyclerView);
-        // init Controller
-        mainController = new MainController();
+        ProgressBar progressBar = (ProgressBar) view.findViewById(R.id.progressBar);
         // init LayoutManager
         GridLayoutManager recyclerViewLayoutManager = new GridLayoutManager(getActivity(), 1);
         recyclerViewLayoutManager.supportsPredictiveItemAnimations();
-        // init ChatRecyclerAdapter
-        mainRecyclerAdapter = new MainRecyclerAdapter();
-        mainRecyclerAdapter.setHasStableIds(true);
         // recyclerView setting
         recyclerView.setLayoutManager(recyclerViewLayoutManager);
         recyclerView.setLimit(LIMIT);
-        recyclerView.setAdapter(mainRecyclerAdapter);
         recyclerView.addOnItemTouchListener(
                 new RecyclerItemClickListener(getActivity(), (view1, position) -> goToConcreteChat(position))
         );
-        Logger.debug("start loading List");
-        mainController.firstStartRecyclerView(recyclerView, mainRecyclerAdapter);
-    }
+        // first start
+        if (mainController == null || mainRecyclerAdapter == null) {
+            // start progressbar
+            progressBar.setVisibility(View.VISIBLE);
+            // init MainRecyclerAdapter
+            mainRecyclerAdapter = new MainRecyclerAdapter();
+            mainRecyclerAdapter.setHasStableIds(true);
+            recyclerView.setAdapter(mainRecyclerAdapter);
+            // init Controller
+            mainController = new MainController();
+            // for more smoother RecyclerView appearing
+            recyclerView.setVisibility(View.GONE);
+            ViewTreeObserver textViewTreeObserver=recyclerView.getViewTreeObserver();
+            textViewTreeObserver.addOnGlobalLayoutListener(() -> recyclerView.setVisibility(View.VISIBLE));
+            Logger.debug("start loading List");
+            mainController.firstStartRecyclerView(recyclerView, mainRecyclerAdapter, progressBar);
+        } else {
+            recyclerView.setAdapter(mainRecyclerAdapter);
+        }
 
-    // init after reorientation
-    private void lightInit(View view) {
-        recyclerView = (AutoLoadingRecyclerView) view.findViewById(R.id.RecyclerView);
-        // init LayoutManager
-        GridLayoutManager recyclerViewLayoutManager = new GridLayoutManager(getActivity(), 1);
-        recyclerViewLayoutManager.supportsPredictiveItemAnimations();
-        // recyclerView setting
-        recyclerView.setLayoutManager(recyclerViewLayoutManager);
-        recyclerView.setLimit(LIMIT);
-        recyclerView.setAdapter(mainRecyclerAdapter);
-        recyclerView.addOnItemTouchListener(
-                new RecyclerItemClickListener(getActivity(), (view1, position) -> {
-                    goToConcreteChat(position);
-                }
-        ));
     }
 
     @Override
@@ -113,6 +107,14 @@ public class MainFragment extends BaseFragment {
         toolbar.setTitle(getResources().getString(R.string.chat_list_toolbar_title));
         getSupportActivity().getSupportActionBar().setDisplayShowHomeEnabled(true);
         getSupportActivity().getSupportActionBar().show();
+    }
+
+    @Override
+    public void onDestroyView() {
+        if (mainController != null) {
+            mainController.onDestroy();
+        }
+        super.onDestroyView();
     }
 
 }
