@@ -8,7 +8,6 @@ import com.tg.osip.tdclient.TGProxy;
 import com.tg.osip.ui.main_screen.MainRecyclerAdapter;
 import com.tg.osip.ui.views.auto_loading.AutoLoadingRecyclerView;
 import com.tg.osip.ui.views.auto_loading.ILoading;
-import com.tg.osip.utils.common.BackgroundExecutor;
 import com.tg.osip.utils.log.Logger;
 
 import org.drinkless.td.libcore.telegram.TdApi;
@@ -16,14 +15,11 @@ import org.drinkless.td.libcore.telegram.TdApi;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 
 import rx.Observable;
 import rx.Subscriber;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
-import rx.functions.Action1;
-import rx.schedulers.Schedulers;
 
 /**
  * Controller for Main screen (MainFragment)
@@ -50,16 +46,8 @@ public class MainController {
                     if (progressBarWeakReference != null && progressBarWeakReference.get() != null) {
                         progressBarWeakReference.get().setVisibility(View.GONE);
                     }
-                    startFileDownloading(mainListItems);
+                    FileDownloaderManager.getInstance().startFileDownloading(mainListItems);
                 });
-    }
-
-    private void startFileDownloading(List<MainListItem> mainListItems) {
-        startFileDownloadingSubscription = Observable.from(mainListItems)
-                .subscribeOn(Schedulers.from(BackgroundExecutor.getSafeBackgroundExecutor()))
-                .filter(mainListItem -> mainListItem.isSmallPhotoFileIdValid() && !mainListItem.isSmallPhotoFilePathValid() && !FileDownloaderManager.getInstance().isFileInCache(mainListItem.getSmallPhotoFileId()))
-                .concatMap(mainListItem -> TGProxy.getInstance().sendTD(new TdApi.DownloadFile(mainListItem.getSmallPhotoFileId()), TdApi.Ok.class))
-                .subscribe();
     }
 
     /**

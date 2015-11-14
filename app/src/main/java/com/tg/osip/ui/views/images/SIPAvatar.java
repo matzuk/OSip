@@ -43,27 +43,27 @@ public class SIPAvatar extends ImageView {
         super(context, attrs, defStyleAttr);
     }
 
-    public void setMainListItem(MainListItem mainListItem) {
-        startImageLoading(mainListItem);
+    public void setImageLoaderI(ImageLoaderI imageLoaderI) {
+        startImageLoading(imageLoaderI);
     }
 
-    private void startImageLoading(MainListItem mainListItem) {
+    private void startImageLoading(ImageLoaderI imageLoaderI) {
         unSubscribe();
-        if (!mainListItem.isSmallPhotoFileIdValid()) {
-            setImageDrawable(mainListItem.getPlug());
+        setImageDrawable(imageLoaderI.getPlug());
+        if (!imageLoaderI.isSmallPhotoFileIdValid()) {
             return;
         }
-        if (mainListItem.isSmallPhotoFilePathValid()) {
-            setFileToView(mainListItem.getSmallPhotoFilePath());
+        if (imageLoaderI.isSmallPhotoFilePathValid()) {
+            setFileToView(imageLoaderI.getSmallPhotoFilePath());
             return;
         }
         // test file downloaded cache
-        if (FileDownloaderManager.getInstance().isFileInCache(mainListItem.getSmallPhotoFileId())) {
-            setFileToView(mainListItem.getSmallPhotoFilePath());
+        if (FileDownloaderManager.getInstance().isFileInCache(imageLoaderI.getSmallPhotoFileId())) {
+            setFileToView(FileDownloaderManager.getInstance().getFilePath(imageLoaderI.getSmallPhotoFileId()));
             return;
         }
         // start update manager listening
-        fileId = mainListItem.getSmallPhotoFileId();
+        fileId = imageLoaderI.getSmallPhotoFileId();
         subscribeToUpdateChannel();
     }
 

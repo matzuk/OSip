@@ -79,6 +79,7 @@ public class AutoLoadingRecyclerView<T> extends RecyclerView {
         if (firstPortionLoaded) {
             subscribeToLoadingChannel();
         } else {
+            // or download first portion and next subscribe to LoadingChannel
             OffsetAndLimit offsetAndLimit = new OffsetAndLimit(START_OFFSET, getLimit());
             loadNewItems(offsetAndLimit);
         }

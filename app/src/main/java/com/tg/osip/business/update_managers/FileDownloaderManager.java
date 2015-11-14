@@ -1,12 +1,16 @@
 package com.tg.osip.business.update_managers;
 
+import com.tg.osip.tdclient.TGProxy;
+import com.tg.osip.ui.views.images.ImageLoaderI;
 import com.tg.osip.utils.common.BackgroundExecutor;
 import com.tg.osip.utils.log.Logger;
 
 import org.drinkless.td.libcore.telegram.TdApi;
 
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
+import rx.Observable;
 import rx.Subscriber;
 import rx.schedulers.Schedulers;
 import rx.subjects.PublishSubject;
@@ -67,6 +71,14 @@ public class FileDownloaderManager {
 
     public boolean isFileInCache(int fileId) {
         return !getFilePath(fileId).equals(FILE_PATH_EMPTY);
+    }
+
+    public <T extends ImageLoaderI> void startFileDownloading(List<T> imageLoaderIs) {
+        Observable.from(imageLoaderIs)
+                .subscribeOn(Schedulers.from(BackgroundExecutor.getSafeBackgroundExecutor()))
+                .filter(imageLoaderI -> imageLoaderI.isSmallPhotoFileIdValid() && !imageLoaderI.isSmallPhotoFilePathValid() && !FileDownloaderManager.getInstance().isFileInCache(imageLoaderI.getSmallPhotoFileId()))
+                .concatMap(imageLoaderI -> TGProxy.getInstance().sendTD(new TdApi.DownloadFile(imageLoaderI.getSmallPhotoFileId()), TdApi.Ok.class))
+                .subscribe();
     }
 
 }

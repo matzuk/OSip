@@ -3,6 +3,7 @@ package com.tg.osip.business.chat;
 import android.view.View;
 import android.widget.ProgressBar;
 
+import com.tg.osip.business.update_managers.FileDownloaderManager;
 import com.tg.osip.tdclient.TGProxy;
 import com.tg.osip.ui.chat.ChatRecyclerAdapter;
 import com.tg.osip.utils.common.BackgroundExecutor;
@@ -54,7 +55,7 @@ public class ChatController {
 
     private Observable<List<TdApi.Message>> getUsersDownloadingProxyObservable(List<TdApi.Message> mainListItems) {
         return Observable.create(subscriber -> getUsersDownloadingObservable(mainListItems)
-                .subscribe(new Subscriber<Map<Integer, TdApi.User>>() {
+                .subscribe(new Subscriber<Map<Integer, UserChatListItem>>() {
                     @Override
                     public void onCompleted() {
                         subscriber.onCompleted();
@@ -66,7 +67,7 @@ public class ChatController {
                     }
 
                     @Override
-                    public void onNext(Map<Integer, TdApi.User> map) {
+                    public void onNext(Map<Integer, UserChatListItem> map) {
                         if (chatRecyclerAdapter != null) {
                             chatRecyclerAdapter.setChatUsers(map);
                         }
@@ -75,17 +76,19 @@ public class ChatController {
                 }));
     }
 
-    private Observable<Map<Integer, TdApi.User>> getUsersDownloadingObservable(List<TdApi.Message> mainListItems) {
+    private Observable<Map<Integer, UserChatListItem>> getUsersDownloadingObservable(List<TdApi.Message> mainListItems) {
         return Observable.from(mainListItems)
                 .subscribeOn(Schedulers.from(BackgroundExecutor.getSafeBackgroundExecutor()))
                 .map(message -> message.fromId)
                 .distinct()
                 .concatMap(integer -> TGProxy.getInstance().sendTD(new TdApi.GetUser(integer), TdApi.User.class))
+                .map(UserChatListItem::new)
                 .toList()
+                .doOnNext(userChatListItems -> FileDownloaderManager.getInstance().startFileDownloading(userChatListItems))
                 .map(users -> {
-                    Map<Integer, TdApi.User> map = new HashMap<>();
-                    for (TdApi.User user : users) {
-                        map.put(user.id, user);
+                    Map<Integer, UserChatListItem> map = new HashMap<>();
+                    for (UserChatListItem user : users) {
+                        map.put(user.getUser().id, user);
                     }
                     return map;
                 });

@@ -130,7 +130,7 @@ public class MainRecyclerAdapter extends AutoLoadingRecyclerViewAdapter<MainList
             //  Set name
             mainHolder.chatUserName.setText(mainListItem.getUserName());
             // Set avatar
-            mainHolder.avatar.setMainListItem(mainListItem);
+            mainHolder.avatar.setImageLoaderI(mainListItem);
         }
         // is chat group?
         mainHolder.chatGroupIcon.setVisibility(mainListItem.isGroupChat()? View.VISIBLE : View.GONE);

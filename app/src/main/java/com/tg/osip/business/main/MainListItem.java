@@ -8,6 +8,8 @@ import com.amulyakhare.textdrawable.TextDrawable;
 import com.amulyakhare.textdrawable.util.ColorGenerator;
 import com.tg.osip.ApplicationSIP;
 import com.tg.osip.R;
+import com.tg.osip.ui.views.images.ImageLoaderI;
+import com.tg.osip.utils.common.AndroidUtils;
 import com.tg.osip.utils.time.TimeUtils;
 
 import org.drinkless.td.libcore.telegram.TdApi;
@@ -17,7 +19,7 @@ import org.drinkless.td.libcore.telegram.TdApi;
  *
  * @author e.matsyuk
  */
-public class MainListItem {
+public class MainListItem implements ImageLoaderI {
 
     private final static int EMPTY_FILE_ID = 0;
     private final static String ADD_TO_PATH = "file://";
@@ -30,7 +32,6 @@ public class MainListItem {
     private boolean groupChat;
     private int smallPhotoFileId;
     private String smallPhotoFilePath;
-    //
     private Drawable plug;
 
     public MainListItem(TdApi.Chat apiChat) {
@@ -68,22 +69,27 @@ public class MainListItem {
         return groupChat;
     }
 
+    @Override
     public int getSmallPhotoFileId() {
         return smallPhotoFileId;
     }
 
+    @Override
     public boolean isSmallPhotoFileIdValid() {
         return smallPhotoFileId != EMPTY_FILE_ID;
     }
 
+    @Override
     public String getSmallPhotoFilePath() {
         return smallPhotoFilePath;
     }
 
+    @Override
     public boolean isSmallPhotoFilePathValid() {
         return !smallPhotoFilePath.equals(FILE_PATH_EMPTY);
     }
 
+    @Override
     public Drawable getPlug() {
         return plug;
     }
@@ -130,6 +136,7 @@ public class MainListItem {
             return ((TdApi.PrivateChatInfo)chatInfo).user.profilePhoto.small.id;
         }
     }
+
     private String getFilePath(TdApi.ChatInfo chatInfo) {
         String filePath;
         if (groupChat) {
@@ -149,11 +156,11 @@ public class MainListItem {
         if (isGroupChat()) {
             TdApi.GroupChatInfo groupChatInfo = ((TdApi.GroupChatInfo)getApiChat().type);
             id = groupChatInfo.groupChat.id;
-            name = getLettersForPlug(groupChatInfo.groupChat.title, null);
+            name = AndroidUtils.getLettersForPlug(groupChatInfo.groupChat.title, null);
         } else {
             TdApi.PrivateChatInfo privateChatInfo = ((TdApi.PrivateChatInfo)getApiChat().type);
             id = privateChatInfo.user.id;
-            name = getLettersForPlug(privateChatInfo.user.firstName, privateChatInfo.user.lastName);
+            name = AndroidUtils.getLettersForPlug(privateChatInfo.user.firstName, privateChatInfo.user.lastName);
         }
         ColorGenerator generator = ColorGenerator.MATERIAL;
         int color = generator.getColor(id);
@@ -161,41 +168,5 @@ public class MainListItem {
         return TextDrawable.builder()
                 .buildRoundRect(name, color, 100);
     }
-
-    private String getLettersForPlug(String firstName, String lastName) {
-        String text = "";
-        if (firstName != null && firstName.length() > 0) {
-            text += firstName.substring(0, 1);
-        }
-        if (lastName != null && lastName.length() > 0) {
-            String lastch = null;
-            for (int a = lastName.length() - 1; a >= 0; a--) {
-                if (lastch != null && lastName.charAt(a) == ' ') {
-                    break;
-                }
-                lastch = lastName.substring(a, a + 1);
-            }
-            if (Build.VERSION.SDK_INT >= 16) {
-                text += "\u200C" + lastch;
-            } else {
-                text += lastch;
-            }
-        } else if (firstName != null && firstName.length() > 0) {
-            for (int a = firstName.length() - 1; a >= 0; a--) {
-                if (firstName.charAt(a) == ' ') {
-                    if (a != firstName.length() - 1 && firstName.charAt(a + 1) != ' ') {
-                        if (Build.VERSION.SDK_INT >= 16) {
-                            text += "\u200C" + firstName.substring(a + 1, a + 2);
-                        } else {
-                            text += firstName.substring(a + 1, a + 2);
-                        }
-                        break;
-                    }
-                }
-            }
-        }
-        return text;
-    }
-
 
 }

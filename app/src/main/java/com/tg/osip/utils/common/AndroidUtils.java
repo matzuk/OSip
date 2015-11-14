@@ -122,4 +122,39 @@ public class AndroidUtils {
         return Build.VERSION.SDK_INT > Build.VERSION_CODES.ICE_CREAM_SANDWICH_MR1;
     }
 
+    public static String getLettersForPlug(String firstName, String lastName) {
+        String text = "";
+        if (firstName != null && firstName.length() > 0) {
+            text += firstName.substring(0, 1);
+        }
+        if (lastName != null && lastName.length() > 0) {
+            String lastch = null;
+            for (int a = lastName.length() - 1; a >= 0; a--) {
+                if (lastch != null && lastName.charAt(a) == ' ') {
+                    break;
+                }
+                lastch = lastName.substring(a, a + 1);
+            }
+            if (Build.VERSION.SDK_INT >= 16) {
+                text += "\u200C" + lastch;
+            } else {
+                text += lastch;
+            }
+        } else if (firstName != null && firstName.length() > 0) {
+            for (int a = firstName.length() - 1; a >= 0; a--) {
+                if (firstName.charAt(a) == ' ') {
+                    if (a != firstName.length() - 1 && firstName.charAt(a + 1) != ' ') {
+                        if (Build.VERSION.SDK_INT >= 16) {
+                            text += "\u200C" + firstName.substring(a + 1, a + 2);
+                        } else {
+                            text += firstName.substring(a + 1, a + 2);
+                        }
+                        break;
+                    }
+                }
+            }
+        }
+        return text;
+    }
+
 }

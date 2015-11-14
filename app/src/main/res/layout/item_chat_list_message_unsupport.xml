@@ -10,11 +10,10 @@
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:orientation="horizontal">
 
-    <ImageView
+    <com.tg.osip.ui.views.images.SIPAvatar
         android:id="@+id/avatar"
         android:layout_width="40dp"
         android:layout_height="40dp"
-        android:layout_gravity="top"
         android:scaleType="centerCrop"/>
 
     <LinearLayout

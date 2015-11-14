@@ -52,7 +52,7 @@
         android:layout_alignParentBottom="true"
         android:textSize="16sp"
         android:textColor="#8a8a8a"
-        android:text="message"
+        android:text="user"
         android:singleLine="true"
         android:textAppearance="?android:attr/textAppearanceMedium"
         android:ellipsize="end"/>
