@@ -54,7 +54,7 @@ public class MainController {
                 });
     }
 
-    public void startFileDownloading(List<MainListItem> mainListItems) {
+    private void startFileDownloading(List<MainListItem> mainListItems) {
         startFileDownloadingSubscription = Observable.from(mainListItems)
                 .subscribeOn(Schedulers.from(BackgroundExecutor.getSafeBackgroundExecutor()))
                 .filter(mainListItem -> mainListItem.isSmallPhotoFileIdValid() && !mainListItem.isSmallPhotoFilePathValid() && !FileDownloaderManager.getInstance().isFileInCache(mainListItem.getSmallPhotoFileId()))
@@ -63,6 +63,7 @@ public class MainController {
     }
 
     /**
+     * This method is called first!
      * load fresh my user.id id and start RecyclerView for first one
      */
     public void firstStartRecyclerView(AutoLoadingRecyclerView<MainListItem> autoLoadingRecyclerView, MainRecyclerAdapter mainRecyclerAdapter, ProgressBar progressBar) {

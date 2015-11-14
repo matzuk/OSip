@@ -15,6 +15,9 @@ import com.tg.osip.utils.time.TimeUtils;
 
 import org.drinkless.td.libcore.telegram.TdApi;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * @author e.matsyuk
  */
@@ -28,6 +31,7 @@ public class ChatRecyclerAdapter extends AutoLoadingRecyclerViewAdapter<TdApi.Me
 
     private int myUserId;
     private int lastChatReadOutboxId;
+    private Map<Integer, TdApi.User> usersMap = new HashMap<>();
 
     static class MainViewHolder extends RecyclerView.ViewHolder {
 
@@ -115,7 +119,7 @@ public class ChatRecyclerAdapter extends AutoLoadingRecyclerViewAdapter<TdApi.Me
             mainHolder.chatMessageText.setText(messageText.text);
         }
 
-//        TdApi.User user = userHashMap.get(message.fromId);
+        TdApi.User user = usersMap.get(message.fromId);
 //        if (user == null) {
 //            return;
 //        }
@@ -133,7 +137,8 @@ public class ChatRecyclerAdapter extends AutoLoadingRecyclerViewAdapter<TdApi.Me
 //            PicassoProxy.getInstance().downloadFile(user);
 //        }
 
-//        mainHolder.chatMessageName.setText(user.firstName + " " + user.lastName);
+        String name = user.firstName + " " + user.lastName;
+        mainHolder.chatMessageName.setText(name);
 
         String dataString = TimeUtils.stringForMessageListDate(message.date);
         mainHolder.chatMessageSendingTime.setText(dataString);
@@ -163,7 +168,7 @@ public class ChatRecyclerAdapter extends AutoLoadingRecyclerViewAdapter<TdApi.Me
     }
 
     private void onBindUnsupportedHolder(RecyclerView.ViewHolder holder, int position) {
-        UnsupportedViewHolder mainHolder = (UnsupportedViewHolder) holder;
+        UnsupportedViewHolder unsupportedHolder = (UnsupportedViewHolder) holder;
         TdApi.Message message = getItem(position);
         if (message == null) {
             return;
@@ -173,7 +178,7 @@ public class ChatRecyclerAdapter extends AutoLoadingRecyclerViewAdapter<TdApi.Me
             return;
         }
 
-//        TdApi.User user = userHashMap.get(message.fromId);
+        TdApi.User user = usersMap.get(message.fromId);
 //        if (user == null) {
 //            return;
 //        }
@@ -191,10 +196,11 @@ public class ChatRecyclerAdapter extends AutoLoadingRecyclerViewAdapter<TdApi.Me
 //            PicassoProxy.getInstance().downloadFile(user);
 //        }
 
-//        mainHolder.chatMessageName.setText(user.firstName + " " + user.lastName);
+        String name = user.firstName + " " + user.lastName;
+        unsupportedHolder.chatMessageName.setText(name);
 
         String dataString = TimeUtils.stringForMessageListDate(message.date);
-        mainHolder.chatMessageSendingTime.setText(dataString);
+        unsupportedHolder.chatMessageSendingTime.setText(dataString);
 
     }
 
@@ -208,6 +214,10 @@ public class ChatRecyclerAdapter extends AutoLoadingRecyclerViewAdapter<TdApi.Me
 
     public void setLastChatReadOutboxId(int lastChatReadOutboxId) {
         this.lastChatReadOutboxId = lastChatReadOutboxId;
+    }
+
+    public void setChatUsers(Map<Integer, TdApi.User> users) {
+        usersMap.putAll(users);
     }
 
 }
