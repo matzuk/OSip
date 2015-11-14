@@ -32,9 +32,9 @@ import rx.schedulers.Schedulers;
  */
 public class MainController {
 
-    WeakReference<ProgressBar> progressBarWeakReference;
-    Subscription startFileDownloadingSubscription;
-    Subscription firstStartRecyclerViewSubscription;
+    private WeakReference<ProgressBar> progressBarWeakReference;
+    private Subscription startFileDownloadingSubscription;
+    private Subscription firstStartRecyclerViewSubscription;
 
     private ILoading<MainListItem> getILoading() {
         return offsetAndLimit -> TGProxy.getInstance().sendTD(new TdApi.GetChats(offsetAndLimit.getOffset(), offsetAndLimit.getLimit()), TdApi.Chats.class)

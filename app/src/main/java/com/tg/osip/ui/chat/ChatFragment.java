@@ -9,6 +9,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 
 import com.tg.osip.R;
 import com.tg.osip.business.chat.ChatController;
@@ -60,6 +61,7 @@ public class ChatFragment extends Fragment {
 
     private void init(View view) {
         recyclerView = (AutoLoadingRecyclerView) view.findViewById(R.id.RecyclerView);
+        ProgressBar progressBar = (ProgressBar) view.findViewById(R.id.progressBar);
         // init LayoutManager
         GridLayoutManager recyclerViewLayoutManager = new GridLayoutManager(getActivity(), 1);
         recyclerViewLayoutManager.supportsPredictiveItemAnimations();
@@ -69,6 +71,8 @@ public class ChatFragment extends Fragment {
         recyclerView.setLimit(LIMIT);
         // for first start
         if (chatRecyclerAdapter == null || chatController == null) {
+            // start progressbar
+            progressBar.setVisibility(View.VISIBLE);
             // init ChatController
             chatController = new ChatController();
             // init ChatRecyclerAdapter
@@ -76,7 +80,7 @@ public class ChatFragment extends Fragment {
             chatRecyclerAdapter.setHasStableIds(true);
             recyclerView.setAdapter(chatRecyclerAdapter);
             Logger.debug("start loading List");
-            chatController.firstStartRecyclerView(recyclerView, chatRecyclerAdapter, chatId);
+            chatController.firstStartRecyclerView(recyclerView, chatRecyclerAdapter, chatId, progressBar);
         } else {
             recyclerView.setAdapter(chatRecyclerAdapter);
         }
