@@ -1,21 +1,22 @@
-package com.tg.osip.business.chat;
+package com.tg.osip.business.messages;
 
 import android.graphics.drawable.Drawable;
 import android.text.TextUtils;
 
 import com.amulyakhare.textdrawable.TextDrawable;
 import com.amulyakhare.textdrawable.util.ColorGenerator;
+import com.tg.osip.ui.messages.MessagesRecyclerAdapter;
 import com.tg.osip.ui.views.images.ImageLoaderI;
 import com.tg.osip.utils.common.AndroidUtils;
 
 import org.drinkless.td.libcore.telegram.TdApi;
 
 /**
- * Comfortable model for {@link com.tg.osip.ui.chat.ChatRecyclerAdapter ChatRecyclerAdapter}
+ * Comfortable model for {@link MessagesRecyclerAdapter MessagesRecyclerAdapter}
  *
  * @author e.matsyuk
  */
-public class UserChatListItem implements ImageLoaderI {
+public class UserMessageListItem implements ImageLoaderI {
 
     private final static int EMPTY_FILE_ID = 0;
     private final static String ADD_TO_PATH = "file://";
@@ -26,7 +27,7 @@ public class UserChatListItem implements ImageLoaderI {
     private String smallPhotoFilePath;
     private Drawable plug;
 
-    public UserChatListItem(TdApi.User user) {
+    public UserMessageListItem(TdApi.User user) {
         this.user = user;
         init(user);
     }

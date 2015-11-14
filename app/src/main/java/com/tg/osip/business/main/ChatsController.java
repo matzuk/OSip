@@ -5,7 +5,7 @@ import android.widget.ProgressBar;
 
 import com.tg.osip.business.update_managers.FileDownloaderManager;
 import com.tg.osip.tdclient.TGProxy;
-import com.tg.osip.ui.main_screen.MainRecyclerAdapter;
+import com.tg.osip.ui.chats.ChatRecyclerAdapter;
 import com.tg.osip.ui.views.auto_loading.AutoLoadingRecyclerView;
 import com.tg.osip.ui.views.auto_loading.ILoading;
 import com.tg.osip.utils.log.Logger;
@@ -22,24 +22,24 @@ import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
 
 /**
- * Controller for Main screen (MainFragment)
+ * Controller for Chats screen (ChatsFragment)
  *
  * @author e.matsyuk
  */
-public class MainController {
+public class ChatsController {
 
     private WeakReference<ProgressBar> progressBarWeakReference;
     private Subscription startFileDownloadingSubscription;
     private Subscription firstStartRecyclerViewSubscription;
 
-    private ILoading<MainListItem> getILoading() {
+    private ILoading<ChatListItem> getILoading() {
         return offsetAndLimit -> TGProxy.getInstance().sendTD(new TdApi.GetChats(offsetAndLimit.getOffset(), offsetAndLimit.getLimit()), TdApi.Chats.class)
                 .map(chats -> {
                     TdApi.Chat chatsMas[] = chats.chats;
                     return new ArrayList<>(Arrays.asList(chatsMas));
                 })
                 .concatMap(Observable::from)
-                .map(MainListItem::new)
+                .map(ChatListItem::new)
                 .toList()
                 .observeOn(AndroidSchedulers.mainThread())
                 .doOnNext(mainListItems -> {
@@ -54,7 +54,7 @@ public class MainController {
      * This method is called first!
      * load fresh my user.id id and start RecyclerView for first one
      */
-    public void firstStartRecyclerView(AutoLoadingRecyclerView<MainListItem> autoLoadingRecyclerView, MainRecyclerAdapter mainRecyclerAdapter, ProgressBar progressBar) {
+    public void firstStartRecyclerView(AutoLoadingRecyclerView<ChatListItem> autoLoadingRecyclerView, ChatRecyclerAdapter chatRecyclerAdapter, ProgressBar progressBar) {
         progressBarWeakReference = new WeakReference<>(progressBar);
         firstStartRecyclerViewSubscription = TGProxy.getInstance()
                 .sendTD(new TdApi.GetMe(), TdApi.User.class)
@@ -73,7 +73,7 @@ public class MainController {
                     @Override
                     public void onNext(TdApi.User user) {
                         Logger.debug("user data loaded, recyclerview is next");
-                        mainRecyclerAdapter.setMyUserId(user.id);
+                        chatRecyclerAdapter.setMyUserId(user.id);
                         autoLoadingRecyclerView.setLoadingObservable(getILoading());
                         autoLoadingRecyclerView.startLoading();
                     }
@@ -84,7 +84,7 @@ public class MainController {
      * set parameters to RecyclerView after screen reorientation
      * so we should not load my user.id for ILoading of RecyclerView
      */
-    public void startRecyclerView(AutoLoadingRecyclerView<com.tg.osip.business.main.MainListItem> autoLoadingRecyclerView) {
+    public void startRecyclerView(AutoLoadingRecyclerView<ChatListItem> autoLoadingRecyclerView) {
         autoLoadingRecyclerView.setLoadingObservable(getILoading());
         autoLoadingRecyclerView.startLoading();
     }

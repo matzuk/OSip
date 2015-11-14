@@ -1,13 +1,13 @@
 package com.tg.osip.business.main;
 
 import android.graphics.drawable.Drawable;
-import android.os.Build;
 import android.text.TextUtils;
 
 import com.amulyakhare.textdrawable.TextDrawable;
 import com.amulyakhare.textdrawable.util.ColorGenerator;
 import com.tg.osip.ApplicationSIP;
 import com.tg.osip.R;
+import com.tg.osip.ui.chats.ChatRecyclerAdapter;
 import com.tg.osip.ui.views.images.ImageLoaderI;
 import com.tg.osip.utils.common.AndroidUtils;
 import com.tg.osip.utils.time.TimeUtils;
@@ -15,11 +15,11 @@ import com.tg.osip.utils.time.TimeUtils;
 import org.drinkless.td.libcore.telegram.TdApi;
 
 /**
- * Comfortable model for {@link com.tg.osip.ui.main_screen.MainRecyclerAdapter MainRecyclerAdapter}
+ * Comfortable model for {@link ChatRecyclerAdapter ChatRecyclerAdapter}
  *
  * @author e.matsyuk
  */
-public class MainListItem implements ImageLoaderI {
+public class ChatListItem implements ImageLoaderI {
 
     private final static int EMPTY_FILE_ID = 0;
     private final static String ADD_TO_PATH = "file://";
@@ -34,7 +34,7 @@ public class MainListItem implements ImageLoaderI {
     private String smallPhotoFilePath;
     private Drawable plug;
 
-    public MainListItem(TdApi.Chat apiChat) {
+    public ChatListItem(TdApi.Chat apiChat) {
         this.apiChat = apiChat;
         init(apiChat);
     }

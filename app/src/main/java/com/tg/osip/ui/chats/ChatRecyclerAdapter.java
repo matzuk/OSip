@@ -1,4 +1,4 @@
-package com.tg.osip.ui.main_screen;
+package com.tg.osip.ui.chats;
 
 import android.support.v4.content.res.ResourcesCompat;
 import android.support.v7.widget.RecyclerView;
@@ -11,7 +11,7 @@ import android.widget.TextView;
 
 import com.tg.osip.ApplicationSIP;
 import com.tg.osip.R;
-import com.tg.osip.business.main.MainListItem;
+import com.tg.osip.business.main.ChatListItem;
 import com.tg.osip.ui.views.auto_loading.AutoLoadingRecyclerViewAdapter;
 import com.tg.osip.ui.views.images.SIPAvatar;
 
@@ -20,7 +20,7 @@ import org.drinkless.td.libcore.telegram.TdApi;
 /**
  * @author e.matsyuk
  */
-public class MainRecyclerAdapter extends AutoLoadingRecyclerViewAdapter<MainListItem> {
+public class ChatRecyclerAdapter extends AutoLoadingRecyclerViewAdapter<ChatListItem> {
 
     private static final int TEMP_SEND_STATE_IS_ERROR = 0;
     private static final int TEMP_SEND_STATE_IS_SENDING = 1000000000;
@@ -45,7 +45,7 @@ public class MainRecyclerAdapter extends AutoLoadingRecyclerViewAdapter<MainList
             chatUserName = (TextView) itemView.findViewById(R.id.chat_user_name);
             chatGroupIcon = (ImageView) itemView.findViewById(R.id.chat_group_icon);
             chatUserLastMessage = (TextView) itemView.findViewById(R.id.chat_user_last_message);
-            chatMessageSendingTime = (TextView) itemView.findViewById(R.id.chat_message_sending_time);
+            chatMessageSendingTime = (TextView) itemView.findViewById(R.id.message_sending_time);
             chatUnreadOutboxMessage = (ImageView) itemView.findViewById(R.id.chat_unread_outbox_messages);
             chatUnreadMessageCount = (TextView) itemView.findViewById(R.id.chat_unread_messages_count);
         }
@@ -62,7 +62,7 @@ public class MainRecyclerAdapter extends AutoLoadingRecyclerViewAdapter<MainList
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         if (viewType == MAIN_VIEW) {
-            View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_main_list, parent, false);
+            View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_chat_list, parent, false);
             return new MainViewHolder(v);
         } else {
             View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_loader_list, parent, false);
@@ -91,8 +91,8 @@ public class MainRecyclerAdapter extends AutoLoadingRecyclerViewAdapter<MainList
 
     public void onBindMainHolder(RecyclerView.ViewHolder holder, int position) {
         MainViewHolder mainHolder = (MainViewHolder) holder;
-        MainListItem mainListItem = getItem(position);
-        TdApi.Chat concreteChat = mainListItem.getApiChat();
+        ChatListItem chatListItem = getItem(position);
+        TdApi.Chat concreteChat = chatListItem.getApiChat();
         if (concreteChat == null) {
             return;
         }
@@ -121,19 +121,19 @@ public class MainRecyclerAdapter extends AutoLoadingRecyclerViewAdapter<MainList
             String dataString = getItem(position).getLastMessageDate();
             mainHolder.chatMessageSendingTime.setText(dataString);
             // get message content and set last message
-            String lastMessageText = textYou + mainListItem.getLastMessageText();
+            String lastMessageText = textYou + chatListItem.getLastMessageText();
             mainHolder.chatUserLastMessage.setText(lastMessageText);
         }
         // get ChatInfo
         TdApi.ChatInfo chatInfo = concreteChat.type;
         if (chatInfo != null) {
             //  Set name
-            mainHolder.chatUserName.setText(mainListItem.getUserName());
+            mainHolder.chatUserName.setText(chatListItem.getUserName());
             // Set avatar
-            mainHolder.avatar.setImageLoaderI(mainListItem);
+            mainHolder.avatar.setImageLoaderI(chatListItem);
         }
         // is chat group?
-        mainHolder.chatGroupIcon.setVisibility(mainListItem.isGroupChat()? View.VISIBLE : View.GONE);
+        mainHolder.chatGroupIcon.setVisibility(chatListItem.isGroupChat()? View.VISIBLE : View.GONE);
         // set unread outbox image
         if (getMyUserId() == concreteChat.topMessage.fromId) {
             if (concreteChat.lastReadOutboxMessageId >= concreteChat.topMessage.id) {

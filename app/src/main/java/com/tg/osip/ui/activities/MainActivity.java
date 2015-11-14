@@ -6,7 +6,7 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 
 import com.tg.osip.R;
-import com.tg.osip.ui.main_screen.MainFragment;
+import com.tg.osip.ui.chats.ChatsFragment;
 
 /**
  *
@@ -18,7 +18,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.ac_login);
         if (savedInstanceState == null) {
-            startFragment(new MainFragment(), false);
+            startFragment(new ChatsFragment(), false);
         }
     }
 

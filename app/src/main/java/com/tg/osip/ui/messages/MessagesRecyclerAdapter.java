@@ -1,4 +1,4 @@
-package com.tg.osip.ui.chat;
+package com.tg.osip.ui.messages;
 
 import android.support.v4.content.res.ResourcesCompat;
 import android.support.v7.widget.RecyclerView;
@@ -10,7 +10,7 @@ import android.widget.TextView;
 
 import com.tg.osip.ApplicationSIP;
 import com.tg.osip.R;
-import com.tg.osip.business.chat.UserChatListItem;
+import com.tg.osip.business.messages.UserMessageListItem;
 import com.tg.osip.ui.views.auto_loading.AutoLoadingRecyclerViewAdapter;
 import com.tg.osip.ui.views.images.SIPAvatar;
 import com.tg.osip.utils.time.TimeUtils;
@@ -23,7 +23,7 @@ import java.util.Map;
 /**
  * @author e.matsyuk
  */
-public class ChatRecyclerAdapter extends AutoLoadingRecyclerViewAdapter<TdApi.Message> {
+public class MessagesRecyclerAdapter extends AutoLoadingRecyclerViewAdapter<TdApi.Message> {
 
     private static final int TEMP_SEND_STATE_IS_SENDING = 1000000000;
     private static final int TEMP_SEND_STATE_IS_ERROR = 0;
@@ -34,34 +34,34 @@ public class ChatRecyclerAdapter extends AutoLoadingRecyclerViewAdapter<TdApi.Me
 
     private int myUserId;
     private int lastChatReadOutboxId;
-    private Map<Integer, UserChatListItem> usersMap = new HashMap<>();
+    private Map<Integer, UserMessageListItem> usersMap = new HashMap<>();
 
     static class MainViewHolder extends RecyclerView.ViewHolder {
 
         SIPAvatar avatar;
-        TextView chatMessageName;
-        TextView chatMessageText;
-        TextView chatMessageSendingTime;
-        ImageView chatMessageUnreadOutbox;
+        TextView messageName;
+        TextView messageText;
+        TextView messageSendingTime;
+        ImageView messageUnreadOutbox;
 
         public MainViewHolder(View itemView) {
             super(itemView);
             avatar = (SIPAvatar) itemView.findViewById(R.id.avatar);
-            chatMessageName = (TextView) itemView.findViewById(R.id.chat_message_name);
-            chatMessageText = (TextView) itemView.findViewById(R.id.chat_message_text);
-            chatMessageSendingTime = (TextView) itemView.findViewById(R.id.chat_message_sending_time);
-            chatMessageUnreadOutbox = (ImageView) itemView.findViewById(R.id.chat_message_unread_outbox);
+            messageName = (TextView) itemView.findViewById(R.id.message_name);
+            messageText = (TextView) itemView.findViewById(R.id.message_text);
+            messageSendingTime = (TextView) itemView.findViewById(R.id.message_sending_time);
+            messageUnreadOutbox = (ImageView) itemView.findViewById(R.id.message_unread_outbox);
         }
     }
 
     static class ActionViewHolder extends RecyclerView.ViewHolder {
 
-        TextView chatMessageText;
+        TextView messageText;
         ImageView photo;
 
         public ActionViewHolder(View itemView) {
             super(itemView);
-            chatMessageText = (TextView) itemView.findViewById(R.id.chat_message_text);
+            messageText = (TextView) itemView.findViewById(R.id.message_text);
             photo = (ImageView) itemView.findViewById(R.id.photo);
         }
     }
@@ -69,16 +69,16 @@ public class ChatRecyclerAdapter extends AutoLoadingRecyclerViewAdapter<TdApi.Me
     static class UnsupportedViewHolder extends RecyclerView.ViewHolder {
 
         SIPAvatar avatar;
-        TextView chatMessageName;
-        TextView chatMessageText;
-        TextView chatMessageSendingTime;
+        TextView messageName;
+        TextView messageText;
+        TextView messageSendingTime;
 
         public UnsupportedViewHolder(View itemView) {
             super(itemView);
             avatar = (SIPAvatar) itemView.findViewById(R.id.avatar);
-            chatMessageName = (TextView) itemView.findViewById(R.id.chat_message_name);
-            chatMessageText = (TextView) itemView.findViewById(R.id.chat_message_text);
-            chatMessageSendingTime = (TextView) itemView.findViewById(R.id.chat_message_sending_time);
+            messageName = (TextView) itemView.findViewById(R.id.message_name);
+            messageText = (TextView) itemView.findViewById(R.id.message_text);
+            messageSendingTime = (TextView) itemView.findViewById(R.id.message_sending_time);
         }
     }
 
@@ -90,14 +90,14 @@ public class ChatRecyclerAdapter extends AutoLoadingRecyclerViewAdapter<TdApi.Me
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         if (viewType == MAIN_VIEW) {
-            View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_chat_list_message_text, parent, false);
+            View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_message_list_text, parent, false);
             return new MainViewHolder(v);
         } else if (viewType == ACTION_VIEW) {
-            View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_chat_list_message_actions, parent, false);
+            View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_message_list_actions, parent, false);
             return new ActionViewHolder(v);
         }
         else if (viewType == UNSUPPORTED_VIEW) {
-            View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_chat_list_message_unsupport, parent, false);
+            View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_message_list_unsupport, parent, false);
             return new UnsupportedViewHolder(v);
         }
         return null;
@@ -144,32 +144,32 @@ public class ChatRecyclerAdapter extends AutoLoadingRecyclerViewAdapter<TdApi.Me
         }
         if (messageContent instanceof TdApi.MessageText) {
             TdApi.MessageText messageText = (TdApi.MessageText)messageContent;
-            mainHolder.chatMessageText.setText(messageText.text);
+            mainHolder.messageText.setText(messageText.text);
         }
 
-        UserChatListItem user = usersMap.get(message.fromId);
+        UserMessageListItem user = usersMap.get(message.fromId);
         // set name
         String name = user.getUser().firstName + " " + user.getUser().lastName;
-        mainHolder.chatMessageName.setText(name);
+        mainHolder.messageName.setText(name);
         // Set avatar
         mainHolder.avatar.setImageLoaderI(user);
 
         String dataString = TimeUtils.stringForMessageListDate(message.date);
-        mainHolder.chatMessageSendingTime.setText(dataString);
+        mainHolder.messageSendingTime.setText(dataString);
 
         // set unread outbox image
         if (message.date == TEMP_SEND_STATE_IS_ERROR) {
-            mainHolder.chatMessageUnreadOutbox.setVisibility(View.VISIBLE);
-            mainHolder.chatMessageUnreadOutbox.setImageDrawable(ResourcesCompat.getDrawable(ApplicationSIP.applicationContext.getResources(), R.drawable.ic_message_error, ApplicationSIP.applicationContext.getTheme()));
+            mainHolder.messageUnreadOutbox.setVisibility(View.VISIBLE);
+            mainHolder.messageUnreadOutbox.setImageDrawable(ResourcesCompat.getDrawable(ApplicationSIP.applicationContext.getResources(), R.drawable.ic_message_error, ApplicationSIP.applicationContext.getTheme()));
         } else if (myUserId == message.fromId) {
             if (lastChatReadOutboxId >= message.id) {
-                mainHolder.chatMessageUnreadOutbox.setVisibility(View.GONE);
+                mainHolder.messageUnreadOutbox.setVisibility(View.GONE);
             } else {
-                mainHolder.chatMessageUnreadOutbox.setVisibility(View.VISIBLE);
-                setSendStateMessage(message, mainHolder.chatMessageUnreadOutbox);
+                mainHolder.messageUnreadOutbox.setVisibility(View.VISIBLE);
+                setSendStateMessage(message, mainHolder.messageUnreadOutbox);
             }
         } else {
-            mainHolder.chatMessageUnreadOutbox.setVisibility(View.GONE);
+            mainHolder.messageUnreadOutbox.setVisibility(View.GONE);
         }
     }
 
@@ -194,7 +194,7 @@ public class ChatRecyclerAdapter extends AutoLoadingRecyclerViewAdapter<TdApi.Me
         TdApi.User userFrom = usersMap.get(message.fromId).getUser();
         String actionText = getActionText(messageContent, userFrom);
         if (actionText != null) {
-            actionHolder.chatMessageText.setText(actionText);
+            actionHolder.messageText.setText(actionText);
         }
         if (messageContent.getClass() == TdApi.MessageChatChangePhoto.class) {
             TdApi.Photo photo = ((TdApi.MessageChatChangePhoto)messageContent).photo;
@@ -251,15 +251,15 @@ public class ChatRecyclerAdapter extends AutoLoadingRecyclerViewAdapter<TdApi.Me
             return;
         }
 
-        UserChatListItem user = usersMap.get(message.fromId);
+        UserMessageListItem user = usersMap.get(message.fromId);
         // set name
         String name = user.getUser().firstName + " " + user.getUser().lastName;
-        unsupportedHolder.chatMessageName.setText(name);
+        unsupportedHolder.messageName.setText(name);
         // Set avatar
         unsupportedHolder.avatar.setImageLoaderI(user);
 
         String dataString = TimeUtils.stringForMessageListDate(message.date);
-        unsupportedHolder.chatMessageSendingTime.setText(dataString);
+        unsupportedHolder.messageSendingTime.setText(dataString);
 
     }
 
@@ -271,7 +271,7 @@ public class ChatRecyclerAdapter extends AutoLoadingRecyclerViewAdapter<TdApi.Me
         this.lastChatReadOutboxId = lastChatReadOutboxId;
     }
 
-    public void setChatUsers(Map<Integer, UserChatListItem> users) {
+    public void setChatUsers(Map<Integer, UserMessageListItem> users) {
         usersMap.putAll(users);
     }
 

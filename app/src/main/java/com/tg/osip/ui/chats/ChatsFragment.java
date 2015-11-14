@@ -1,4 +1,4 @@
-package com.tg.osip.ui.main_screen;
+package com.tg.osip.ui.chats;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -14,9 +14,9 @@ import android.view.ViewTreeObserver;
 import android.widget.ProgressBar;
 
 import com.tg.osip.R;
-import com.tg.osip.business.main.MainController;
-import com.tg.osip.business.main.MainListItem;
-import com.tg.osip.ui.chat.ChatFragment;
+import com.tg.osip.business.main.ChatsController;
+import com.tg.osip.business.main.ChatListItem;
+import com.tg.osip.ui.messages.MessagesFragment;
 import com.tg.osip.ui.general.BaseFragment;
 import com.tg.osip.ui.views.auto_loading.AutoLoadingRecyclerView;
 import com.tg.osip.utils.log.Logger;
@@ -27,13 +27,13 @@ import com.tg.osip.ui.views.RecyclerItemClickListener;
  *
  * @author e.matsyuk
  */
-public class MainFragment extends BaseFragment {
+public class ChatsFragment extends BaseFragment {
 
     private static final int LIMIT = 50;
 
-    private AutoLoadingRecyclerView<MainListItem> recyclerView;
-    private MainController mainController;
-    private MainRecyclerAdapter mainRecyclerAdapter;
+    private AutoLoadingRecyclerView<ChatListItem> recyclerView;
+    private ChatsController chatsController;
+    private ChatRecyclerAdapter chatRecyclerAdapter;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -58,23 +58,23 @@ public class MainFragment extends BaseFragment {
                 new RecyclerItemClickListener(getActivity(), (view1, position) -> goToConcreteChat(position))
         );
         // first start
-        if (mainController == null || mainRecyclerAdapter == null) {
+        if (chatsController == null || chatRecyclerAdapter == null) {
             // start progressbar
             progressBar.setVisibility(View.VISIBLE);
-            // init MainRecyclerAdapter
-            mainRecyclerAdapter = new MainRecyclerAdapter();
-            mainRecyclerAdapter.setHasStableIds(true);
-            recyclerView.setAdapter(mainRecyclerAdapter);
+            // init ChatRecyclerAdapter
+            chatRecyclerAdapter = new ChatRecyclerAdapter();
+            chatRecyclerAdapter.setHasStableIds(true);
+            recyclerView.setAdapter(chatRecyclerAdapter);
             // init Controller
-            mainController = new MainController();
+            chatsController = new ChatsController();
             // for more smoother RecyclerView appearing
             recyclerView.setVisibility(View.GONE);
             ViewTreeObserver textViewTreeObserver=recyclerView.getViewTreeObserver();
             textViewTreeObserver.addOnGlobalLayoutListener(() -> recyclerView.setVisibility(View.VISIBLE));
             Logger.debug("start loading List");
-            mainController.firstStartRecyclerView(recyclerView, mainRecyclerAdapter, progressBar);
+            chatsController.firstStartRecyclerView(recyclerView, chatRecyclerAdapter, progressBar);
         } else {
-            recyclerView.setAdapter(mainRecyclerAdapter);
+            recyclerView.setAdapter(chatRecyclerAdapter);
         }
 
     }
@@ -84,14 +84,14 @@ public class MainFragment extends BaseFragment {
         super.onViewStateRestored(savedInstanceState);
         // start loading after reorientation
         if (savedInstanceState != null) {
-            mainController.startRecyclerView(recyclerView);
+            chatsController.startRecyclerView(recyclerView);
         }
     }
 
     private void goToConcreteChat(int position) {
         long chatId = recyclerView.getAdapter().getItem(position).getApiChat().id;
-        ChatFragment chatFragment = ChatFragment.newInstance(chatId);
-        startFragment(chatFragment);
+        MessagesFragment messagesFragment = MessagesFragment.newInstance(chatId);
+        startFragment(messagesFragment);
     }
 
     private void startFragment(Fragment fragment) {
@@ -111,8 +111,8 @@ public class MainFragment extends BaseFragment {
 
     @Override
     public void onDestroyView() {
-        if (mainController != null) {
-            mainController.onDestroy();
+        if (chatsController != null) {
+            chatsController.onDestroy();
         }
         super.onDestroyView();
     }

@@ -1,11 +1,11 @@
-package com.tg.osip.business.chat;
+package com.tg.osip.business.messages;
 
 import android.view.View;
 import android.widget.ProgressBar;
 
 import com.tg.osip.business.update_managers.FileDownloaderManager;
 import com.tg.osip.tdclient.TGProxy;
-import com.tg.osip.ui.chat.ChatRecyclerAdapter;
+import com.tg.osip.ui.messages.MessagesRecyclerAdapter;
 import com.tg.osip.utils.common.BackgroundExecutor;
 import com.tg.osip.utils.log.Logger;
 import com.tg.osip.ui.views.auto_loading.AutoLoadingRecyclerView;
@@ -27,16 +27,16 @@ import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 
 /**
- * Controller for Chat screen (ChatFragment)
+ * Controller for Chat screen (MessagesFragment)
  *
  * @author e.matsyuk
  */
-public class ChatController {
+public class MessagesController {
 
     private WeakReference<ProgressBar> progressBarWeakReference;
     private int topMessageId;
     private Subscription firstStartRecyclerViewSubscription;
-    private ChatRecyclerAdapter chatRecyclerAdapter;
+    private MessagesRecyclerAdapter messagesRecyclerAdapter;
 
     private ILoading<TdApi.Message> getILoading(long chatId, int topMessageId) {
         return offsetAndLimit -> TGProxy.getInstance().sendTD(new TdApi.GetChatHistory(chatId, topMessageId, offsetAndLimit.getOffset(), offsetAndLimit.getLimit()), TdApi.Messages.class)
@@ -55,7 +55,7 @@ public class ChatController {
 
     private Observable<List<TdApi.Message>> getUsersDownloadingProxyObservable(List<TdApi.Message> mainListItems) {
         return Observable.create(subscriber -> getUsersDownloadingObservable(mainListItems)
-                .subscribe(new Subscriber<Map<Integer, UserChatListItem>>() {
+                .subscribe(new Subscriber<Map<Integer, UserMessageListItem>>() {
                     @Override
                     public void onCompleted() {
                         subscriber.onCompleted();
@@ -67,27 +67,27 @@ public class ChatController {
                     }
 
                     @Override
-                    public void onNext(Map<Integer, UserChatListItem> map) {
-                        if (chatRecyclerAdapter != null) {
-                            chatRecyclerAdapter.setChatUsers(map);
+                    public void onNext(Map<Integer, UserMessageListItem> map) {
+                        if (messagesRecyclerAdapter != null) {
+                            messagesRecyclerAdapter.setChatUsers(map);
                         }
                         subscriber.onNext(mainListItems);
                     }
                 }));
     }
 
-    private Observable<Map<Integer, UserChatListItem>> getUsersDownloadingObservable(List<TdApi.Message> mainListItems) {
+    private Observable<Map<Integer, UserMessageListItem>> getUsersDownloadingObservable(List<TdApi.Message> mainListItems) {
         return Observable.from(mainListItems)
                 .subscribeOn(Schedulers.from(BackgroundExecutor.getSafeBackgroundExecutor()))
                 .map(message -> message.fromId)
                 .distinct()
                 .concatMap(integer -> TGProxy.getInstance().sendTD(new TdApi.GetUser(integer), TdApi.User.class))
-                .map(UserChatListItem::new)
+                .map(UserMessageListItem::new)
                 .toList()
                 .doOnNext(userChatListItems -> FileDownloaderManager.getInstance().startFileDownloading(userChatListItems))
                 .map(users -> {
-                    Map<Integer, UserChatListItem> map = new HashMap<>();
-                    for (UserChatListItem user : users) {
+                    Map<Integer, UserMessageListItem> map = new HashMap<>();
+                    for (UserMessageListItem user : users) {
                         map.put(user.getUser().id, user);
                     }
                     return map;
@@ -98,13 +98,13 @@ public class ChatController {
      * This method is called first!
      * load fresh top message id and start RecyclerView for first one
     */
-    public void firstStartRecyclerView(AutoLoadingRecyclerView<TdApi.Message> autoLoadingRecyclerView, ChatRecyclerAdapter chatRecyclerAdapter, long chatId, ProgressBar progressBar) {
-        this.chatRecyclerAdapter = chatRecyclerAdapter;
+    public void firstStartRecyclerView(AutoLoadingRecyclerView<TdApi.Message> autoLoadingRecyclerView, MessagesRecyclerAdapter messagesRecyclerAdapter, long chatId, ProgressBar progressBar) {
+        this.messagesRecyclerAdapter = messagesRecyclerAdapter;
         progressBarWeakReference = new WeakReference<>(progressBar);
         firstStartRecyclerViewSubscription = TGProxy.getInstance()
                 .sendTD(new TdApi.GetMe(), TdApi.User.class)
                 .observeOn(AndroidSchedulers.mainThread())
-                .doOnNext(user -> chatRecyclerAdapter.setMyUserId(user.id))
+                .doOnNext(user -> messagesRecyclerAdapter.setMyUserId(user.id))
                 .concatMap(user -> TGProxy.getInstance().sendTD(new TdApi.GetChat(chatId), TdApi.Chat.class))
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Subscriber<TdApi.Chat>() {
@@ -120,9 +120,9 @@ public class ChatController {
                     public void onNext(TdApi.Chat chat) {
                         Logger.debug("user data loaded, recyclerview is next");
                         topMessageId = chat.topMessage.id;
-                        chatRecyclerAdapter.setLastChatReadOutboxId(chat.lastReadOutboxMessageId);
-                        chatRecyclerAdapter.addNewItem(chat.topMessage);
-                        chatRecyclerAdapter.notifyItemInserted(0);
+                        messagesRecyclerAdapter.setLastChatReadOutboxId(chat.lastReadOutboxMessageId);
+                        messagesRecyclerAdapter.addNewItem(chat.topMessage);
+                        messagesRecyclerAdapter.notifyItemInserted(0);
                         autoLoadingRecyclerView.setLoadingObservable(getILoading(chatId, topMessageId));
                         autoLoadingRecyclerView.startLoading();
                     }
