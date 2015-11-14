@@ -46,7 +46,7 @@ public class ChatsController {
                     if (progressBarWeakReference != null && progressBarWeakReference.get() != null) {
                         progressBarWeakReference.get().setVisibility(View.GONE);
                     }
-                    FileDownloaderManager.getInstance().startFileDownloading(mainListItems);
+                    FileDownloaderManager.getInstance().startFileListDownloading(mainListItems);
                 });
     }
 

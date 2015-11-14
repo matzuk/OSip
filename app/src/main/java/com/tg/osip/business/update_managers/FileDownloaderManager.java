@@ -73,7 +73,7 @@ public class FileDownloaderManager {
         return !getFilePath(fileId).equals(FILE_PATH_EMPTY);
     }
 
-    public <T extends ImageLoaderI> void startFileDownloading(List<T> imageLoaderIs) {
+    public <T extends ImageLoaderI> void startFileListDownloading(List<T> imageLoaderIs) {
         Observable.from(imageLoaderIs)
                 .subscribeOn(Schedulers.from(BackgroundExecutor.getSafeBackgroundExecutor()))
                 .filter(imageLoaderI -> imageLoaderI.isSmallPhotoFileIdValid() && !imageLoaderI.isSmallPhotoFilePathValid() && !FileDownloaderManager.getInstance().isFileInCache(imageLoaderI.getSmallPhotoFileId()))

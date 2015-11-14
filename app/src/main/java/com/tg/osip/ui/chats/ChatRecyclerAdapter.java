@@ -77,7 +77,7 @@ public class ChatRecyclerAdapter extends AutoLoadingRecyclerViewAdapter<ChatList
 
     @Override
     public long getItemId(int position) {
-        return getItem(position).getApiChat().id;
+        return getItem(position).getChat().id;
     }
 
     @Override
@@ -92,7 +92,7 @@ public class ChatRecyclerAdapter extends AutoLoadingRecyclerViewAdapter<ChatList
     public void onBindMainHolder(RecyclerView.ViewHolder holder, int position) {
         MainViewHolder mainHolder = (MainViewHolder) holder;
         ChatListItem chatListItem = getItem(position);
-        TdApi.Chat concreteChat = chatListItem.getApiChat();
+        TdApi.Chat concreteChat = chatListItem.getChat();
         if (concreteChat == null) {
             return;
         }

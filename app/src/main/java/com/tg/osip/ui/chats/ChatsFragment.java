@@ -89,7 +89,7 @@ public class ChatsFragment extends BaseFragment {
     }
 
     private void goToConcreteChat(int position) {
-        long chatId = recyclerView.getAdapter().getItem(position).getApiChat().id;
+        long chatId = recyclerView.getAdapter().getItem(position).getChat().id;
         MessagesFragment messagesFragment = MessagesFragment.newInstance(chatId);
         startFragment(messagesFragment);
     }

@@ -1,11 +1,19 @@
 package com.tg.osip.business.messages;
 
+import android.content.Context;
+import android.support.v7.widget.Toolbar;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 
+import com.tg.osip.R;
+import com.tg.osip.business.main.ChatListItem;
 import com.tg.osip.business.update_managers.FileDownloaderManager;
 import com.tg.osip.tdclient.TGProxy;
 import com.tg.osip.ui.messages.MessagesRecyclerAdapter;
+import com.tg.osip.ui.views.images.SIPAvatar;
 import com.tg.osip.utils.common.BackgroundExecutor;
 import com.tg.osip.utils.log.Logger;
 import com.tg.osip.ui.views.auto_loading.AutoLoadingRecyclerView;
@@ -33,10 +41,88 @@ import rx.schedulers.Schedulers;
  */
 public class MessagesController {
 
+    // views
     private WeakReference<ProgressBar> progressBarWeakReference;
-    private int topMessageId;
-    private Subscription firstStartRecyclerViewSubscription;
+    private WeakReference<AutoLoadingRecyclerView<TdApi.Message>> recyclerViewWeakReference;
+    private WeakReference<Context> contextWeakReference;
+    private WeakReference<Toolbar> toolbarWeakReference;
+    // adapters
     private MessagesRecyclerAdapter messagesRecyclerAdapter;
+    // subscriptions
+    private Subscription firstStartRecyclerViewSubscription;
+    // needed members
+    private ChatListItem chatListItem;
+    private long chatId;
+
+    public MessagesController(long chatId) {
+        this.chatId = chatId;
+        initAdapters();
+    }
+
+    private void initAdapters() {
+        messagesRecyclerAdapter = new MessagesRecyclerAdapter();
+        messagesRecyclerAdapter.setHasStableIds(true);
+    }
+
+    public void setProgressBar(ProgressBar progressBar) {
+        progressBarWeakReference = new WeakReference<>(progressBar);
+    }
+
+    public void setRecyclerView(AutoLoadingRecyclerView<TdApi.Message> autoLoadingRecyclerView) {
+        recyclerViewWeakReference = new WeakReference<>(autoLoadingRecyclerView);
+        // set adapter to new or recreated recyclerView
+        autoLoadingRecyclerView.setAdapter(messagesRecyclerAdapter);
+    }
+
+    public void setToolbar(Context context, Toolbar toolbar) {
+        contextWeakReference = new WeakReference<>(context);
+        toolbarWeakReference = new WeakReference<>(toolbar);
+        initToolbar();
+    }
+
+    /**
+     * load data to views
+     */
+    public void loadData() {
+        if (firstStartRecyclerViewSubscription != null) {
+            return;
+        }
+        // load needed data (in adapters and members) in the first start
+        firstStartRecyclerViewSubscription = TGProxy.getInstance()
+                .sendTD(new TdApi.GetMe(), TdApi.User.class)
+                .observeOn(AndroidSchedulers.mainThread())
+                .doOnNext(user -> messagesRecyclerAdapter.setMyUserId(user.id))
+                .concatMap(user -> TGProxy.getInstance().sendTD(new TdApi.GetChat(chatId), TdApi.Chat.class))
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Subscriber<TdApi.Chat>() {
+                    @Override
+                    public void onCompleted() { }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        Logger.error(e);
+                    }
+
+                    @Override
+                    public void onNext(TdApi.Chat chat) {
+                        Logger.debug("user data loaded, recyclerview is next");
+                        successLoadData(chat);
+                    }
+                });
+    }
+
+    private void successLoadData(TdApi.Chat chat) {
+        chatListItem = new ChatListItem(chat);
+        initToolbar();
+        messagesRecyclerAdapter.setLastChatReadOutboxId(chat.lastReadOutboxMessageId);
+        messagesRecyclerAdapter.addNewItem(chat.topMessage);
+        messagesRecyclerAdapter.notifyItemInserted(0);
+        if (recyclerViewWeakReference != null && recyclerViewWeakReference.get() != null) {
+            AutoLoadingRecyclerView<TdApi.Message> autoLoadingRecyclerView = recyclerViewWeakReference.get();
+            autoLoadingRecyclerView.setLoadingObservable(getILoading(chatId, chatListItem.getChat().topMessage.id));
+            autoLoadingRecyclerView.startLoading();
+        }
+    }
 
     private ILoading<TdApi.Message> getILoading(long chatId, int topMessageId) {
         return offsetAndLimit -> TGProxy.getInstance().sendTD(new TdApi.GetChatHistory(chatId, topMessageId, offsetAndLimit.getOffset(), offsetAndLimit.getLimit()), TdApi.Messages.class)
@@ -84,7 +170,7 @@ public class MessagesController {
                 .concatMap(integer -> TGProxy.getInstance().sendTD(new TdApi.GetUser(integer), TdApi.User.class))
                 .map(UserMessageListItem::new)
                 .toList()
-                .doOnNext(userChatListItems -> FileDownloaderManager.getInstance().startFileDownloading(userChatListItems))
+                .doOnNext(userChatListItems -> FileDownloaderManager.getInstance().startFileListDownloading(userChatListItems))
                 .map(users -> {
                     Map<Integer, UserMessageListItem> map = new HashMap<>();
                     for (UserMessageListItem user : users) {
@@ -94,48 +180,39 @@ public class MessagesController {
                 });
     }
 
-    /**
-     * This method is called first!
-     * load fresh top message id and start RecyclerView for first one
-    */
-    public void firstStartRecyclerView(AutoLoadingRecyclerView<TdApi.Message> autoLoadingRecyclerView, MessagesRecyclerAdapter messagesRecyclerAdapter, long chatId, ProgressBar progressBar) {
-        this.messagesRecyclerAdapter = messagesRecyclerAdapter;
-        progressBarWeakReference = new WeakReference<>(progressBar);
-        firstStartRecyclerViewSubscription = TGProxy.getInstance()
-                .sendTD(new TdApi.GetMe(), TdApi.User.class)
-                .observeOn(AndroidSchedulers.mainThread())
-                .doOnNext(user -> messagesRecyclerAdapter.setMyUserId(user.id))
-                .concatMap(user -> TGProxy.getInstance().sendTD(new TdApi.GetChat(chatId), TdApi.Chat.class))
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Subscriber<TdApi.Chat>() {
-                    @Override
-                    public void onCompleted() { }
+    private void initToolbar() {
+        if (chatListItem == null || contextWeakReference == null || contextWeakReference.get() == null ||
+                toolbarWeakReference == null || toolbarWeakReference.get() == null) {
+            return;
+        }
+        Context context = contextWeakReference.get();
+        Toolbar toolbar = toolbarWeakReference.get();
 
-                    @Override
-                    public void onError(Throwable e) {
-                        Logger.error(e);
-                    }
+        LayoutInflater layoutInflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        View headerView = layoutInflater.inflate(R.layout.toolbar_messages, null);
 
-                    @Override
-                    public void onNext(TdApi.Chat chat) {
-                        Logger.debug("user data loaded, recyclerview is next");
-                        topMessageId = chat.topMessage.id;
-                        messagesRecyclerAdapter.setLastChatReadOutboxId(chat.lastReadOutboxMessageId);
-                        messagesRecyclerAdapter.addNewItem(chat.topMessage);
-                        messagesRecyclerAdapter.notifyItemInserted(0);
-                        autoLoadingRecyclerView.setLoadingObservable(getILoading(chatId, topMessageId));
-                        autoLoadingRecyclerView.startLoading();
-                    }
-                });
+        SIPAvatar headerAvatar = (SIPAvatar)headerView.findViewById(R.id.avatar);
+        headerAvatar.setImageLoaderI(chatListItem);
+        // not start file downloading because all chats avatars downloading was started in ChatsController
+
+        TextView chatNameView = (TextView)headerView.findViewById(R.id.chat_name);
+        chatNameView.setText(chatListItem.getUserName());
+
+        TextView chatInfoView = (TextView)headerView.findViewById(R.id.chat_info);
+        chatInfoView.setText(chatListItem.getInfo());
+
+        toolbar.addView(headerView);
     }
 
     /**
-     * set parameters to RecyclerView after screen reorientation
-     * so we should not load topMessageId for ILoading of RecyclerView
+     * restore data to recreated views
      */
-    public void startRecyclerView(AutoLoadingRecyclerView<TdApi.Message> autoLoadingRecyclerView, long chatId) {
-        autoLoadingRecyclerView.setLoadingObservable(getILoading(chatId, topMessageId));
-        autoLoadingRecyclerView.startLoading();
+    public void restoreDataToViews() {
+        if (recyclerViewWeakReference != null && recyclerViewWeakReference.get() != null) {
+            AutoLoadingRecyclerView<TdApi.Message> autoLoadingRecyclerView = recyclerViewWeakReference.get();
+            autoLoadingRecyclerView.setLoadingObservable(getILoading(chatId, chatListItem.getChat().topMessage.id));
+            autoLoadingRecyclerView.startLoading();
+        }
     }
 
     /**

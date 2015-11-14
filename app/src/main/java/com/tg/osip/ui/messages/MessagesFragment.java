@@ -13,7 +13,6 @@ import android.widget.ProgressBar;
 
 import com.tg.osip.R;
 import com.tg.osip.business.messages.MessagesController;
-import com.tg.osip.utils.log.Logger;
 import com.tg.osip.ui.views.auto_loading.AutoLoadingRecyclerView;
 
 import org.drinkless.td.libcore.telegram.TdApi;
@@ -27,7 +26,7 @@ public class MessagesFragment extends Fragment {
     private static final int LIMIT = 50;
 
     private AutoLoadingRecyclerView<TdApi.Message> recyclerView;
-    private MessagesRecyclerAdapter messagesRecyclerAdapter;
+    private Toolbar toolbar;
     private MessagesController messagesController;
 
     private long chatId;
@@ -62,6 +61,7 @@ public class MessagesFragment extends Fragment {
     private void init(View view) {
         recyclerView = (AutoLoadingRecyclerView) view.findViewById(R.id.RecyclerView);
         ProgressBar progressBar = (ProgressBar) view.findViewById(R.id.progressBar);
+        toolbar = (Toolbar) view.findViewById(R.id.toolbar);
         // init LayoutManager
         GridLayoutManager recyclerViewLayoutManager = new GridLayoutManager(getActivity(), 1);
         recyclerViewLayoutManager.supportsPredictiveItemAnimations();
@@ -70,20 +70,16 @@ public class MessagesFragment extends Fragment {
         recyclerView.setLayoutManager(recyclerViewLayoutManager);
         recyclerView.setLimit(LIMIT);
         // for first start
-        if (messagesRecyclerAdapter == null || messagesController == null) {
+        if (messagesController == null) {
             // start progressbar
             progressBar.setVisibility(View.VISIBLE);
             // init MessagesController
-            messagesController = new MessagesController();
-            // init MessagesRecyclerAdapter
-            messagesRecyclerAdapter = new MessagesRecyclerAdapter();
-            messagesRecyclerAdapter.setHasStableIds(true);
-            recyclerView.setAdapter(messagesRecyclerAdapter);
-            Logger.debug("start loading List");
-            messagesController.firstStartRecyclerView(recyclerView, messagesRecyclerAdapter, chatId, progressBar);
-        } else {
-            recyclerView.setAdapter(messagesRecyclerAdapter);
+            messagesController = new MessagesController(chatId);
         }
+        messagesController.setProgressBar(progressBar);
+        messagesController.setRecyclerView(recyclerView);
+        messagesController.setToolbar(getContext(), toolbar);
+        messagesController.loadData();
     }
 
     @Override
@@ -91,12 +87,12 @@ public class MessagesFragment extends Fragment {
         super.onViewStateRestored(savedInstanceState);
         // start loading after reorientation
         if (savedInstanceState != null) {
-            messagesController.startRecyclerView(recyclerView, chatId);
+            messagesController.setRecyclerView(recyclerView);
+            messagesController.restoreDataToViews();
         }
     }
 
     private void initToolbar(View rootView) {
-        Toolbar toolbar = (Toolbar) rootView.findViewById(R.id.toolbar);
         if (getActivity() != null) {
             getSupportActivity().setSupportActionBar(toolbar);
             getSupportActivity().getSupportActionBar().setTitle("");

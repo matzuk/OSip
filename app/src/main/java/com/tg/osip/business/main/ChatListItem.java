@@ -25,7 +25,7 @@ public class ChatListItem implements ImageLoaderI {
     private final static String ADD_TO_PATH = "file://";
     private final static String FILE_PATH_EMPTY = "";
 
-    private TdApi.Chat apiChat;
+    private TdApi.Chat chat;
     private String lastMessageDate;
     private String lastMessageText;
     private String userName;
@@ -33,10 +33,11 @@ public class ChatListItem implements ImageLoaderI {
     private int smallPhotoFileId;
     private String smallPhotoFilePath;
     private Drawable plug;
+    private String info;
 
-    public ChatListItem(TdApi.Chat apiChat) {
-        this.apiChat = apiChat;
-        init(apiChat);
+    public ChatListItem(TdApi.Chat chat) {
+        this.chat = chat;
+        init(chat);
     }
 
     private void init(TdApi.Chat chat) {
@@ -46,11 +47,12 @@ public class ChatListItem implements ImageLoaderI {
         userName = getName(chat.type);
         smallPhotoFileId = getFileId(chat.type);
         smallPhotoFilePath = getFilePath(chat.type);
-        plug = setPlug();
+        plug = loadPlug();
+        info = loadInfo();
     }
 
-    public TdApi.Chat getApiChat() {
-        return apiChat;
+    public TdApi.Chat getChat() {
+        return chat;
     }
 
     public String getLastMessageDate() {
@@ -92,6 +94,10 @@ public class ChatListItem implements ImageLoaderI {
     @Override
     public Drawable getPlug() {
         return plug;
+    }
+
+    public String getInfo() {
+        return info;
     }
 
     private String getChatLastMessage(TdApi.Message message) {
@@ -150,15 +156,15 @@ public class ChatListItem implements ImageLoaderI {
         return FILE_PATH_EMPTY;
     }
 
-    private Drawable setPlug() {
+    private Drawable loadPlug() {
         int id;
         String name;
         if (isGroupChat()) {
-            TdApi.GroupChatInfo groupChatInfo = ((TdApi.GroupChatInfo)getApiChat().type);
+            TdApi.GroupChatInfo groupChatInfo = ((TdApi.GroupChatInfo) getChat().type);
             id = groupChatInfo.groupChat.id;
             name = AndroidUtils.getLettersForPlug(groupChatInfo.groupChat.title, null);
         } else {
-            TdApi.PrivateChatInfo privateChatInfo = ((TdApi.PrivateChatInfo)getApiChat().type);
+            TdApi.PrivateChatInfo privateChatInfo = ((TdApi.PrivateChatInfo) getChat().type);
             id = privateChatInfo.user.id;
             name = AndroidUtils.getLettersForPlug(privateChatInfo.user.firstName, privateChatInfo.user.lastName);
         }
@@ -167,6 +173,37 @@ public class ChatListItem implements ImageLoaderI {
 
         return TextDrawable.builder()
                 .buildRoundRect(name, color, 100);
+    }
+
+    private String loadInfo() {
+        TdApi.ChatInfo chatInfo = chat.type;
+        String info = "";
+        if (chatInfo.getClass() == TdApi.GroupChatInfo.class) {
+            return getHeaderInfoForGroupChat((TdApi.GroupChatInfo)chatInfo);
+        } else if (chatInfo.getClass() == TdApi.PrivateChatInfo.class) {
+            return getHeaderInfoForPrivateChat((TdApi.PrivateChatInfo)chatInfo);
+        }
+        return info;
+    }
+
+    private String getHeaderInfoForPrivateChat(TdApi.PrivateChatInfo privateChatInfo) {
+        String info = "";
+        TdApi.UserStatus userStatus = privateChatInfo.user.status;
+        if (userStatus instanceof TdApi.UserStatusOnline) {
+            info = ApplicationSIP.applicationContext.getResources().getString(R.string.chat_status_online);
+        } else {
+            // FIXME other statuses
+            info = ApplicationSIP.applicationContext.getResources().getString(R.string.chat_status_offline);
+        }
+        return info;
+    }
+
+    private String getHeaderInfoForGroupChat(TdApi.GroupChatInfo groupChatInfo) {
+        String info = "";
+        int count = groupChatInfo.groupChat.participantsCount;
+        info = String.valueOf(count) + " " + ApplicationSIP.applicationContext.getString(R.string.chat_status_members);
+        // FIXME add online count
+        return info;
     }
 
 }
