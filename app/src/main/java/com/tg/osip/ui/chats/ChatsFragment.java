@@ -33,7 +33,6 @@ public class ChatsFragment extends BaseFragment {
 
     private AutoLoadingRecyclerView<ChatListItem> recyclerView;
     private ChatsController chatsController;
-    private ChatRecyclerAdapter chatRecyclerAdapter;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -58,25 +57,19 @@ public class ChatsFragment extends BaseFragment {
                 new RecyclerItemClickListener(getActivity(), (view1, position) -> goToConcreteChat(position))
         );
         // first start
-        if (chatsController == null || chatRecyclerAdapter == null) {
+        if (chatsController == null) {
             // start progressbar
             progressBar.setVisibility(View.VISIBLE);
-            // init ChatRecyclerAdapter
-            chatRecyclerAdapter = new ChatRecyclerAdapter();
-            chatRecyclerAdapter.setHasStableIds(true);
-            recyclerView.setAdapter(chatRecyclerAdapter);
             // init Controller
             chatsController = new ChatsController();
             // for more smoother RecyclerView appearing
             recyclerView.setVisibility(View.GONE);
-            ViewTreeObserver textViewTreeObserver=recyclerView.getViewTreeObserver();
+            ViewTreeObserver textViewTreeObserver = recyclerView.getViewTreeObserver();
             textViewTreeObserver.addOnGlobalLayoutListener(() -> recyclerView.setVisibility(View.VISIBLE));
-            Logger.debug("start loading List");
-            chatsController.firstStartRecyclerView(recyclerView, chatRecyclerAdapter, progressBar);
-        } else {
-            recyclerView.setAdapter(chatRecyclerAdapter);
         }
-
+        chatsController.setProgressBar(progressBar);
+        chatsController.setRecyclerView(recyclerView);
+        chatsController.loadData();
     }
 
     @Override
@@ -84,8 +77,7 @@ public class ChatsFragment extends BaseFragment {
         super.onViewStateRestored(savedInstanceState);
         // start loading after reorientation
         if (savedInstanceState != null) {
-            initToolbar();
-            chatsController.startRecyclerView(recyclerView);
+            chatsController.restoreDataToViews();
         }
     }
 

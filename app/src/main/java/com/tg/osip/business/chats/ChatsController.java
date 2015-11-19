@@ -28,8 +28,69 @@ import rx.android.schedulers.AndroidSchedulers;
  */
 public class ChatsController {
 
+    // views from fragment
     private WeakReference<ProgressBar> progressBarWeakReference;
+    private WeakReference<AutoLoadingRecyclerView<ChatListItem>> recyclerViewWeakReference;
+    // adapters
+    private ChatRecyclerAdapter chatRecyclerAdapter;
+    // subscriptions
     private Subscription firstStartRecyclerViewSubscription;
+
+    public ChatsController() {
+        initAdapters();
+    }
+
+    private void initAdapters() {
+        chatRecyclerAdapter = new ChatRecyclerAdapter();
+        chatRecyclerAdapter.setHasStableIds(true);
+    }
+
+    public void setProgressBar(ProgressBar progressBar) {
+        progressBarWeakReference = new WeakReference<>(progressBar);
+    }
+
+    public void setRecyclerView(AutoLoadingRecyclerView<ChatListItem> autoLoadingRecyclerView) {
+        recyclerViewWeakReference = new WeakReference<>(autoLoadingRecyclerView);
+        // set adapter to new or recreated recyclerView
+        autoLoadingRecyclerView.setAdapter(chatRecyclerAdapter);
+    }
+
+    /**
+     * This method is called first!
+     * load fresh my user.id id and start RecyclerView for first one
+     */
+    public void loadData() {
+        if (firstStartRecyclerViewSubscription != null) {
+            return;
+        }
+        firstStartRecyclerViewSubscription = TGProxy.getInstance()
+                .sendTD(new TdApi.GetMe(), TdApi.User.class)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Subscriber<TdApi.User>() {
+                    @Override
+                    public void onCompleted() { }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        Logger.error(e);
+                    }
+
+                    @Override
+                    public void onNext(TdApi.User user) {
+                        Logger.debug("user data loaded, recyclerview is next");
+                        successLoadData(user);
+                    }
+                });
+    }
+
+    private void successLoadData(TdApi.User user) {
+        chatRecyclerAdapter.setMyUserId(user.id);
+        if (recyclerViewWeakReference != null && recyclerViewWeakReference.get() != null) {
+            AutoLoadingRecyclerView<ChatListItem> autoLoadingRecyclerView = recyclerViewWeakReference.get();
+            autoLoadingRecyclerView.setLoadingObservable(getILoading());
+            autoLoadingRecyclerView.startLoading();
+        }
+    }
 
     private ILoading<ChatListItem> getILoading() {
         return offsetAndLimit -> TGProxy.getInstance().sendTD(new TdApi.GetChats(offsetAndLimit.getOffset(), offsetAndLimit.getLimit()), TdApi.Chats.class)
@@ -50,42 +111,14 @@ public class ChatsController {
     }
 
     /**
-     * This method is called first!
-     * load fresh my user.id id and start RecyclerView for first one
+     * restore data to recreated views
      */
-    public void firstStartRecyclerView(AutoLoadingRecyclerView<ChatListItem> autoLoadingRecyclerView, ChatRecyclerAdapter chatRecyclerAdapter, ProgressBar progressBar) {
-        progressBarWeakReference = new WeakReference<>(progressBar);
-        firstStartRecyclerViewSubscription = TGProxy.getInstance()
-                .sendTD(new TdApi.GetMe(), TdApi.User.class)
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Subscriber<TdApi.User>() {
-                    @Override
-                    public void onCompleted() {
-
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                        Logger.error(e);
-                    }
-
-                    @Override
-                    public void onNext(TdApi.User user) {
-                        Logger.debug("user data loaded, recyclerview is next");
-                        chatRecyclerAdapter.setMyUserId(user.id);
-                        autoLoadingRecyclerView.setLoadingObservable(getILoading());
-                        autoLoadingRecyclerView.startLoading();
-                    }
-                });
-    }
-
-    /**
-     * set parameters to RecyclerView after screen reorientation
-     * so we should not load my user.id for ILoading of RecyclerView
-     */
-    public void startRecyclerView(AutoLoadingRecyclerView<ChatListItem> autoLoadingRecyclerView) {
-        autoLoadingRecyclerView.setLoadingObservable(getILoading());
-        autoLoadingRecyclerView.startLoading();
+    public void restoreDataToViews() {
+        if (recyclerViewWeakReference != null && recyclerViewWeakReference.get() != null) {
+            AutoLoadingRecyclerView<ChatListItem> autoLoadingRecyclerView = recyclerViewWeakReference.get();
+            autoLoadingRecyclerView.setLoadingObservable(getILoading());
+            autoLoadingRecyclerView.startLoading();
+        }
     }
 
     /**

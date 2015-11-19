@@ -37,10 +37,14 @@ public class MainActivity extends AppCompatActivity {
 
     private void setToolbar() {
         toolbar = (Toolbar) findViewById(R.id.toolbar);
-        if (toolbar != null) {
-            setSupportActionBar(toolbar);
-            getSupportActionBar().show();
+        if (toolbar == null) {
+            return;
         }
+        setSupportActionBar(toolbar);
+        if (getSupportActionBar() == null) {
+            return;
+        }
+        getSupportActionBar().show();
     }
 
     private void initView() {

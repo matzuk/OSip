@@ -88,7 +88,6 @@ public class MessagesFragment extends Fragment {
         super.onViewStateRestored(savedInstanceState);
         // start loading after reorientation
         if (savedInstanceState != null) {
-            initToolbar();
             messagesController.setRecyclerView(recyclerView);
             messagesController.restoreDataToViews();
         }
