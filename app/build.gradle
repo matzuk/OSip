@@ -14,9 +14,8 @@ buildscript {
 repositories {
     mavenCentral()
     jcenter()
-    maven {
-        url 'http://dl.bintray.com/amulyakhare/maven'
-    }
+    maven { url 'http://dl.bintray.com/amulyakhare/maven' }
+    maven { url "https://jitpack.io" }
 }
 
 apply plugin: 'me.tatarka.retrolambda'
@@ -67,4 +66,10 @@ dependencies {
     compile 'io.reactivex:rxjava:1.0.14'
     compile 'com.squareup.picasso:picasso:2.5.2'
     compile 'com.amulyakhare:com.amulyakhare.textdrawable:1.0.1'
+    compile('com.afollestad.material-dialogs:core:0.8.4.2@aar') {
+        transitive = true
+    }
+    compile('com.afollestad.material-dialogs:commons:0.8.4.2@aar') {
+        transitive = true
+    }
 }

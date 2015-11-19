@@ -1,5 +1,6 @@
 package com.tg.osip.ui.activities;
 
+import android.app.Dialog;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
@@ -26,6 +27,7 @@ public class MainActivity extends AppCompatActivity {
     private View headerNavigationView;
     private DrawerLayout drawerLayout;
     private ActionBarDrawerToggle drawerToggle;
+
     private MainController mainController;
 
     @Override
@@ -72,8 +74,9 @@ public class MainActivity extends AppCompatActivity {
         navigationView.setNavigationItemSelectedListener(
                 item -> {
                     switch (item.getItemId()) {
-                        case R.id.navigation_item_1:
+                        case R.id.navigation_item_logout:
                             drawerLayout.closeDrawers();
+                            mainController.logout(this);
                             return true;
                         default:
                             return true;

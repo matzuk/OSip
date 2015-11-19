@@ -88,5 +88,8 @@
     <string name="description_cell">Cell</string>
     <string name="emoji_no_recent">No recent used emoji</string>
 
+    <!-- Dialogs -->
+    <string name="wait">Please wait…</string>
+
 
 </resources>
