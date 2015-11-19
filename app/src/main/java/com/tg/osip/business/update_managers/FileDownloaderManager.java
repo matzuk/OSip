@@ -73,6 +73,13 @@ public class FileDownloaderManager {
         return !getFilePath(fileId).equals(FILE_PATH_EMPTY);
     }
 
+    public <T extends ImageLoaderI> void startFileDownloading(T imageLoaderI) {
+        if (imageLoaderI.isSmallPhotoFileIdValid() && !imageLoaderI.isSmallPhotoFilePathValid() && !FileDownloaderManager.getInstance().isFileInCache(imageLoaderI.getSmallPhotoFileId())) {
+            TGProxy.getInstance().sendTD(new TdApi.DownloadFile(imageLoaderI.getSmallPhotoFileId()), TdApi.Ok.class)
+                    .subscribe();
+        }
+    }
+
     public <T extends ImageLoaderI> void startFileListDownloading(List<T> imageLoaderIs) {
         Observable.from(imageLoaderIs)
                 .subscribeOn(Schedulers.from(BackgroundExecutor.getSafeBackgroundExecutor()))

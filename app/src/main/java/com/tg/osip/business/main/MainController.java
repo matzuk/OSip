@@ -10,6 +10,7 @@ import android.widget.TextView;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.tg.osip.R;
 import com.tg.osip.business.models.UserItem;
+import com.tg.osip.business.update_managers.FileDownloaderManager;
 import com.tg.osip.tdclient.TGProxy;
 import com.tg.osip.ui.activities.LoginActivity;
 import com.tg.osip.ui.views.images.SIPAvatar;
@@ -34,7 +35,7 @@ import rx.schedulers.Schedulers;
  */
 public class MainController {
 
-    private static final int TIMER_IN_MS = 150;
+    private static final int TIMER_IN_MS = 200;
 
     // views from activity
     private WeakReference<View> viewWeakReference;
@@ -74,6 +75,7 @@ public class MainController {
                     public void onNext(UserItem userItem) {
                         Logger.debug("userItem data loaded, recyclerview is next");
                         MainController.this.userItem = userItem;
+                        FileDownloaderManager.getInstance().startFileDownloading(userItem);
                         bindView();
                     }
                 });
