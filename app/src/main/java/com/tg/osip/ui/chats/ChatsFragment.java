@@ -14,12 +14,11 @@ import android.widget.ProgressBar;
 
 import com.tg.osip.R;
 import com.tg.osip.business.chats.ChatsController;
-import com.tg.osip.business.chats.ChatListItem;
+import com.tg.osip.business.models.ChatItem;
 import com.tg.osip.ui.activities.MainActivity;
 import com.tg.osip.ui.messages.MessagesFragment;
 import com.tg.osip.ui.general.BaseFragment;
 import com.tg.osip.ui.views.auto_loading.AutoLoadingRecyclerView;
-import com.tg.osip.utils.log.Logger;
 import com.tg.osip.ui.views.RecyclerItemClickListener;
 
 /**
@@ -31,7 +30,7 @@ public class ChatsFragment extends BaseFragment {
 
     private static final int LIMIT = 50;
 
-    private AutoLoadingRecyclerView<ChatListItem> recyclerView;
+    private AutoLoadingRecyclerView<ChatItem> recyclerView;
     private ChatsController chatsController;
 
     @Override

@@ -10,7 +10,7 @@ import android.widget.TextView;
 
 import com.tg.osip.ApplicationSIP;
 import com.tg.osip.R;
-import com.tg.osip.business.messages.UserMessageListItem;
+import com.tg.osip.business.models.UserItem;
 import com.tg.osip.ui.views.auto_loading.AutoLoadingRecyclerViewAdapter;
 import com.tg.osip.ui.views.images.SIPAvatar;
 import com.tg.osip.utils.time.TimeUtils;
@@ -34,7 +34,7 @@ public class MessagesRecyclerAdapter extends AutoLoadingRecyclerViewAdapter<TdAp
 
     private int myUserId;
     private int lastChatReadOutboxId;
-    private Map<Integer, UserMessageListItem> usersMap = new HashMap<>();
+    private Map<Integer, UserItem> usersMap = new HashMap<>();
 
     static class MainViewHolder extends RecyclerView.ViewHolder {
 
@@ -147,9 +147,9 @@ public class MessagesRecyclerAdapter extends AutoLoadingRecyclerViewAdapter<TdAp
             mainHolder.messageText.setText(messageText.text);
         }
 
-        UserMessageListItem user = usersMap.get(message.fromId);
+        UserItem user = usersMap.get(message.fromId);
         // set name
-        String name = user.getUser().firstName + " " + user.getUser().lastName;
+        String name = user.getName();
         mainHolder.messageName.setText(name);
         // Set avatar
         mainHolder.avatar.setImageLoaderI(user);
@@ -191,8 +191,7 @@ public class MessagesRecyclerAdapter extends AutoLoadingRecyclerViewAdapter<TdAp
         if (messageContent == null) {
             return;
         }
-        TdApi.User userFrom = usersMap.get(message.fromId).getUser();
-        String actionText = getActionText(messageContent, userFrom);
+        String actionText = getActionText(messageContent, usersMap.get(message.fromId));
         if (actionText != null) {
             actionHolder.messageText.setText(actionText);
         }
@@ -208,32 +207,33 @@ public class MessagesRecyclerAdapter extends AutoLoadingRecyclerViewAdapter<TdAp
     }
 
     // TODO add name selecting
-    private String getActionText(TdApi.MessageContent messageContent, TdApi.User userFrom) {
+    private String getActionText(TdApi.MessageContent messageContent, UserItem userItem) {
         String text;
+        TdApi.User userFrom = userItem.getUser();
         if (messageContent.getClass() == TdApi.MessageChatAddParticipant.class) {
-            text = userFrom.firstName + " " + userFrom.lastName;
+            text = userItem.getName();
             text = text + " " + ApplicationSIP.applicationContext.getString(R.string.invited);
             text = text + " " +((TdApi.MessageChatAddParticipant)messageContent).user.firstName + " " + ((TdApi.MessageChatAddParticipant)messageContent).user.lastName;
             return text;
         } else if (messageContent.getClass() == TdApi.MessageChatChangePhoto.class) {
-            text = userFrom.firstName + " " + userFrom.lastName;
+            text = userItem.getName();
             text = text + " " + ApplicationSIP.applicationContext.getString(R.string.changed_group_photo);
             return text;
         } else if (messageContent.getClass() == TdApi.MessageChatChangeTitle.class) {
-            text = userFrom.firstName + " " + userFrom.lastName;
+            text = userItem.getName();
             text = text + " " + ApplicationSIP.applicationContext.getString(R.string.changed_group_name);
             text = text + " " +((TdApi.MessageChatChangeTitle)messageContent).title;
             return text;
         } else if (messageContent.getClass() == TdApi.MessageChatDeleteParticipant.class) {
             text = ((TdApi.MessageChatDeleteParticipant)messageContent).user.firstName + " " + ((TdApi.MessageChatDeleteParticipant)messageContent).user.lastName;
             if (userFrom != null) {
-                text = userFrom.firstName + " " + userFrom.lastName + ApplicationSIP.applicationContext.getString(R.string.removed) + " " + text;
+                text = userItem.getName() + ApplicationSIP.applicationContext.getString(R.string.removed) + " " + text;
             } else {
                 text = text + " " + ApplicationSIP.applicationContext.getString(R.string.left_group);
             }
             return text;
         } else if (messageContent instanceof TdApi.MessageChatDeletePhoto) {
-            text = userFrom.firstName + " " + userFrom.lastName;
+            text = userItem.getName();
             text = text + " " + ApplicationSIP.applicationContext.getString(R.string.removed_group_photo);
             return text;
         }
@@ -251,9 +251,9 @@ public class MessagesRecyclerAdapter extends AutoLoadingRecyclerViewAdapter<TdAp
             return;
         }
 
-        UserMessageListItem user = usersMap.get(message.fromId);
+        UserItem user = usersMap.get(message.fromId);
         // set name
-        String name = user.getUser().firstName + " " + user.getUser().lastName;
+        String name = user.getName();
         unsupportedHolder.messageName.setText(name);
         // Set avatar
         unsupportedHolder.avatar.setImageLoaderI(user);
@@ -271,7 +271,7 @@ public class MessagesRecyclerAdapter extends AutoLoadingRecyclerViewAdapter<TdAp
         this.lastChatReadOutboxId = lastChatReadOutboxId;
     }
 
-    public void setChatUsers(Map<Integer, UserMessageListItem> users) {
+    public void setChatUsers(Map<Integer, UserItem> users) {
         usersMap.putAll(users);
     }
 

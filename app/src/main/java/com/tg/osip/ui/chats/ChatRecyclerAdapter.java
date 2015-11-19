@@ -11,7 +11,7 @@ import android.widget.TextView;
 
 import com.tg.osip.ApplicationSIP;
 import com.tg.osip.R;
-import com.tg.osip.business.chats.ChatListItem;
+import com.tg.osip.business.models.ChatItem;
 import com.tg.osip.ui.views.auto_loading.AutoLoadingRecyclerViewAdapter;
 import com.tg.osip.ui.views.images.SIPAvatar;
 
@@ -20,7 +20,7 @@ import org.drinkless.td.libcore.telegram.TdApi;
 /**
  * @author e.matsyuk
  */
-public class ChatRecyclerAdapter extends AutoLoadingRecyclerViewAdapter<ChatListItem> {
+public class ChatRecyclerAdapter extends AutoLoadingRecyclerViewAdapter<ChatItem> {
 
     private static final int TEMP_SEND_STATE_IS_ERROR = 0;
     private static final int TEMP_SEND_STATE_IS_SENDING = 1000000000;
@@ -91,8 +91,8 @@ public class ChatRecyclerAdapter extends AutoLoadingRecyclerViewAdapter<ChatList
 
     public void onBindMainHolder(RecyclerView.ViewHolder holder, int position) {
         MainViewHolder mainHolder = (MainViewHolder) holder;
-        ChatListItem chatListItem = getItem(position);
-        TdApi.Chat concreteChat = chatListItem.getChat();
+        ChatItem chatItem = getItem(position);
+        TdApi.Chat concreteChat = chatItem.getChat();
         if (concreteChat == null) {
             return;
         }
@@ -121,19 +121,19 @@ public class ChatRecyclerAdapter extends AutoLoadingRecyclerViewAdapter<ChatList
             String dataString = getItem(position).getLastMessageDate();
             mainHolder.chatMessageSendingTime.setText(dataString);
             // get message content and set last message
-            String lastMessageText = textYou + chatListItem.getLastMessageText();
+            String lastMessageText = textYou + chatItem.getLastMessageText();
             mainHolder.chatUserLastMessage.setText(lastMessageText);
         }
         // get ChatInfo
         TdApi.ChatInfo chatInfo = concreteChat.type;
         if (chatInfo != null) {
             //  Set name
-            mainHolder.chatUserName.setText(chatListItem.getUserName());
+            mainHolder.chatUserName.setText(chatItem.getUserName());
             // Set avatar
-            mainHolder.avatar.setImageLoaderI(chatListItem);
+            mainHolder.avatar.setImageLoaderI(chatItem);
         }
         // is chat group?
-        mainHolder.chatGroupIcon.setVisibility(chatListItem.isGroupChat()? View.VISIBLE : View.GONE);
+        mainHolder.chatGroupIcon.setVisibility(chatItem.isGroupChat()? View.VISIBLE : View.GONE);
         // set unread outbox image
         if (getMyUserId() == concreteChat.topMessage.fromId) {
             if (concreteChat.lastReadOutboxMessageId >= concreteChat.topMessage.id) {

@@ -1,4 +1,4 @@
-package com.tg.osip.business.messages;
+package com.tg.osip.business.models;
 
 import android.graphics.drawable.Drawable;
 import android.text.TextUtils;
@@ -16,18 +16,21 @@ import org.drinkless.td.libcore.telegram.TdApi;
  *
  * @author e.matsyuk
  */
-public class UserMessageListItem implements ImageLoaderI {
+public class UserItem implements ImageLoaderI {
 
     private final static int EMPTY_FILE_ID = 0;
     private final static String ADD_TO_PATH = "file://";
-    private final static String FILE_PATH_EMPTY = "";
+    private final static String EMPTY_STRING = "";
+    private final static String SPACE = " ";
 
     private TdApi.User user;
     private int smallPhotoFileId;
     private String smallPhotoFilePath;
     private Drawable plug;
+    private String name;
+    private String phone;
 
-    public UserMessageListItem(TdApi.User user) {
+    public UserItem(TdApi.User user) {
         this.user = user;
         init(user);
     }
@@ -36,6 +39,8 @@ public class UserMessageListItem implements ImageLoaderI {
         smallPhotoFileId = getFileId(user);
         smallPhotoFilePath = getFilePath(user);
         plug = setPlug();
+        initName();
+        initPhone();
     }
 
     private Integer getFileId(TdApi.User user) {
@@ -47,7 +52,7 @@ public class UserMessageListItem implements ImageLoaderI {
         if (!TextUtils.isEmpty(filePath)) {
             return ADD_TO_PATH + filePath;
         }
-        return FILE_PATH_EMPTY;
+        return EMPTY_STRING;
     }
 
     private Drawable setPlug() {
@@ -57,6 +62,26 @@ public class UserMessageListItem implements ImageLoaderI {
         int color = generator.getColor(id);
         return TextDrawable.builder()
                 .buildRoundRect(name, color, 100);
+    }
+
+    private void initName() {
+        StringBuilder stringBuilder = new StringBuilder();
+        if (user.firstName != null) {
+            stringBuilder.append(user.firstName);
+            stringBuilder.append(SPACE);
+        }
+        if (user.lastName != null) {
+            stringBuilder.append(user.lastName);
+        }
+        name = stringBuilder.toString();
+    }
+
+    private void initPhone() {
+        if (user.phoneNumber != null) {
+            phone = user.phoneNumber;
+        } else {
+            phone = EMPTY_STRING;
+        }
     }
 
     public TdApi.User getUser() {
@@ -80,12 +105,20 @@ public class UserMessageListItem implements ImageLoaderI {
 
     @Override
     public boolean isSmallPhotoFilePathValid() {
-        return !smallPhotoFilePath.equals(FILE_PATH_EMPTY);
+        return !smallPhotoFilePath.equals(EMPTY_STRING);
     }
 
     @Override
     public Drawable getPlug() {
         return plug;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getPhone() {
+        return phone;
     }
 
 }

@@ -8,7 +8,8 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.tg.osip.R;
-import com.tg.osip.business.chats.ChatListItem;
+import com.tg.osip.business.models.ChatItem;
+import com.tg.osip.business.models.UserItem;
 import com.tg.osip.business.update_managers.FileDownloaderManager;
 import com.tg.osip.tdclient.TGProxy;
 import com.tg.osip.ui.messages.MessagesRecyclerAdapter;
@@ -52,7 +53,7 @@ public class MessagesController {
     // subscriptions
     private Subscription firstStartRecyclerViewSubscription;
     // needed members
-    private ChatListItem chatListItem;
+    private ChatItem chatItem;
     private long chatId;
 
     public MessagesController(long chatId) {
@@ -113,14 +114,14 @@ public class MessagesController {
     }
 
     private void successLoadData(TdApi.Chat chat) {
-        chatListItem = new ChatListItem(chat);
+        chatItem = new ChatItem(chat);
         initToolbar();
         messagesRecyclerAdapter.setLastChatReadOutboxId(chat.lastReadOutboxMessageId);
         messagesRecyclerAdapter.addNewItem(chat.topMessage);
         messagesRecyclerAdapter.notifyItemInserted(0);
         if (recyclerViewWeakReference != null && recyclerViewWeakReference.get() != null) {
             AutoLoadingRecyclerView<TdApi.Message> autoLoadingRecyclerView = recyclerViewWeakReference.get();
-            autoLoadingRecyclerView.setLoadingObservable(getILoading(chatId, chatListItem.getChat().topMessage.id));
+            autoLoadingRecyclerView.setLoadingObservable(getILoading(chatId, chatItem.getChat().topMessage.id));
             autoLoadingRecyclerView.startLoading();
         }
     }
@@ -142,7 +143,7 @@ public class MessagesController {
 
     private Observable<List<TdApi.Message>> getUsersDownloadingProxyObservable(List<TdApi.Message> mainListItems) {
         return Observable.create(subscriber -> getUsersDownloadingObservable(mainListItems)
-                .subscribe(new Subscriber<Map<Integer, UserMessageListItem>>() {
+                .subscribe(new Subscriber<Map<Integer, UserItem>>() {
                     @Override
                     public void onCompleted() {
                         subscriber.onCompleted();
@@ -154,7 +155,7 @@ public class MessagesController {
                     }
 
                     @Override
-                    public void onNext(Map<Integer, UserMessageListItem> map) {
+                    public void onNext(Map<Integer, UserItem> map) {
                         if (messagesRecyclerAdapter != null) {
                             messagesRecyclerAdapter.setChatUsers(map);
                         }
@@ -163,18 +164,18 @@ public class MessagesController {
                 }));
     }
 
-    private Observable<Map<Integer, UserMessageListItem>> getUsersDownloadingObservable(List<TdApi.Message> mainListItems) {
+    private Observable<Map<Integer, UserItem>> getUsersDownloadingObservable(List<TdApi.Message> mainListItems) {
         return Observable.from(mainListItems)
                 .subscribeOn(Schedulers.from(BackgroundExecutor.getSafeBackgroundExecutor()))
                 .map(message -> message.fromId)
                 .distinct()
                 .concatMap(integer -> TGProxy.getInstance().sendTD(new TdApi.GetUser(integer), TdApi.User.class))
-                .map(UserMessageListItem::new)
+                .map(UserItem::new)
                 .toList()
                 .doOnNext(userChatListItems -> FileDownloaderManager.getInstance().startFileListDownloading(userChatListItems))
                 .map(users -> {
-                    Map<Integer, UserMessageListItem> map = new HashMap<>();
-                    for (UserMessageListItem user : users) {
+                    Map<Integer, UserItem> map = new HashMap<>();
+                    for (UserItem user : users) {
                         map.put(user.getUser().id, user);
                     }
                     return map;
@@ -182,7 +183,7 @@ public class MessagesController {
     }
 
     private void initToolbar() {
-        if (chatListItem == null || contextWeakReference == null || contextWeakReference.get() == null ||
+        if (chatItem == null || contextWeakReference == null || contextWeakReference.get() == null ||
                 toolbarWeakReference == null || toolbarWeakReference.get() == null) {
             return;
         }
@@ -193,14 +194,14 @@ public class MessagesController {
         headerView = layoutInflater.inflate(R.layout.toolbar_messages, null);
 
         SIPAvatar headerAvatar = (SIPAvatar)headerView.findViewById(R.id.avatar);
-        headerAvatar.setImageLoaderI(chatListItem);
+        headerAvatar.setImageLoaderI(chatItem);
         // not start file downloading because all chats avatars downloading was started in ChatsController
 
         TextView chatNameView = (TextView)headerView.findViewById(R.id.chat_name);
-        chatNameView.setText(chatListItem.getUserName());
+        chatNameView.setText(chatItem.getUserName());
 
         TextView chatInfoView = (TextView)headerView.findViewById(R.id.chat_info);
-        chatInfoView.setText(chatListItem.getInfo());
+        chatInfoView.setText(chatItem.getInfo());
 
         toolbar.addView(headerView);
     }
@@ -211,7 +212,7 @@ public class MessagesController {
     public void restoreDataToViews() {
         if (recyclerViewWeakReference != null && recyclerViewWeakReference.get() != null) {
             AutoLoadingRecyclerView<TdApi.Message> autoLoadingRecyclerView = recyclerViewWeakReference.get();
-            autoLoadingRecyclerView.setLoadingObservable(getILoading(chatId, chatListItem.getChat().topMessage.id));
+            autoLoadingRecyclerView.setLoadingObservable(getILoading(chatId, chatItem.getChat().topMessage.id));
             autoLoadingRecyclerView.startLoading();
         }
     }
@@ -228,6 +229,5 @@ public class MessagesController {
             toolbar.removeView(headerView);
         }
     }
-
 
 }

@@ -1,4 +1,4 @@
-package com.tg.osip.business.chats;
+package com.tg.osip.business.models;
 
 import android.graphics.drawable.Drawable;
 import android.text.TextUtils;
@@ -19,7 +19,7 @@ import org.drinkless.td.libcore.telegram.TdApi;
  *
  * @author e.matsyuk
  */
-public class ChatListItem implements ImageLoaderI {
+public class ChatItem implements ImageLoaderI {
 
     private final static int EMPTY_FILE_ID = 0;
     private final static String ADD_TO_PATH = "file://";
@@ -35,7 +35,7 @@ public class ChatListItem implements ImageLoaderI {
     private Drawable plug;
     private String info;
 
-    public ChatListItem(TdApi.Chat chat) {
+    public ChatItem(TdApi.Chat chat) {
         this.chat = chat;
         init(chat);
     }

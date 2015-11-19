@@ -3,6 +3,7 @@ package com.tg.osip.business.chats;
 import android.view.View;
 import android.widget.ProgressBar;
 
+import com.tg.osip.business.models.ChatItem;
 import com.tg.osip.business.update_managers.FileDownloaderManager;
 import com.tg.osip.tdclient.TGProxy;
 import com.tg.osip.ui.chats.ChatRecyclerAdapter;
@@ -30,7 +31,7 @@ public class ChatsController {
 
     // views from fragment
     private WeakReference<ProgressBar> progressBarWeakReference;
-    private WeakReference<AutoLoadingRecyclerView<ChatListItem>> recyclerViewWeakReference;
+    private WeakReference<AutoLoadingRecyclerView<ChatItem>> recyclerViewWeakReference;
     // adapters
     private ChatRecyclerAdapter chatRecyclerAdapter;
     // subscriptions
@@ -49,7 +50,7 @@ public class ChatsController {
         progressBarWeakReference = new WeakReference<>(progressBar);
     }
 
-    public void setRecyclerView(AutoLoadingRecyclerView<ChatListItem> autoLoadingRecyclerView) {
+    public void setRecyclerView(AutoLoadingRecyclerView<ChatItem> autoLoadingRecyclerView) {
         recyclerViewWeakReference = new WeakReference<>(autoLoadingRecyclerView);
         // set adapter to new or recreated recyclerView
         autoLoadingRecyclerView.setAdapter(chatRecyclerAdapter);
@@ -86,20 +87,20 @@ public class ChatsController {
     private void successLoadData(TdApi.User user) {
         chatRecyclerAdapter.setMyUserId(user.id);
         if (recyclerViewWeakReference != null && recyclerViewWeakReference.get() != null) {
-            AutoLoadingRecyclerView<ChatListItem> autoLoadingRecyclerView = recyclerViewWeakReference.get();
+            AutoLoadingRecyclerView<ChatItem> autoLoadingRecyclerView = recyclerViewWeakReference.get();
             autoLoadingRecyclerView.setLoadingObservable(getILoading());
             autoLoadingRecyclerView.startLoading();
         }
     }
 
-    private ILoading<ChatListItem> getILoading() {
+    private ILoading<ChatItem> getILoading() {
         return offsetAndLimit -> TGProxy.getInstance().sendTD(new TdApi.GetChats(offsetAndLimit.getOffset(), offsetAndLimit.getLimit()), TdApi.Chats.class)
                 .map(chats -> {
                     TdApi.Chat chatsMas[] = chats.chats;
                     return new ArrayList<>(Arrays.asList(chatsMas));
                 })
                 .concatMap(Observable::from)
-                .map(ChatListItem::new)
+                .map(ChatItem::new)
                 .toList()
                 .observeOn(AndroidSchedulers.mainThread())
                 .doOnNext(mainListItems -> {
@@ -115,7 +116,7 @@ public class ChatsController {
      */
     public void restoreDataToViews() {
         if (recyclerViewWeakReference != null && recyclerViewWeakReference.get() != null) {
-            AutoLoadingRecyclerView<ChatListItem> autoLoadingRecyclerView = recyclerViewWeakReference.get();
+            AutoLoadingRecyclerView<ChatItem> autoLoadingRecyclerView = recyclerViewWeakReference.get();
             autoLoadingRecyclerView.setLoadingObservable(getILoading());
             autoLoadingRecyclerView.startLoading();
         }
