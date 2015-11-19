@@ -13,6 +13,7 @@ import android.widget.ProgressBar;
 
 import com.tg.osip.R;
 import com.tg.osip.business.messages.MessagesController;
+import com.tg.osip.ui.activities.MainActivity;
 import com.tg.osip.ui.views.auto_loading.AutoLoadingRecyclerView;
 
 import org.drinkless.td.libcore.telegram.TdApi;
@@ -54,14 +55,14 @@ public class MessagesFragment extends Fragment {
         View rootView = inflater.inflate(R.layout.fmt_messages, container, false);
         setRetainInstance(true);
         init(rootView);
-        initToolbar(rootView);
+        initToolbar();
         return rootView;
     }
 
     private void init(View view) {
         recyclerView = (AutoLoadingRecyclerView) view.findViewById(R.id.RecyclerView);
         ProgressBar progressBar = (ProgressBar) view.findViewById(R.id.progressBar);
-        toolbar = (Toolbar) view.findViewById(R.id.toolbar);
+        toolbar = ((MainActivity)getSupportActivity()).getToolbar();
         // init LayoutManager
         GridLayoutManager recyclerViewLayoutManager = new GridLayoutManager(getActivity(), 1);
         recyclerViewLayoutManager.supportsPredictiveItemAnimations();
@@ -87,18 +88,20 @@ public class MessagesFragment extends Fragment {
         super.onViewStateRestored(savedInstanceState);
         // start loading after reorientation
         if (savedInstanceState != null) {
+            initToolbar();
             messagesController.setRecyclerView(recyclerView);
             messagesController.restoreDataToViews();
         }
     }
 
-    private void initToolbar(View rootView) {
-        if (getActivity() != null) {
-            getSupportActivity().setSupportActionBar(toolbar);
-            getSupportActivity().getSupportActionBar().setTitle("");
-            getSupportActivity().getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-            getSupportActivity().getSupportActionBar().show();
+    private void initToolbar() {
+        if (getSupportActivity() == null || getSupportActivity().getSupportActionBar() == null) {
+            return;
         }
+        getSupportActivity().getSupportActionBar().setTitle("");
+        getSupportActivity().getSupportActionBar().setDisplayShowHomeEnabled(true);
+        getSupportActivity().getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        toolbar.setNavigationOnClickListener(v -> getSupportActivity().onBackPressed());
     }
 
     private AppCompatActivity getSupportActivity() {

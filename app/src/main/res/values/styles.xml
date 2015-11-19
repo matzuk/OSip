@@ -4,6 +4,7 @@
     <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
         <item name="colorPrimary">@color/toolbar_color_primary</item>
         <item name="colorPrimaryDark">@color/toolbar_color_primary_dark</item>
+        <item name="colorAccent">#E040FB</item>
         <item name="android:autoCompleteTextViewStyle">@style/cursorColor</item>
         <item name="colorControlNormal">@color/edit_text_background_line_color</item>
         <item name="colorControlActivated">@color/material_blue_color</item>

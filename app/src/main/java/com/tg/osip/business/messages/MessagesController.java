@@ -4,12 +4,11 @@ import android.content.Context;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.tg.osip.R;
-import com.tg.osip.business.main.ChatListItem;
+import com.tg.osip.business.chats.ChatListItem;
 import com.tg.osip.business.update_managers.FileDownloaderManager;
 import com.tg.osip.tdclient.TGProxy;
 import com.tg.osip.ui.messages.MessagesRecyclerAdapter;
@@ -41,11 +40,13 @@ import rx.schedulers.Schedulers;
  */
 public class MessagesController {
 
-    // views
+    // views from fragment
     private WeakReference<ProgressBar> progressBarWeakReference;
     private WeakReference<AutoLoadingRecyclerView<TdApi.Message>> recyclerViewWeakReference;
     private WeakReference<Context> contextWeakReference;
     private WeakReference<Toolbar> toolbarWeakReference;
+    // views was created in controller
+    private View headerView;
     // adapters
     private MessagesRecyclerAdapter messagesRecyclerAdapter;
     // subscriptions
@@ -189,7 +190,7 @@ public class MessagesController {
         Toolbar toolbar = toolbarWeakReference.get();
 
         LayoutInflater layoutInflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        View headerView = layoutInflater.inflate(R.layout.toolbar_messages, null);
+        headerView = layoutInflater.inflate(R.layout.toolbar_messages, null);
 
         SIPAvatar headerAvatar = (SIPAvatar)headerView.findViewById(R.id.avatar);
         headerAvatar.setImageLoaderI(chatListItem);
@@ -221,6 +222,10 @@ public class MessagesController {
     public void onDestroy() {
         if (firstStartRecyclerViewSubscription != null && !firstStartRecyclerViewSubscription.isUnsubscribed()) {
             firstStartRecyclerViewSubscription.unsubscribe();
+        }
+        if (toolbarWeakReference != null && toolbarWeakReference.get() != null && headerView != null) {
+            Toolbar toolbar = toolbarWeakReference.get();
+            toolbar.removeView(headerView);
         }
     }
 

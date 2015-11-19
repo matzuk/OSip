@@ -4,7 +4,6 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
@@ -14,8 +13,9 @@ import android.view.ViewTreeObserver;
 import android.widget.ProgressBar;
 
 import com.tg.osip.R;
-import com.tg.osip.business.main.ChatsController;
-import com.tg.osip.business.main.ChatListItem;
+import com.tg.osip.business.chats.ChatsController;
+import com.tg.osip.business.chats.ChatListItem;
+import com.tg.osip.ui.activities.MainActivity;
 import com.tg.osip.ui.messages.MessagesFragment;
 import com.tg.osip.ui.general.BaseFragment;
 import com.tg.osip.ui.views.auto_loading.AutoLoadingRecyclerView;
@@ -41,7 +41,7 @@ public class ChatsFragment extends BaseFragment {
         View rootView = inflater.inflate(R.layout.fmt_main, container, false);
         setRetainInstance(true);
         init(rootView);
-        initToolbar(rootView);
+        initToolbar();
         return rootView;
     }
 
@@ -84,6 +84,7 @@ public class ChatsFragment extends BaseFragment {
         super.onViewStateRestored(savedInstanceState);
         // start loading after reorientation
         if (savedInstanceState != null) {
+            initToolbar();
             chatsController.startRecyclerView(recyclerView);
         }
     }
@@ -101,12 +102,16 @@ public class ChatsFragment extends BaseFragment {
         transaction.commit();
     }
 
-    private void initToolbar(View view) {
-        Toolbar toolbar = (Toolbar) view.findViewById(R.id.toolbar);
-        ((AppCompatActivity)getActivity()).setSupportActionBar(toolbar);
-        toolbar.setTitle(getResources().getString(R.string.chat_list_toolbar_title));
-        getSupportActivity().getSupportActionBar().setDisplayShowHomeEnabled(true);
-        getSupportActivity().getSupportActionBar().show();
+    private void initToolbar() {
+        if (getSupportActivity() == null || getSupportActivity().getSupportActionBar() == null) {
+            return;
+        }
+        Toolbar toolbar = ((MainActivity) getSupportActivity()).getToolbar();
+        toolbar.setNavigationOnClickListener(((MainActivity) getSupportActivity()).getCommonNavigationOnClickListener());
+        getSupportActivity().getSupportActionBar().setTitle(getResources().getString(R.string.chat_list_toolbar_title));
+        getSupportActivity().getSupportActionBar().setDisplayShowHomeEnabled(false);
+        getSupportActivity().getSupportActionBar().setDisplayHomeAsUpEnabled(false);
+        ((MainActivity) getSupportActivity()).drawerToggleSyncState();
     }
 
     @Override

@@ -11,7 +11,7 @@ import android.widget.TextView;
 
 import com.tg.osip.ApplicationSIP;
 import com.tg.osip.R;
-import com.tg.osip.business.main.ChatListItem;
+import com.tg.osip.business.chats.ChatListItem;
 import com.tg.osip.ui.views.auto_loading.AutoLoadingRecyclerViewAdapter;
 import com.tg.osip.ui.views.images.SIPAvatar;
 

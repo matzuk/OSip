@@ -1,4 +1,4 @@
-package com.tg.osip.business.main;
+package com.tg.osip.business.chats;
 
 import android.view.View;
 import android.widget.ProgressBar;
@@ -29,7 +29,6 @@ import rx.android.schedulers.AndroidSchedulers;
 public class ChatsController {
 
     private WeakReference<ProgressBar> progressBarWeakReference;
-    private Subscription startFileDownloadingSubscription;
     private Subscription firstStartRecyclerViewSubscription;
 
     private ILoading<ChatListItem> getILoading() {
@@ -93,9 +92,6 @@ public class ChatsController {
      * Required method for memory leaks preventing
      */
     public void onDestroy() {
-        if (startFileDownloadingSubscription != null && !startFileDownloadingSubscription.isUnsubscribed()) {
-            startFileDownloadingSubscription.unsubscribe();
-        }
         if (firstStartRecyclerViewSubscription != null && !firstStartRecyclerViewSubscription.isUnsubscribed()) {
             firstStartRecyclerViewSubscription.unsubscribe();
         }

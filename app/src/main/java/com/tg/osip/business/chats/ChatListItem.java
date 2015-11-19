@@ -1,4 +1,4 @@
-package com.tg.osip.business.main;
+package com.tg.osip.business.chats;
 
 import android.graphics.drawable.Drawable;
 import android.text.TextUtils;
