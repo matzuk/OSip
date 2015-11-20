@@ -18,7 +18,7 @@
         android:paddingBottom="64dp"
         android:gravity="center">
 
-        <com.tg.osip.ui.views.images.ScalableImageView
+        <com.tg.osip.ui.general.views.images.ScalableImageView
             android:id="@+id/imageView1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -27,7 +27,7 @@
             android:layout_marginBottom="24dp"
             android:layout_gravity="center_horizontal" />
 
-        <com.tg.osip.ui.views.images.ScalableImageView
+        <com.tg.osip.ui.general.views.images.ScalableImageView
             android:id="@+id/imageView2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

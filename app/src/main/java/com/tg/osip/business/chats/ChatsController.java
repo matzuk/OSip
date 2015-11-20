@@ -7,8 +7,8 @@ import com.tg.osip.business.models.ChatItem;
 import com.tg.osip.business.update_managers.FileDownloaderManager;
 import com.tg.osip.tdclient.TGProxy;
 import com.tg.osip.ui.chats.ChatRecyclerAdapter;
-import com.tg.osip.ui.views.auto_loading.AutoLoadingRecyclerView;
-import com.tg.osip.ui.views.auto_loading.ILoading;
+import com.tg.osip.ui.general.views.auto_loading.AutoLoadingRecyclerView;
+import com.tg.osip.ui.general.views.auto_loading.ILoading;
 import com.tg.osip.utils.log.Logger;
 
 import org.drinkless.td.libcore.telegram.TdApi;

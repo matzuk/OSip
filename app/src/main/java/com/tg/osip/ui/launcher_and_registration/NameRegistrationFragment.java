@@ -17,8 +17,8 @@ import android.widget.EditText;
 import com.tg.osip.R;
 import com.tg.osip.business.AuthManager;
 import com.tg.osip.utils.common.AndroidUtils;
-import com.tg.osip.ui.views.images.ScalableImageView;
-import com.tg.osip.ui.views.SimpleAlertDialog;
+import com.tg.osip.ui.general.views.images.ScalableImageView;
+import com.tg.osip.ui.general.views.SimpleAlertDialog;
 
 /**
  * @author e.matsyuk

@@ -14,7 +14,7 @@ import android.widget.ProgressBar;
 import com.tg.osip.R;
 import com.tg.osip.business.messages.MessagesController;
 import com.tg.osip.ui.activities.MainActivity;
-import com.tg.osip.ui.views.auto_loading.AutoLoadingRecyclerView;
+import com.tg.osip.ui.general.views.auto_loading.AutoLoadingRecyclerView;
 
 import org.drinkless.td.libcore.telegram.TdApi;
 

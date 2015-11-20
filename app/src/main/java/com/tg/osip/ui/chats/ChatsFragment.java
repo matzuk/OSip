@@ -18,8 +18,8 @@ import com.tg.osip.business.models.ChatItem;
 import com.tg.osip.ui.activities.MainActivity;
 import com.tg.osip.ui.messages.MessagesFragment;
 import com.tg.osip.ui.general.BaseFragment;
-import com.tg.osip.ui.views.auto_loading.AutoLoadingRecyclerView;
-import com.tg.osip.ui.views.RecyclerItemClickListener;
+import com.tg.osip.ui.general.views.auto_loading.AutoLoadingRecyclerView;
+import com.tg.osip.ui.general.views.RecyclerItemClickListener;
 
 /**
  * Fragment show list of all chats

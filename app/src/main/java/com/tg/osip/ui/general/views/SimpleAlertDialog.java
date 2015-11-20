@@ -1,4 +1,4 @@
-package com.tg.osip.ui.views;
+package com.tg.osip.ui.general.views;
 
 import android.app.Activity;
 import android.app.Dialog;

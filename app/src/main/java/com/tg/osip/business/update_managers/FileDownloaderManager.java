@@ -1,7 +1,7 @@
 package com.tg.osip.business.update_managers;
 
 import com.tg.osip.tdclient.TGProxy;
-import com.tg.osip.ui.views.images.ImageLoaderI;
+import com.tg.osip.ui.general.views.images.ImageLoaderI;
 import com.tg.osip.utils.common.BackgroundExecutor;
 import com.tg.osip.utils.log.Logger;
 
@@ -86,6 +86,10 @@ public class FileDownloaderManager {
                 .filter(imageLoaderI -> imageLoaderI.isSmallPhotoFileIdValid() && !imageLoaderI.isSmallPhotoFilePathValid() && !FileDownloaderManager.getInstance().isFileInCache(imageLoaderI.getSmallPhotoFileId()))
                 .concatMap(imageLoaderI -> TGProxy.getInstance().sendTD(new TdApi.DownloadFile(imageLoaderI.getSmallPhotoFileId()), TdApi.Ok.class))
                 .subscribe();
+    }
+
+    public void clearManager() {
+        fileHashMap.clear();
     }
 
 }

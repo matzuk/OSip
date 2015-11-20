@@ -23,7 +23,7 @@
             android:layout_gravity="right"
             android:orientation="horizontal">
 
-            <com.tg.osip.ui.views.images.ScalableImageView
+            <com.tg.osip.ui.general.views.images.ScalableImageView
                 android:id="@+id/next_button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -79,7 +79,7 @@
                     <requestFocus />
                 </EditText>
 
-                <com.tg.osip.ui.views.images.ScalableImageView
+                <com.tg.osip.ui.general.views.images.ScalableImageView
                     android:id="@+id/verification_code_image"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -89,7 +89,7 @@
 
             </LinearLayout>
 
-            <com.tg.osip.ui.views.TransitionTextView
+            <com.tg.osip.ui.general.views.TransitionTextView
                 android:id="@+id/verification_wrong_number"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

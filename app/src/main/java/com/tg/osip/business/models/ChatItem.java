@@ -8,7 +8,7 @@ import com.amulyakhare.textdrawable.util.ColorGenerator;
 import com.tg.osip.ApplicationSIP;
 import com.tg.osip.R;
 import com.tg.osip.ui.chats.ChatRecyclerAdapter;
-import com.tg.osip.ui.views.images.ImageLoaderI;
+import com.tg.osip.ui.general.views.images.ImageLoaderI;
 import com.tg.osip.utils.common.AndroidUtils;
 import com.tg.osip.utils.time.TimeUtils;
 
@@ -23,7 +23,8 @@ public class ChatItem implements ImageLoaderI {
 
     private final static int EMPTY_FILE_ID = 0;
     private final static String ADD_TO_PATH = "file://";
-    private final static String FILE_PATH_EMPTY = "";
+    private final static String EMPTY_STRING = "";
+    private final static String SPACE = " ";
 
     private TdApi.Chat chat;
     private String lastMessageDate;
@@ -43,12 +44,12 @@ public class ChatItem implements ImageLoaderI {
     private void init(TdApi.Chat chat) {
         groupChat = determineIsChatGroupType(chat.type);
         lastMessageDate = TimeUtils.stringForMessageListDate(chat.topMessage.date);
-        lastMessageText = getChatLastMessage(chat.topMessage);
-        userName = getName(chat.type);
-        smallPhotoFileId = getFileId(chat.type);
-        smallPhotoFilePath = getFilePath(chat.type);
-        plug = loadPlug();
-        info = loadInfo();
+        initChatLastMessage(chat.topMessage);
+        initName(chat.type);
+        initFileId(chat.type);
+        initFilePath(chat.type);
+        initPlug();
+        initInfo();
     }
 
     public TdApi.Chat getChat() {
@@ -88,7 +89,7 @@ public class ChatItem implements ImageLoaderI {
 
     @Override
     public boolean isSmallPhotoFilePathValid() {
-        return !smallPhotoFilePath.equals(FILE_PATH_EMPTY);
+        return !smallPhotoFilePath.equals(EMPTY_STRING);
     }
 
     @Override
@@ -100,50 +101,60 @@ public class ChatItem implements ImageLoaderI {
         return info;
     }
 
-    private String getChatLastMessage(TdApi.Message message) {
+    private void initChatLastMessage(TdApi.Message message) {
         TdApi.MessageContent messageContent = message.message;
         if (messageContent == null) {
-            return "";
+            lastMessageText = EMPTY_STRING;
+            return;
         }
         if (messageContent.getClass() == TdApi.MessageText.class) {
-            return ((TdApi.MessageText)messageContent).text;
+            lastMessageText = ((TdApi.MessageText)messageContent).text != null ? ((TdApi.MessageText)messageContent).text : EMPTY_STRING;
+        } else if (messageContent.getClass() == TdApi.MessageAudio.class) {
+            lastMessageText = ApplicationSIP.applicationContext.getResources().getString(R.string.chat_list_message_type_audio);
+        } else if (messageContent.getClass() == TdApi.MessageVideo.class) {
+            lastMessageText = ApplicationSIP.applicationContext.getResources().getString(R.string.chat_list_message_type_video);
+        } else if (messageContent.getClass() == TdApi.MessagePhoto.class) {
+            lastMessageText = ApplicationSIP.applicationContext.getResources().getString(R.string.chat_list_message_type_photo);
+        } else if (messageContent.getClass() == TdApi.MessageSticker.class) {
+            lastMessageText = ApplicationSIP.applicationContext.getResources().getString(R.string.chat_list_message_type_sticker);
+        } else {
+            lastMessageText = ApplicationSIP.applicationContext.getResources().getString(R.string.chat_list_message_type_other);
         }
-        if (messageContent.getClass() == TdApi.MessageAudio.class) {
-            return ApplicationSIP.applicationContext.getResources().getString(R.string.chat_list_message_type_audio);
-        }
-        if (messageContent.getClass() == TdApi.MessageVideo.class) {
-            return ApplicationSIP.applicationContext.getResources().getString(R.string.chat_list_message_type_video);
-        }
-        if (messageContent.getClass() == TdApi.MessagePhoto.class) {
-            return ApplicationSIP.applicationContext.getResources().getString(R.string.chat_list_message_type_photo);
-        }
-        if (messageContent.getClass() == TdApi.MessageSticker.class) {
-            return ApplicationSIP.applicationContext.getResources().getString(R.string.chat_list_message_type_sticker);
-        }
-        return ApplicationSIP.applicationContext.getResources().getString(R.string.chat_list_message_type_other);
     }
 
-    private String getName(TdApi.ChatInfo chatInfo) {
+    private void initName(TdApi.ChatInfo chatInfo) {
         if (groupChat) {
-            return ((TdApi.GroupChatInfo)chatInfo).groupChat.title;
+            userName = ((TdApi.GroupChatInfo)chatInfo).groupChat.title != null ? ((TdApi.GroupChatInfo)chatInfo).groupChat.title : EMPTY_STRING;
         } else {
-            return ((TdApi.PrivateChatInfo)chatInfo).user.firstName + " " + ((TdApi.PrivateChatInfo)chatInfo).user.lastName;
+            userName = initNameFromPrivateChat(((TdApi.PrivateChatInfo)chatInfo).user);
         }
+    }
+
+    private String initNameFromPrivateChat(TdApi.User user) {
+        StringBuilder stringBuilder = new StringBuilder();
+        if (user.firstName != null) {
+            stringBuilder.append(user.firstName);
+            stringBuilder.append(SPACE);
+        }
+        if (user.lastName != null) {
+            stringBuilder.append(user.lastName);
+        }
+        return stringBuilder.toString();
     }
 
     private boolean determineIsChatGroupType(TdApi.ChatInfo chatInfo) {
         return chatInfo.getClass() == TdApi.GroupChatInfo.class;
     }
 
-    private Integer getFileId(TdApi.ChatInfo chatInfo) {
+    private void initFileId(TdApi.ChatInfo chatInfo) {
         if (groupChat) {
-            return ((TdApi.GroupChatInfo)chatInfo).groupChat.photo.small.id;
+            smallPhotoFileId = ((TdApi.GroupChatInfo)chatInfo).groupChat.photo.small.id;
         } else {
-            return ((TdApi.PrivateChatInfo)chatInfo).user.profilePhoto.small.id;
+            smallPhotoFileId = ((TdApi.PrivateChatInfo)chatInfo).user.profilePhoto.small.id;
         }
     }
 
-    private String getFilePath(TdApi.ChatInfo chatInfo) {
+    private void initFilePath(TdApi.ChatInfo chatInfo) {
         String filePath;
         if (groupChat) {
             filePath = ((TdApi.GroupChatInfo)chatInfo).groupChat.photo.small.path;
@@ -151,12 +162,13 @@ public class ChatItem implements ImageLoaderI {
             filePath = ((TdApi.PrivateChatInfo)chatInfo).user.profilePhoto.small.path;
         }
         if (!TextUtils.isEmpty(filePath)) {
-            return ADD_TO_PATH + filePath;
+            smallPhotoFilePath = ADD_TO_PATH + filePath;
+        } else {
+            smallPhotoFilePath = EMPTY_STRING;
         }
-        return FILE_PATH_EMPTY;
     }
 
-    private Drawable loadPlug() {
+    private void initPlug() {
         int id;
         String name;
         if (isGroupChat()) {
@@ -170,40 +182,35 @@ public class ChatItem implements ImageLoaderI {
         }
         ColorGenerator generator = ColorGenerator.MATERIAL;
         int color = generator.getColor(id);
-
-        return TextDrawable.builder()
-                .buildRoundRect(name, color, 100);
+        plug = TextDrawable.builder().buildRoundRect(name, color, 100);
     }
 
-    private String loadInfo() {
+    private void initInfo() {
         TdApi.ChatInfo chatInfo = chat.type;
-        String info = "";
         if (chatInfo.getClass() == TdApi.GroupChatInfo.class) {
-            return getHeaderInfoForGroupChat((TdApi.GroupChatInfo)chatInfo);
+            info = getHeaderInfoForGroupChat((TdApi.GroupChatInfo)chatInfo);
+            return;
         } else if (chatInfo.getClass() == TdApi.PrivateChatInfo.class) {
-            return getHeaderInfoForPrivateChat((TdApi.PrivateChatInfo)chatInfo);
+            info = getHeaderInfoForPrivateChat((TdApi.PrivateChatInfo)chatInfo);
+            return;
         }
-        return info;
+        info = EMPTY_STRING;
     }
 
     private String getHeaderInfoForPrivateChat(TdApi.PrivateChatInfo privateChatInfo) {
-        String info = "";
         TdApi.UserStatus userStatus = privateChatInfo.user.status;
         if (userStatus instanceof TdApi.UserStatusOnline) {
-            info = ApplicationSIP.applicationContext.getResources().getString(R.string.chat_status_online);
+            return ApplicationSIP.applicationContext.getResources().getString(R.string.chat_status_online);
         } else {
             // FIXME other statuses
-            info = ApplicationSIP.applicationContext.getResources().getString(R.string.chat_status_offline);
+            return ApplicationSIP.applicationContext.getResources().getString(R.string.chat_status_offline);
         }
-        return info;
     }
 
     private String getHeaderInfoForGroupChat(TdApi.GroupChatInfo groupChatInfo) {
-        String info = "";
         int count = groupChatInfo.groupChat.participantsCount;
-        info = String.valueOf(count) + " " + ApplicationSIP.applicationContext.getString(R.string.chat_status_members);
+        return String.valueOf(count) + " " + ApplicationSIP.applicationContext.getString(R.string.chat_status_members);
         // FIXME add online count
-        return info;
     }
 
 }

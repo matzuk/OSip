@@ -4,7 +4,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <com.tg.osip.ui.views.auto_loading.AutoLoadingRecyclerView
+    <com.tg.osip.ui.general.views.auto_loading.AutoLoadingRecyclerView
         android:id="@+id/RecyclerView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"

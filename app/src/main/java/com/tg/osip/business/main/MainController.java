@@ -13,7 +13,7 @@ import com.tg.osip.business.models.UserItem;
 import com.tg.osip.business.update_managers.FileDownloaderManager;
 import com.tg.osip.tdclient.TGProxy;
 import com.tg.osip.ui.activities.LoginActivity;
-import com.tg.osip.ui.views.images.SIPAvatar;
+import com.tg.osip.ui.general.views.images.SIPAvatar;
 import com.tg.osip.utils.common.BackgroundExecutor;
 import com.tg.osip.utils.log.Logger;
 
@@ -125,6 +125,8 @@ public class MainController {
 
                     @Override
                     public void onNext(TdApi.AuthState authState) {
+                        // clear FileDownloaderManager
+                        FileDownloaderManager.getInstance().clearManager();
                         if (logoutProgressDialog != null && logoutProgressDialog.isShowing()) {
                             logoutProgressDialog.dismiss();
                         }

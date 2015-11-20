@@ -16,7 +16,7 @@ import com.tg.osip.ui.launcher_and_registration.PhoneRegistrationFragment;
 import com.tg.osip.ui.launcher_and_registration.SplashFragment;
 import com.tg.osip.utils.common.AndroidUtils;
 import com.tg.osip.utils.log.Logger;
-import com.tg.osip.ui.views.SimpleAlertDialog;
+import com.tg.osip.ui.general.views.SimpleAlertDialog;
 
 import rx.Subscriber;
 import rx.Subscription;

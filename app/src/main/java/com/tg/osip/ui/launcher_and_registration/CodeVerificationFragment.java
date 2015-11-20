@@ -21,8 +21,8 @@ import com.tg.osip.R;
 import com.tg.osip.business.AuthManager;
 import com.tg.osip.utils.common.AndroidUtils;
 import com.tg.osip.utils.log.Logger;
-import com.tg.osip.ui.views.images.ScalableImageView;
-import com.tg.osip.ui.views.TransitionTextView;
+import com.tg.osip.ui.general.views.images.ScalableImageView;
+import com.tg.osip.ui.general.views.TransitionTextView;
 
 import rx.Subscriber;
 import rx.Subscription;

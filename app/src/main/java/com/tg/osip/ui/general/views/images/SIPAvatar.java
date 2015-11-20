@@ -1,4 +1,4 @@
-package com.tg.osip.ui.views.images;
+package com.tg.osip.ui.general.views.images;
 
 import android.content.Context;
 import android.util.AttributeSet;

@@ -12,8 +12,8 @@ import android.widget.TextView;
 import com.tg.osip.ApplicationSIP;
 import com.tg.osip.R;
 import com.tg.osip.business.models.ChatItem;
-import com.tg.osip.ui.views.auto_loading.AutoLoadingRecyclerViewAdapter;
-import com.tg.osip.ui.views.images.SIPAvatar;
+import com.tg.osip.ui.general.views.auto_loading.AutoLoadingRecyclerViewAdapter;
+import com.tg.osip.ui.general.views.images.SIPAvatar;
 
 import org.drinkless.td.libcore.telegram.TdApi;
 

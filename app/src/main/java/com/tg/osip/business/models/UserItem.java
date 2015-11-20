@@ -6,7 +6,7 @@ import android.text.TextUtils;
 import com.amulyakhare.textdrawable.TextDrawable;
 import com.amulyakhare.textdrawable.util.ColorGenerator;
 import com.tg.osip.ui.messages.MessagesRecyclerAdapter;
-import com.tg.osip.ui.views.images.ImageLoaderI;
+import com.tg.osip.ui.general.views.images.ImageLoaderI;
 import com.tg.osip.utils.common.AndroidUtils;
 
 import org.drinkless.td.libcore.telegram.TdApi;
@@ -36,32 +36,32 @@ public class UserItem implements ImageLoaderI {
     }
 
     private void init(TdApi.User user) {
-        smallPhotoFileId = getFileId(user);
-        smallPhotoFilePath = getFilePath(user);
-        plug = setPlug();
+        initFileId(user);
+        initFilePath(user);
+        initPlug();
         initName();
         initPhone();
     }
 
-    private Integer getFileId(TdApi.User user) {
-        return user.profilePhoto.small.id;
+    private void initFileId(TdApi.User user) {
+        smallPhotoFileId = user.profilePhoto.small.id;
     }
 
-    private String getFilePath(TdApi.User user) {
+    private void initFilePath(TdApi.User user) {
         String filePath = user.profilePhoto.small.path;
         if (!TextUtils.isEmpty(filePath)) {
-            return ADD_TO_PATH + filePath;
+            smallPhotoFilePath = ADD_TO_PATH + filePath;
+            return;
         }
-        return EMPTY_STRING;
+        smallPhotoFilePath = EMPTY_STRING;
     }
 
-    private Drawable setPlug() {
+    private void initPlug() {
         int id = user.id;
         String name = AndroidUtils.getLettersForPlug(user.firstName, user.lastName);
         ColorGenerator generator = ColorGenerator.MATERIAL;
         int color = generator.getColor(id);
-        return TextDrawable.builder()
-                .buildRoundRect(name, color, 100);
+        plug = TextDrawable.builder().buildRoundRect(name, color, 100);
     }
 
     private void initName() {

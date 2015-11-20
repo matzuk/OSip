@@ -13,10 +13,10 @@ import com.tg.osip.business.models.UserItem;
 import com.tg.osip.business.update_managers.FileDownloaderManager;
 import com.tg.osip.tdclient.TGProxy;
 import com.tg.osip.ui.messages.MessagesRecyclerAdapter;
-import com.tg.osip.ui.views.images.SIPAvatar;
+import com.tg.osip.ui.general.views.images.SIPAvatar;
 import com.tg.osip.utils.log.Logger;
-import com.tg.osip.ui.views.auto_loading.AutoLoadingRecyclerView;
-import com.tg.osip.ui.views.auto_loading.ILoading;
+import com.tg.osip.ui.general.views.auto_loading.AutoLoadingRecyclerView;
+import com.tg.osip.ui.general.views.auto_loading.ILoading;
 
 import org.drinkless.td.libcore.telegram.TdApi;
 
