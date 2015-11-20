@@ -14,7 +14,6 @@ import com.tg.osip.business.update_managers.FileDownloaderManager;
 import com.tg.osip.tdclient.TGProxy;
 import com.tg.osip.ui.messages.MessagesRecyclerAdapter;
 import com.tg.osip.ui.views.images.SIPAvatar;
-import com.tg.osip.utils.common.BackgroundExecutor;
 import com.tg.osip.utils.log.Logger;
 import com.tg.osip.ui.views.auto_loading.AutoLoadingRecyclerView;
 import com.tg.osip.ui.views.auto_loading.ILoading;
@@ -32,7 +31,6 @@ import rx.Observable;
 import rx.Subscriber;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
-import rx.schedulers.Schedulers;
 
 /**
  * Controller for Chat screen (MessagesFragment)
@@ -95,6 +93,12 @@ public class MessagesController {
                 .observeOn(AndroidSchedulers.mainThread())
                 .doOnNext(user -> messagesRecyclerAdapter.setMyUserId(user.id))
                 .concatMap(user -> TGProxy.getInstance().sendTD(new TdApi.GetChat(chatId), TdApi.Chat.class))
+                .concatMap(chat -> {
+                    List<TdApi.Message> messages = new ArrayList<>(1);
+                    messages.add(chat.topMessage);
+                    getUsersDownloadingObservable(messages).subscribe();
+                    return Observable.just(chat);
+                })
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Subscriber<TdApi.Chat>() {
                     @Override
@@ -116,8 +120,8 @@ public class MessagesController {
         chatItem = new ChatItem(chat);
         initToolbar();
         messagesRecyclerAdapter.setLastChatReadOutboxId(chat.lastReadOutboxMessageId);
-//        messagesRecyclerAdapter.addNewItem(chat.topMessage);
-//        messagesRecyclerAdapter.notifyItemInserted(0);
+        messagesRecyclerAdapter.addNewItem(chat.topMessage);
+        messagesRecyclerAdapter.notifyItemInserted(0);
         if (recyclerViewWeakReference != null && recyclerViewWeakReference.get() != null) {
             AutoLoadingRecyclerView<TdApi.Message> autoLoadingRecyclerView = recyclerViewWeakReference.get();
             autoLoadingRecyclerView.setLoadingObservable(getILoading(chatId, chatItem.getChat().topMessage.id));
@@ -131,7 +135,10 @@ public class MessagesController {
                     TdApi.Message messageMas[] = messages.messages;
                     return (List<TdApi.Message>) new ArrayList<>(Arrays.asList(messageMas));
                 })
-                .concatMap(this::getUsersDownloadingProxyObservable)
+                .concatMap(messages -> {
+                    getUsersDownloadingObservable(messages).subscribe();
+                    return Observable.just(messages);
+                })
                 .observeOn(AndroidSchedulers.mainThread())
                 .doOnNext((messageList) -> {
                     if (progressBarWeakReference != null && progressBarWeakReference.get() != null) {
@@ -140,32 +147,9 @@ public class MessagesController {
                 });
     }
 
-    private Observable<List<TdApi.Message>> getUsersDownloadingProxyObservable(List<TdApi.Message> mainListItems) {
-        return Observable.create(subscriber -> getUsersDownloadingObservable(mainListItems)
-                .subscribe(new Subscriber<Map<Integer, UserItem>>() {
-                    @Override
-                    public void onCompleted() {
-                        subscriber.onCompleted();
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                        subscriber.onError(e);
-                    }
-
-                    @Override
-                    public void onNext(Map<Integer, UserItem> map) {
-                        if (messagesRecyclerAdapter != null) {
-                            messagesRecyclerAdapter.setChatUsers(map);
-                        }
-                        subscriber.onNext(mainListItems);
-                    }
-                }));
-    }
-
     private Observable<Map<Integer, UserItem>> getUsersDownloadingObservable(List<TdApi.Message> mainListItems) {
         return Observable.from(mainListItems)
-                .subscribeOn(Schedulers.from(BackgroundExecutor.getSafeBackgroundExecutor()))
+//                .subscribeOn(Schedulers.from(BackgroundExecutor.getSafeBackgroundExecutor()))
                 .map(message -> message.fromId)
                 .distinct()
                 .concatMap(integer -> TGProxy.getInstance().sendTD(new TdApi.GetUser(integer), TdApi.User.class))
@@ -178,6 +162,11 @@ public class MessagesController {
                         map.put(user.getUser().id, user);
                     }
                     return map;
+                })
+                .doOnNext(integerUserItemMap -> {
+                    if (messagesRecyclerAdapter != null) {
+                        messagesRecyclerAdapter.setChatUsers(integerUserItemMap);
+                    }
                 });
     }
 
