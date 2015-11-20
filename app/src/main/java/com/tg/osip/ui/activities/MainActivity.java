@@ -76,7 +76,6 @@ public class MainActivity extends AppCompatActivity {
                 item -> {
                     switch (item.getItemId()) {
                         case R.id.navigation_item_logout:
-                            Logger.debug("logout");
                             drawerLayout.closeDrawers();
                             mainController.logout(this);
                             return true;
