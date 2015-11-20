@@ -73,7 +73,6 @@ public class MainController {
 
                     @Override
                     public void onNext(UserItem userItem) {
-                        Logger.debug("userItem data loaded, recyclerview is next");
                         MainController.this.userItem = userItem;
                         FileDownloaderManager.getInstance().startFileDownloading(userItem);
                         bindView();

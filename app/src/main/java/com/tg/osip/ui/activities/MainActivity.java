@@ -17,6 +17,7 @@ import android.view.View;
 import com.tg.osip.R;
 import com.tg.osip.business.main.MainController;
 import com.tg.osip.ui.chats.ChatsFragment;
+import com.tg.osip.utils.log.Logger;
 
 /**
  *
@@ -75,6 +76,7 @@ public class MainActivity extends AppCompatActivity {
                 item -> {
                     switch (item.getItemId()) {
                         case R.id.navigation_item_logout:
+                            Logger.debug("logout");
                             drawerLayout.closeDrawers();
                             mainController.logout(this);
                             return true;

@@ -1,5 +1,7 @@
 package com.tg.osip.business.update_managers;
 
+import android.util.Log;
+
 import org.drinkless.td.libcore.telegram.TdApi;
 
 import rx.subjects.PublishSubject;
@@ -10,6 +12,8 @@ import rx.subjects.PublishSubject;
  * @author e.matsyuk
  */
 public class UpdateManager {
+
+    private static final String LOG = "Updates";
 
     private static volatile UpdateManager instance;
     private PublishSubject<TdApi.Update> updateChannel = PublishSubject.create();
@@ -31,6 +35,7 @@ public class UpdateManager {
     }
 
     public void sendUpdateEvent(TdApi.Update update) {
+        Log.d(LOG, update.toString());
         updateChannel.onNext(update);
     }
 

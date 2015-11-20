@@ -1,5 +1,7 @@
 package com.tg.osip.tdclient;
 
+import android.util.Log;
+
 import com.tg.osip.business.update_managers.UpdateManager;
 import com.tg.osip.tdclient.exceptions.TdApiClassCastException;
 import com.tg.osip.tdclient.exceptions.TdApiErrorException;
@@ -20,6 +22,9 @@ import rx.Subscriber;
  * @author e.matsyuk
  */
 public class TGProxy {
+
+    private static final String LOG_REQUEST = "TGProxy request";
+    private static final String LOG_RESPONSE = "TGProxy response";
 
     private static volatile TGProxy instance;
 
@@ -58,6 +63,7 @@ public class TGProxy {
     }
 
     public <T extends TdApi.TLObject> Observable<T> sendTD(TdApi.TLFunction tlFunction, Class<T> clazz) {
+        Log.d(LOG_REQUEST, tlFunction.toString());
         return BackgroundExecutor.createSafeBackgroundObservable(subscriber -> {
             try {
                 TGProxy.getInstance().getClientInstance().send(tlFunction, object -> resultHandling(subscriber, object, clazz));
@@ -72,6 +78,7 @@ public class TGProxy {
             if (object.getClass() == TdApi.Error.class) {
                 TdApi.Error error = (TdApi.Error)object;
                 subscriber.onError(new TdApiErrorException(error));
+                Log.e(LOG_RESPONSE, new TdApiErrorException(error).getMessage());
             } else {
                 resultHandlingClassCast(subscriber, object, clazz);
             }
@@ -83,9 +90,11 @@ public class TGProxy {
         try {
             t = clazz.cast(object);
             subscriber.onNext(t);
+            Log.d(LOG_RESPONSE, t.toString());
             subscriber.onCompleted();
         } catch(ClassCastException e) {
             subscriber.onError(new TdApiClassCastException(e));
+            Log.e(LOG_RESPONSE, new TdApiClassCastException(e).getMessage());
         }
     }
 

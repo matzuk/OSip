@@ -78,7 +78,6 @@ public class ChatsController {
 
                     @Override
                     public void onNext(TdApi.User user) {
-                        Logger.debug("user data loaded, recyclerview is next");
                         successLoadData(user);
                     }
                 });

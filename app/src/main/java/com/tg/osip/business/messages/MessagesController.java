@@ -107,7 +107,6 @@ public class MessagesController {
 
                     @Override
                     public void onNext(TdApi.Chat chat) {
-                        Logger.debug("user data loaded, recyclerview is next");
                         successLoadData(chat);
                     }
                 });
@@ -117,8 +116,8 @@ public class MessagesController {
         chatItem = new ChatItem(chat);
         initToolbar();
         messagesRecyclerAdapter.setLastChatReadOutboxId(chat.lastReadOutboxMessageId);
-        messagesRecyclerAdapter.addNewItem(chat.topMessage);
-        messagesRecyclerAdapter.notifyItemInserted(0);
+//        messagesRecyclerAdapter.addNewItem(chat.topMessage);
+//        messagesRecyclerAdapter.notifyItemInserted(0);
         if (recyclerViewWeakReference != null && recyclerViewWeakReference.get() != null) {
             AutoLoadingRecyclerView<TdApi.Message> autoLoadingRecyclerView = recyclerViewWeakReference.get();
             autoLoadingRecyclerView.setLoadingObservable(getILoading(chatId, chatItem.getChat().topMessage.id));
