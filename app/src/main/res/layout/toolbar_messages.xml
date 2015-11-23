@@ -4,16 +4,16 @@
     android:id="@+id/main_translate"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:paddingBottom="4dp"
-    android:paddingTop="4dp"
-    android:paddingLeft="8dp"
-    android:paddingRight="8dp"
+    android:paddingBottom="@dimen/size_xsmall"
+    android:paddingTop="@dimen/size_xsmall"
+    android:paddingLeft="@dimen/size_small"
+    android:paddingRight="@dimen/size_small"
     android:orientation="horizontal">
 
     <com.tg.osip.ui.general.views.images.SIPAvatar
         android:id="@+id/avatar"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
+        android:layout_width="@dimen/size_xxlarge"
+        android:layout_height="@dimen/size_xxlarge"
         android:scaleType="centerCrop"/>
 
     <LinearLayout
@@ -21,16 +21,16 @@
         android:layout_height="match_parent"
         android:layout_gravity="center"
         android:gravity="center_vertical"
-        android:paddingLeft="16dp"
-        android:paddingStart="16dp"
+        android:paddingLeft="@dimen/size_medium"
+        android:paddingStart="@dimen/size_medium"
         android:orientation="vertical">
 
         <TextView
             android:id="@+id/chat_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="18sp"
-            android:textColor="#ffffff"
+            android:textSize="@dimen/text_size_medium_plus"
+            android:textColor="@color/color_background"
             android:textStyle="bold"
             android:text="Username"
             android:singleLine="true"
@@ -42,8 +42,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:gravity="center_vertical"
-            android:textSize="14sp"
-            android:textColor="#d2eafc"
+            android:textSize="@dimen/text_size_small"
+            android:textColor="@color/color_message_toolbar_secondary"
             android:text="message"
             android:singleLine="true"
             android:textAppearance="?android:attr/textAppearanceMedium"

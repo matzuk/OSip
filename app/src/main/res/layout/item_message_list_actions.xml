@@ -4,8 +4,8 @@
     android:id="@+id/main_translate"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:paddingBottom="4dp"
-    android:paddingTop="8dp"
+    android:paddingBottom="@dimen/size_xsmall"
+    android:paddingTop="@dimen/size_small"
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:gravity="center"
@@ -15,11 +15,11 @@
         android:id="@+id/message_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:paddingBottom="4dp"
+        android:paddingBottom="@dimen/size_xsmall"
         android:gravity="center_vertical"
-        android:textSize="15sp"
+        android:textSize="@dimen/text_size_medium"
         android:layout_gravity="center"
-        android:textColor="#333333"
+        android:textColor="@color/color_text_primary"
         android:text="action"
         android:textAppearance="?android:attr/textAppearanceMedium"/>
 
@@ -28,7 +28,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:paddingBottom="4dp"
+        android:paddingBottom="@dimen/size_xsmall"
         android:scaleType="centerCrop"/>
 
 </LinearLayout>

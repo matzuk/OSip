@@ -13,7 +13,7 @@
         android:layout_width="match_parent"
         android:minHeight="?attr/actionBarSize"
         android:background="?attr/colorPrimary"
-        android:layout_gravity="right"
+        android:layout_gravity="end"
         app:titleTextAppearance="@style/Toolbar.TitleText"
         android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
         app:popupTheme="@style/ThemeOverlay.AppCompat.Light" >
@@ -21,15 +21,15 @@
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="right"
+            android:layout_gravity="end"
             android:orientation="horizontal">
 
             <com.tg.osip.ui.general.views.images.ScalableImageView
                 android:id="@+id/next_button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:padding="16dp"
-                android:layout_gravity="right"
+                android:padding="@dimen/size_medium"
+                android:layout_gravity="end"
                 android:visibility="gone"
                 android:src="@drawable/checkbig"
                 android:scaleType="centerCrop"/>
@@ -49,16 +49,16 @@
         <LinearLayout
             android:orientation="vertical"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:background="@android:color/white"
             android:padding="@dimen/activity_horizontal_margin">
 
             <EditText
-                android:id="@+id/phone_reg_country_edit"
+                android:id="@+id/reg_country_edit"
                 style="@style/MaterialEditText"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="24dp"
+                android:layout_marginTop="@dimen/size_large"
                 android:clickable="true"
                 android:hint="@string/reg_phone_choose_country"
                 android:focusable="false"
@@ -70,8 +70,8 @@
                 android:orientation="horizontal"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="24dp"
-                android:layout_marginBottom="32dp">
+                android:layout_marginTop="@dimen/size_large"
+                android:layout_marginBottom="@dimen/size_xlarge">
 
                 <TextView
                     android:id="@+id/phone_reg_code_plus_edit"
@@ -85,9 +85,12 @@
                     style="@style/MaterialEditText"
                     android:layout_width="72dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="-20dp"
-                    android:paddingLeft="20dp"
-                    android:layout_marginRight="16dp"
+                    android:layout_marginLeft="@dimen/size_medium_plus_negative"
+                    android:layout_marginStart="@dimen/size_medium_plus_negative"
+                    android:paddingLeft="@dimen/size_medium_plus"
+                    android:paddingStart="@dimen/size_medium_plus"
+                    android:layout_marginRight="@dimen/size_medium"
+                    android:layout_marginEnd="@dimen/size_medium"
                     android:singleLine="true"
                     android:inputType="phone"
                     android:imeOptions="actionNext|flagNoExtractUi"/>
@@ -111,7 +114,7 @@
                 android:id="@+id/phone_reg_help_text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textSize="16sp"
+                android:textSize="@dimen/text_size_medium"
                 android:textAppearance="?android:attr/textAppearanceSmall"
                 android:text="@string/reg_phone_help_text" />
 

@@ -86,7 +86,7 @@ public class PhoneRegistrationFragment extends Fragment {
         });
         phoneEdit.requestFocus();
 
-        countryEdit = (EditText)view.findViewById(R.id.phone_reg_country_edit);
+        countryEdit = (EditText)view.findViewById(R.id.reg_country_edit);
         countryEdit.setOnFocusChangeListener((v, hasFocus) -> goToCountryFragment());
         countryEdit.setOnClickListener(v -> goToCountryFragment());
 

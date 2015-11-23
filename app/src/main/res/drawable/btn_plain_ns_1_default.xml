@@ -2,7 +2,7 @@
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
   <item android:top="@dimen/ctrl_plain_margin" android:bottom="@dimen/ctrl_plain_margin">
     <shape>
-      <solid android:color="@color/material_blue_color" />
+      <solid android:color="@color/color_primary" />
       <corners android:radius="@dimen/ctrl_plain_radius" />
     </shape>
   </item>

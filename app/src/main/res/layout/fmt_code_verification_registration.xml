@@ -20,7 +20,7 @@
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="right"
+            android:layout_gravity="end"
             android:orientation="horizontal">
 
             <com.tg.osip.ui.general.views.images.ScalableImageView
@@ -28,7 +28,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:padding="16dp"
-                android:layout_gravity="right"
+                android:layout_gravity="end"
                 android:visibility="gone"
                 android:src="@drawable/checkbig"
                 android:scaleType="centerCrop"/>
@@ -47,15 +47,15 @@
         <LinearLayout
             android:orientation="vertical"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:padding="@dimen/activity_horizontal_margin">
 
             <TextView
                 android:id="@+id/verification_help_text"
                 android:layout_width="wrap_content"
-                android:layout_height="48dp"
-                android:textSize="16sp"
-                android:layout_marginTop="24dp"
+                android:layout_height="@dimen/size_xxxlarge"
+                android:textSize="@dimen/text_size_medium"
+                android:layout_marginTop="@dimen/size_large"
                 android:textAppearance="?android:attr/textAppearanceSmall"
                 android:text="@string/reg_verification_help_text" />
 
@@ -63,13 +63,13 @@
                 android:orientation="horizontal"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="24dp"
+                android:layout_marginTop="@dimen/size_large"
                 android:gravity="center">
 
                 <EditText
                     android:id="@+id/verification_code_edit"
                     style="@style/MaterialEditText"
-                    android:layout_width="165dp"
+                    android:layout_width="@dimen/size_reg_edittext_width"
                     android:layout_height="wrap_content"
                     android:focusable="true"
                     android:singleLine="true"
@@ -83,7 +83,8 @@
                     android:id="@+id/verification_code_image"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="16dp"
+                    android:layout_marginLeft="@dimen/size_medium"
+                    android:layout_marginStart="@dimen/size_medium"
                     android:visibility="gone"
                     android:src="@drawable/register_no"/>
 
@@ -94,9 +95,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:visibility="gone"
-                android:textSize="16sp"
+                android:textSize="@dimen/text_size_medium"
                 android:textAppearance="?android:attr/textAppearanceSmall"
-                android:textColor="@color/custom_text_color"
+                android:textColor="@color/color_text_primary"
                 android:text="@string/reg_verification_wrong_number" />
 
             <ProgressBar
@@ -105,7 +106,7 @@
                 android:layout_height="wrap_content"
                 android:layout_width="wrap_content"
                 android:layout_gravity="center"
-                android:layout_marginTop="16dp"
+                android:layout_marginTop="@dimen/size_medium"
                 android:visibility="gone">
             </ProgressBar>
 

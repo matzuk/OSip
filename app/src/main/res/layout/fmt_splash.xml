@@ -4,18 +4,18 @@
     android:id="@+id/scrollView"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@android:color/white"
+    android:background="@color/color_background"
     android:fillViewport="true"
     android:overScrollMode="never" >
 
     <LinearLayout
         android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:paddingLeft="@dimen/activity_horizontal_margin"
         android:paddingRight="@dimen/activity_horizontal_margin"
         android:paddingTop="@dimen/activity_horizontal_margin"
-        android:paddingBottom="64dp"
+        android:paddingBottom="@dimen/size_padding_common"
         android:gravity="center">
 
         <com.tg.osip.ui.general.views.images.ScalableImageView
@@ -24,7 +24,7 @@
             android:layout_height="wrap_content"
             android:src="@drawable/logo"
             android:visibility="gone"
-            android:layout_marginBottom="24dp"
+            android:layout_marginBottom="@dimen/size_large"
             android:layout_gravity="center_horizontal" />
 
         <com.tg.osip.ui.general.views.images.ScalableImageView
@@ -33,7 +33,7 @@
             android:layout_height="wrap_content"
             android:src="@drawable/logo_txt"
             android:visibility="gone"
-            android:layout_marginBottom="24dp"
+            android:layout_marginBottom="@dimen/size_large"
             android:layout_gravity="center_horizontal" />
 
     </LinearLayout>

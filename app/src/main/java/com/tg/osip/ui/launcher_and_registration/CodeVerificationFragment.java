@@ -116,7 +116,7 @@ public class CodeVerificationFragment extends Fragment {
         verificationCodeImage.setVisibility(View.GONE);
 
         resultTextView.setText(getResources().getString(R.string.reg_verification_wrong_number));
-        resultTextView.setTextColor(ContextCompat.getColor(getContext(), R.color.registration_no_color));
+        resultTextView.setTextColor(ContextCompat.getColor(getContext(), R.color.color_registration_no));
         verificationCodeImage.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.register_no, null));
 
         resultTextView.setVisibility(View.VISIBLE);
@@ -128,7 +128,7 @@ public class CodeVerificationFragment extends Fragment {
         verificationCodeImage.setVisibility(View.GONE);
 
         resultTextView.setText(getResources().getString(R.string.reg_verification_right_number));
-        resultTextView.setTextColor(ContextCompat.getColor(getContext(), R.color.registration_yes_color));
+        resultTextView.setTextColor(ContextCompat.getColor(getContext(), R.color.color_registration_yes));
         verificationCodeImage.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.register_yes, null));
 
         resultTextView.setVisibility(View.VISIBLE);

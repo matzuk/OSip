@@ -51,23 +51,13 @@ public class ChatRecyclerAdapter extends AutoLoadingRecyclerViewAdapter<ChatItem
         }
     }
 
-    static class LoaderViewHolder extends RecyclerView.ViewHolder {
-        RelativeLayout layout;
-        public LoaderViewHolder(View itemView) {
-            super(itemView);
-            layout = (RelativeLayout) itemView.findViewById(R.id.layout);
-        }
-    }
-
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         if (viewType == MAIN_VIEW) {
             View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_chat_list, parent, false);
             return new MainViewHolder(v);
-        } else {
-            View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_loader_list, parent, false);
-            return new LoaderViewHolder(v);
         }
+        return null;
     }
 
     @Override

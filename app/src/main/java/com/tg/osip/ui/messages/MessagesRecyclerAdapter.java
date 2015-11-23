@@ -13,6 +13,7 @@ import com.tg.osip.R;
 import com.tg.osip.business.models.UserItem;
 import com.tg.osip.ui.general.views.auto_loading.AutoLoadingRecyclerViewAdapter;
 import com.tg.osip.ui.general.views.images.SIPAvatar;
+import com.tg.osip.utils.log.Logger;
 import com.tg.osip.utils.time.TimeUtils;
 
 import org.drinkless.td.libcore.telegram.TdApi;
@@ -249,6 +250,11 @@ public class MessagesRecyclerAdapter extends AutoLoadingRecyclerViewAdapter<TdAp
         TdApi.MessageContent messageContent = message.message;
         if (messageContent == null) {
             return;
+        }
+
+        //
+        if (messageContent.getClass() == TdApi.MessagePhoto.class) {
+            Logger.debug("Photo: " + messageContent);
         }
 
         UserItem user = usersMap.get(message.fromId);

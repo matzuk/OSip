@@ -1,25 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- Default screen margins, per the Android Design guidelines. -->
-    <dimen name="activity_horizontal_margin">16dp</dimen>
-    <dimen name="activity_vertical_margin">16dp</dimen>
-    <dimen name="ctrl_plain_margin">2dip</dimen>
-    <dimen name="ctrl_plain_radius">2dip</dimen>
-
-    <!-- All of the possible tile background colors -->
-    <array name="letter_tile_colors">
-        <item>#f16364</item>
-        <item>#f58559</item>
-        <item>#f9a43e</item>
-        <item>#e4c62e</item>
-        <item>#67bf74</item>
-        <item>#59a2be</item>
-        <item>#2093cd</item>
-        <item>#ad62a7</item>
-    </array>
-
-    <!-- The default letter tile text size -->
-    <dimen name="tile_letter_font_size">33sp</dimen>
-    <!-- The deafult tile size -->
-    <dimen name="letter_tile_size">64dp</dimen>
+    <dimen name="activity_horizontal_margin">@dimen/size_medium</dimen>
+    <dimen name="activity_vertical_margin">@dimen/size_medium</dimen>
+    <dimen name="ctrl_plain_margin">@dimen/size_xxsmall</dimen>
+    <dimen name="ctrl_plain_radius">@dimen/size_xxsmall</dimen>
 </resources>

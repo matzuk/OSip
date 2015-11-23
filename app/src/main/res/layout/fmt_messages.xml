@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
@@ -10,10 +9,9 @@
         android:id="@+id/RecyclerView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@android:color/white"
+        android:background="@color/common_white"
         android:scrollbars="vertical"
-        android:overScrollMode="always"
-        android:layout_below="@+id/toolbar" />
+        android:overScrollMode="always" />
 
     <ProgressBar
         android:id="@+id/progressBar"

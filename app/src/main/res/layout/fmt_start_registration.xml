@@ -5,16 +5,16 @@
     android:layout_height="match_parent"
     android:fillViewport="true"
     android:overScrollMode="never"
-    android:background="@android:color/white">
+    android:background="@color/color_background">
 
     <LinearLayout
         android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:paddingLeft="@dimen/activity_horizontal_margin"
         android:paddingRight="@dimen/activity_horizontal_margin"
         android:paddingTop="@dimen/activity_horizontal_margin"
-        android:paddingBottom="64dp"
+        android:paddingBottom="@dimen/size_padding_common"
         android:gravity="center">
 
         <ImageView
@@ -22,7 +22,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:src="@drawable/intro1"
-            android:layout_marginBottom="24dp"
+            android:layout_marginBottom="@dimen/size_large"
             android:layout_gravity="center_horizontal" />
 
         <TextView
@@ -31,9 +31,8 @@
             android:layout_height="wrap_content"
             android:textAppearance="?android:attr/textAppearanceMedium"
             android:text="@string/splash_text_main"
-            android:textColor="@android:color/black"
-            android:textSize="28sp"
-            android:layout_marginBottom="8dp"
+            android:textSize="@dimen/text_size_xxlarge"
+            android:layout_marginBottom="@dimen/size_small"
             android:layout_gravity="center_horizontal" />
 
         <TextView
@@ -42,8 +41,8 @@
             android:layout_height="wrap_content"
             android:textAppearance="?android:attr/textAppearanceMedium"
             android:text="@string/splash_text_secondary"
-            android:textSize="16sp"
-            android:layout_marginBottom="32dp"
+            android:textSize="@dimen/text_size_medium"
+            android:layout_marginBottom="@dimen/size_xlarge"
             android:layout_gravity="center_horizontal" />
 
         <Button
@@ -53,9 +52,9 @@
             android:text="@string/splash_start_button_name"
             android:background="@drawable/btn_plain_ns_1"
             android:textColor="@android:color/white"
-            android:paddingLeft="16dp"
-            android:paddingRight="16dp"
-            android:textSize="20sp"
+            android:paddingLeft="@dimen/size_medium"
+            android:paddingRight="@dimen/size_medium"
+            android:textSize="@dimen/text_size_large"
             android:layout_gravity="center_horizontal" />
 
     </LinearLayout>
