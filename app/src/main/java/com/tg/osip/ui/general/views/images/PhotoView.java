@@ -8,11 +8,8 @@ import com.squareup.picasso.Picasso;
 import com.tg.osip.ApplicationSIP;
 import com.tg.osip.business.models.ImageLoaderI;
 import com.tg.osip.business.update_managers.FileDownloaderManager;
-import com.tg.osip.business.update_managers.UpdateManager;
 import com.tg.osip.utils.common.BackgroundExecutor;
 import com.tg.osip.utils.log.Logger;
-
-import org.drinkless.td.libcore.telegram.TdApi;
 
 import rx.Subscriber;
 import rx.Subscription;
@@ -26,10 +23,8 @@ import rx.schedulers.Schedulers;
  */
 public class PhotoView extends ImageView {
 
-    private final static String ADD_TO_PATH = "file://";
-
     private int fileId;
-    private Subscription updateChannelSubscription;
+    private Subscription downloadChannelSubscription;
     private boolean circleRounds;
 
     public PhotoView(Context context) {
@@ -65,7 +60,7 @@ public class PhotoView extends ImageView {
         }
         // start update manager listening
         fileId = imageLoaderI.getPhotoFileId();
-        subscribeToUpdateChannel();
+        subscribeToDownloadChannel();
     }
 
     /**
@@ -95,13 +90,12 @@ public class PhotoView extends ImageView {
         }
     }
 
-    private void subscribeToUpdateChannel() {
-        updateChannelSubscription = UpdateManager.getInstance().getUpdateChannel()
-                .filter(update -> update.getClass() == TdApi.UpdateFile.class && ((TdApi.UpdateFile)update).file.id == fileId)
-                .map(update -> (TdApi.UpdateFile)update)
+    private void subscribeToDownloadChannel() {
+        downloadChannelSubscription = FileDownloaderManager.getInstance().getDownloadChannel()
+                .filter(downloadedFileId -> downloadedFileId == fileId)
                 .subscribeOn(Schedulers.from(BackgroundExecutor.getSafeBackgroundExecutor()))
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Subscriber<TdApi.UpdateFile>() {
+                .subscribe(new Subscriber<Integer>() {
                     @Override
                     public void onCompleted() { }
 
@@ -111,9 +105,11 @@ public class PhotoView extends ImageView {
                     }
 
                     @Override
-                    public void onNext(TdApi.UpdateFile update) {
+                    public void onNext(Integer downloadedFileId) {
                         unsubscribe();
-                        setFileToView(ADD_TO_PATH + update.file.path);
+                        if (FileDownloaderManager.getInstance().isFileInCache(downloadedFileId)) {
+                            setFileToView(FileDownloaderManager.getInstance().getFilePath(downloadedFileId));
+                        }
                     }
                 });
     }
@@ -125,8 +121,8 @@ public class PhotoView extends ImageView {
     }
 
     private void unSubscribe() {
-        if (updateChannelSubscription != null && !updateChannelSubscription.isUnsubscribed()) {
-            updateChannelSubscription.unsubscribe();
+        if (downloadChannelSubscription != null && !downloadChannelSubscription.isUnsubscribed()) {
+            downloadChannelSubscription.unsubscribe();
         }
     }
 

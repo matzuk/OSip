@@ -28,6 +28,7 @@ public class FileDownloaderManager {
     private static volatile FileDownloaderManager instance;
 
     private ConcurrentHashMap<Integer, TdApi.File> fileHashMap = new ConcurrentHashMap<>();
+    private PublishSubject<Integer> downloadChannel = PublishSubject.create();
 
     public static FileDownloaderManager getInstance() {
         if (instance == null) {
@@ -38,6 +39,10 @@ public class FileDownloaderManager {
             }
         }
         return instance;
+    }
+
+    public PublishSubject<Integer> getDownloadChannel() {
+        return downloadChannel;
     }
 
     void subscribeToUpdateChannel(PublishSubject<TdApi.Update> updateChannel) {
@@ -57,6 +62,7 @@ public class FileDownloaderManager {
                     @Override
                     public void onNext(TdApi.UpdateFile update) {
                         fileHashMap.put(update.file.id, update.file);
+                        downloadChannel.onNext(update.file.id);
                     }
                 });
     }
