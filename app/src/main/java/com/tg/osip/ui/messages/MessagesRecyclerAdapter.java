@@ -13,7 +13,7 @@ import com.tg.osip.R;
 import com.tg.osip.business.models.MessageItem;
 import com.tg.osip.business.models.UserItem;
 import com.tg.osip.ui.general.views.auto_loading.AutoLoadingRecyclerViewAdapter;
-import com.tg.osip.ui.general.views.images.SIPAvatar;
+import com.tg.osip.ui.general.views.images.PhotoAvatar;
 import com.tg.osip.utils.log.Logger;
 import com.tg.osip.utils.time.TimeUtils;
 
@@ -41,7 +41,7 @@ public class MessagesRecyclerAdapter extends AutoLoadingRecyclerViewAdapter<Mess
 
     static class MainViewHolder extends RecyclerView.ViewHolder {
 
-        SIPAvatar avatar;
+        PhotoAvatar avatar;
         TextView messageName;
         TextView messageText;
         TextView messageSendingTime;
@@ -49,7 +49,7 @@ public class MessagesRecyclerAdapter extends AutoLoadingRecyclerViewAdapter<Mess
 
         public MainViewHolder(View itemView) {
             super(itemView);
-            avatar = (SIPAvatar) itemView.findViewById(R.id.avatar);
+            avatar = (PhotoAvatar) itemView.findViewById(R.id.avatar);
             messageName = (TextView) itemView.findViewById(R.id.message_name);
             messageText = (TextView) itemView.findViewById(R.id.message_text);
             messageSendingTime = (TextView) itemView.findViewById(R.id.message_sending_time);
@@ -59,17 +59,17 @@ public class MessagesRecyclerAdapter extends AutoLoadingRecyclerViewAdapter<Mess
 
     static class PhotoViewHolder extends RecyclerView.ViewHolder {
 
-        SIPAvatar avatar;
+        PhotoAvatar avatar;
         TextView messageName;
-        SIPAvatar photo;
+        PhotoAvatar photo;
         TextView messageSendingTime;
         ImageView messageUnreadOutbox;
 
         public PhotoViewHolder(View itemView) {
             super(itemView);
-            avatar = (SIPAvatar) itemView.findViewById(R.id.avatar);
+            avatar = (PhotoAvatar) itemView.findViewById(R.id.avatar);
             messageName = (TextView) itemView.findViewById(R.id.message_name);
-            photo = (SIPAvatar) itemView.findViewById(R.id.photo);
+            photo = (PhotoAvatar) itemView.findViewById(R.id.photo);
             messageSendingTime = (TextView) itemView.findViewById(R.id.message_sending_time);
             messageUnreadOutbox = (ImageView) itemView.findViewById(R.id.message_unread_outbox);
         }
@@ -89,14 +89,14 @@ public class MessagesRecyclerAdapter extends AutoLoadingRecyclerViewAdapter<Mess
 
     static class UnsupportedViewHolder extends RecyclerView.ViewHolder {
 
-        SIPAvatar avatar;
+        PhotoAvatar avatar;
         TextView messageName;
         TextView messageText;
         TextView messageSendingTime;
 
         public UnsupportedViewHolder(View itemView) {
             super(itemView);
-            avatar = (SIPAvatar) itemView.findViewById(R.id.avatar);
+            avatar = (PhotoAvatar) itemView.findViewById(R.id.avatar);
             messageName = (TextView) itemView.findViewById(R.id.message_name);
             messageText = (TextView) itemView.findViewById(R.id.message_text);
             messageSendingTime = (TextView) itemView.findViewById(R.id.message_sending_time);

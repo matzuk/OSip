@@ -3,8 +3,6 @@ package com.tg.osip.business.models;
 import android.graphics.drawable.Drawable;
 import android.text.TextUtils;
 
-import com.tg.osip.ui.general.views.images.ImageLoaderI;
-
 import org.drinkless.td.libcore.telegram.TdApi;
 
 /**
@@ -19,8 +17,8 @@ public class PhotoItem implements ImageLoaderI {
     private final static String EMPTY_STRING = "";
 
     private TdApi.PhotoSize photoSize;
-    private int smallPhotoFileId;
-    private String smallPhotoFilePath;
+    private int photoFileId;
+    private String photoFilePath;
     private Drawable plug;
 
     public PhotoItem (TdApi.PhotoSize photoSize) {
@@ -31,16 +29,16 @@ public class PhotoItem implements ImageLoaderI {
     }
 
     private void initFileId() {
-        smallPhotoFileId = photoSize.photo.id;
+        photoFileId = photoSize.photo.id;
     }
 
     private void initFilePath() {
         String filePath = photoSize.photo.path;
         if (!TextUtils.isEmpty(filePath)) {
-            smallPhotoFilePath = ADD_TO_PATH + filePath;
+            photoFilePath = ADD_TO_PATH + filePath;
             return;
         }
-        smallPhotoFilePath = EMPTY_STRING;
+        photoFilePath = EMPTY_STRING;
     }
 
     private void initPlug() {
@@ -49,23 +47,23 @@ public class PhotoItem implements ImageLoaderI {
     }
 
     @Override
-    public int getSmallPhotoFileId() {
-        return smallPhotoFileId;
+    public int getPhotoFileId() {
+        return photoFileId;
     }
 
     @Override
-    public boolean isSmallPhotoFileIdValid() {
-        return smallPhotoFileId != EMPTY_FILE_ID;
+    public boolean isPhotoFileIdValid() {
+        return photoFileId != EMPTY_FILE_ID;
     }
 
     @Override
-    public String getSmallPhotoFilePath() {
-        return smallPhotoFilePath;
+    public String getPhotoFilePath() {
+        return photoFilePath;
     }
 
     @Override
-    public boolean isSmallPhotoFilePathValid() {
-        return !smallPhotoFilePath.equals(EMPTY_STRING);
+    public boolean isPhotoFilePathValid() {
+        return !photoFilePath.equals(EMPTY_STRING);
     }
 
     @Override

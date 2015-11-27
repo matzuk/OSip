@@ -6,7 +6,6 @@ import android.text.TextUtils;
 import com.amulyakhare.textdrawable.TextDrawable;
 import com.amulyakhare.textdrawable.util.ColorGenerator;
 import com.tg.osip.ui.messages.MessagesRecyclerAdapter;
-import com.tg.osip.ui.general.views.images.ImageLoaderI;
 import com.tg.osip.utils.common.AndroidUtils;
 
 import org.drinkless.td.libcore.telegram.TdApi;
@@ -24,8 +23,8 @@ public class UserItem implements ImageLoaderI {
     private final static String SPACE = " ";
 
     private TdApi.User user;
-    private int smallPhotoFileId;
-    private String smallPhotoFilePath;
+    private int photoFileId;
+    private String photoFilePath;
     private Drawable plug;
     private String name;
     private String phone;
@@ -44,16 +43,16 @@ public class UserItem implements ImageLoaderI {
     }
 
     private void initFileId(TdApi.User user) {
-        smallPhotoFileId = user.profilePhoto.small.id;
+        photoFileId = user.profilePhoto.small.id;
     }
 
     private void initFilePath(TdApi.User user) {
         String filePath = user.profilePhoto.small.path;
         if (!TextUtils.isEmpty(filePath)) {
-            smallPhotoFilePath = ADD_TO_PATH + filePath;
+            photoFilePath = ADD_TO_PATH + filePath;
             return;
         }
-        smallPhotoFilePath = EMPTY_STRING;
+        photoFilePath = EMPTY_STRING;
     }
 
     private void initPlug() {
@@ -89,23 +88,23 @@ public class UserItem implements ImageLoaderI {
     }
 
     @Override
-    public int getSmallPhotoFileId() {
-        return smallPhotoFileId;
+    public int getPhotoFileId() {
+        return photoFileId;
     }
 
     @Override
-    public boolean isSmallPhotoFileIdValid() {
-        return smallPhotoFileId != EMPTY_FILE_ID;
+    public boolean isPhotoFileIdValid() {
+        return photoFileId != EMPTY_FILE_ID;
     }
 
     @Override
-    public String getSmallPhotoFilePath() {
-        return smallPhotoFilePath;
+    public String getPhotoFilePath() {
+        return photoFilePath;
     }
 
     @Override
-    public boolean isSmallPhotoFilePathValid() {
-        return !smallPhotoFilePath.equals(EMPTY_STRING);
+    public boolean isPhotoFilePathValid() {
+        return !photoFilePath.equals(EMPTY_STRING);
     }
 
     @Override

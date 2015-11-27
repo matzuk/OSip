@@ -6,6 +6,7 @@ import android.widget.ImageView;
 
 import com.squareup.picasso.Picasso;
 import com.tg.osip.ApplicationSIP;
+import com.tg.osip.business.models.ImageLoaderI;
 import com.tg.osip.business.update_managers.FileDownloaderManager;
 import com.tg.osip.business.update_managers.UpdateManager;
 import com.tg.osip.utils.common.BackgroundExecutor;
@@ -23,22 +24,22 @@ import rx.schedulers.Schedulers;
  *
  * @author e.matsyuk
  */
-public class SIPAvatar extends ImageView {
+public class PhotoAvatar extends ImageView {
 
     private final static String ADD_TO_PATH = "file://";
 
     private int fileId;
     private Subscription updateChannelSubscription;
 
-    public SIPAvatar(Context context) {
+    public PhotoAvatar(Context context) {
         super(context);
     }
 
-    public SIPAvatar(Context context, AttributeSet attrs) {
+    public PhotoAvatar(Context context, AttributeSet attrs) {
         super(context, attrs);
     }
 
-    public SIPAvatar(Context context, AttributeSet attrs, int defStyleAttr) {
+    public PhotoAvatar(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
     }
 
@@ -49,20 +50,20 @@ public class SIPAvatar extends ImageView {
     private void startImageLoading(ImageLoaderI imageLoaderI) {
         unSubscribe();
         setImageDrawable(imageLoaderI.getPlug());
-        if (!imageLoaderI.isSmallPhotoFileIdValid()) {
+        if (!imageLoaderI.isPhotoFileIdValid()) {
             return;
         }
-        if (imageLoaderI.isSmallPhotoFilePathValid()) {
-            setFileToView(imageLoaderI.getSmallPhotoFilePath());
+        if (imageLoaderI.isPhotoFilePathValid()) {
+            setFileToView(imageLoaderI.getPhotoFilePath());
             return;
         }
         // test file downloaded cache
-        if (FileDownloaderManager.getInstance().isFileInCache(imageLoaderI.getSmallPhotoFileId())) {
-            setFileToView(FileDownloaderManager.getInstance().getFilePath(imageLoaderI.getSmallPhotoFileId()));
+        if (FileDownloaderManager.getInstance().isFileInCache(imageLoaderI.getPhotoFileId())) {
+            setFileToView(FileDownloaderManager.getInstance().getFilePath(imageLoaderI.getPhotoFileId()));
             return;
         }
         // start update manager listening
-        fileId = imageLoaderI.getSmallPhotoFileId();
+        fileId = imageLoaderI.getPhotoFileId();
         subscribeToUpdateChannel();
     }
 

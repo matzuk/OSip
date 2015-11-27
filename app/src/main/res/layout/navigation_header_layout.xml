@@ -6,7 +6,7 @@
     android:background="@color/color_primary"
     android:orientation="vertical" >
 
-    <com.tg.osip.ui.general.views.images.SIPAvatar
+    <com.tg.osip.ui.general.views.images.PhotoAvatar
         android:id="@+id/avatar"
         android:layout_width="@dimen/size_navigation_header_avatar"
         android:layout_height="@dimen/size_navigation_header_avatar"

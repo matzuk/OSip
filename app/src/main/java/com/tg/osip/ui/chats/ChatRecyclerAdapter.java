@@ -6,14 +6,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.tg.osip.ApplicationSIP;
 import com.tg.osip.R;
 import com.tg.osip.business.models.ChatItem;
 import com.tg.osip.ui.general.views.auto_loading.AutoLoadingRecyclerViewAdapter;
-import com.tg.osip.ui.general.views.images.SIPAvatar;
+import com.tg.osip.ui.general.views.images.PhotoAvatar;
 
 import org.drinkless.td.libcore.telegram.TdApi;
 
@@ -31,7 +30,7 @@ public class ChatRecyclerAdapter extends AutoLoadingRecyclerViewAdapter<ChatItem
 
     static class MainViewHolder extends RecyclerView.ViewHolder {
 
-        SIPAvatar avatar;
+        PhotoAvatar avatar;
         TextView chatUserName;
         ImageView chatGroupIcon;
         TextView chatUserLastMessage;
@@ -41,7 +40,7 @@ public class ChatRecyclerAdapter extends AutoLoadingRecyclerViewAdapter<ChatItem
 
         public MainViewHolder(View itemView) {
             super(itemView);
-            avatar = (SIPAvatar) itemView.findViewById(R.id.avatar);
+            avatar = (PhotoAvatar) itemView.findViewById(R.id.avatar);
             chatUserName = (TextView) itemView.findViewById(R.id.chat_user_name);
             chatGroupIcon = (ImageView) itemView.findViewById(R.id.chat_group_icon);
             chatUserLastMessage = (TextView) itemView.findViewById(R.id.chat_user_last_message);

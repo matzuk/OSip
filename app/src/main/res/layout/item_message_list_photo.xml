@@ -10,7 +10,7 @@
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:orientation="horizontal">
 
-    <com.tg.osip.ui.general.views.images.SIPAvatar
+    <com.tg.osip.ui.general.views.images.PhotoAvatar
         android:id="@+id/avatar"
         android:layout_width="@dimen/size_xxlarge"
         android:layout_height="@dimen/size_xxlarge"
@@ -69,7 +69,7 @@
 
         </LinearLayout>
 
-        <com.tg.osip.ui.general.views.images.SIPAvatar
+        <com.tg.osip.ui.general.views.images.PhotoAvatar
             android:id="@+id/photo"
             android:layout_width="@dimen/size_photo_message"
             android:layout_height="@dimen/size_photo_message"

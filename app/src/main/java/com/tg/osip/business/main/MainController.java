@@ -13,7 +13,7 @@ import com.tg.osip.business.models.UserItem;
 import com.tg.osip.business.update_managers.FileDownloaderManager;
 import com.tg.osip.tdclient.TGProxy;
 import com.tg.osip.ui.activities.LoginActivity;
-import com.tg.osip.ui.general.views.images.SIPAvatar;
+import com.tg.osip.ui.general.views.images.PhotoAvatar;
 import com.tg.osip.utils.common.BackgroundExecutor;
 import com.tg.osip.utils.log.Logger;
 
@@ -94,7 +94,7 @@ public class MainController {
         }
         View view = viewWeakReference.get();
 
-        SIPAvatar avatar = (SIPAvatar) view.findViewById(R.id.avatar);
+        PhotoAvatar avatar = (PhotoAvatar) view.findViewById(R.id.avatar);
         avatar.setImageLoaderI(userItem);
         TextView name = (TextView) view.findViewById(R.id.name);
         name.setText(userItem.getName());
