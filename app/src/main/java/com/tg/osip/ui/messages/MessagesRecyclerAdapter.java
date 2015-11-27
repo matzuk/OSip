@@ -11,9 +11,11 @@ import android.widget.TextView;
 import com.tg.osip.ApplicationSIP;
 import com.tg.osip.R;
 import com.tg.osip.business.models.MessageItem;
+import com.tg.osip.business.models.PhotoItem;
 import com.tg.osip.business.models.UserItem;
 import com.tg.osip.ui.general.views.auto_loading.AutoLoadingRecyclerViewAdapter;
 import com.tg.osip.ui.general.views.images.PhotoView;
+import com.tg.osip.utils.common.AndroidUtils;
 import com.tg.osip.utils.log.Logger;
 import com.tg.osip.utils.time.TimeUtils;
 
@@ -215,7 +217,12 @@ public class MessagesRecyclerAdapter extends AutoLoadingRecyclerViewAdapter<Mess
             return;
         }
         if (getItem(position).isPhotoMessage()) {
-            photoViewHolder.photo.setImageLoaderI(getItem(position).getPhotoItemM());
+            PhotoItem photoItem = getItem(position).getPhotoItemM();
+            android.view.ViewGroup.LayoutParams layoutParams = photoViewHolder.photo.getLayoutParams();
+            layoutParams.width = AndroidUtils.dp(photoItem.getWidth());
+            layoutParams.height = AndroidUtils.dp(photoItem.getHeight());
+            photoViewHolder.photo.setLayoutParams(layoutParams);
+            photoViewHolder.photo.setImageLoaderI(photoItem);
         }
 
         UserItem user = usersMap.get(message.fromId);

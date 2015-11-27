@@ -95,6 +95,7 @@ public class MainController {
         View view = viewWeakReference.get();
 
         PhotoView avatar = (PhotoView) view.findViewById(R.id.avatar);
+        avatar.setCircleRounds(true);
         avatar.setImageLoaderI(userItem);
         TextView name = (TextView) view.findViewById(R.id.name);
         name.setText(userItem.getName());

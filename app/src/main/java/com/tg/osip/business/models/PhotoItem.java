@@ -46,6 +46,14 @@ public class PhotoItem implements ImageLoaderI {
         plug = null;
     }
 
+    public int getWidth() {
+        return photoSize.width;
+    }
+
+    public int getHeight() {
+        return photoSize.height;
+    }
+
     @Override
     public int getPhotoFileId() {
         return photoFileId;

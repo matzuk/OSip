@@ -71,8 +71,8 @@
 
         <com.tg.osip.ui.general.views.images.PhotoView
             android:id="@+id/photo"
-            android:layout_width="@dimen/size_photo_message"
-            android:layout_height="@dimen/size_photo_message"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:scaleType="centerCrop"/>
 
     </LinearLayout>
