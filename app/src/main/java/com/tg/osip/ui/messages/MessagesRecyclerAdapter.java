@@ -10,6 +10,7 @@ import android.widget.TextView;
 
 import com.tg.osip.ApplicationSIP;
 import com.tg.osip.R;
+import com.tg.osip.business.models.MessageItem;
 import com.tg.osip.business.models.UserItem;
 import com.tg.osip.ui.general.views.auto_loading.AutoLoadingRecyclerViewAdapter;
 import com.tg.osip.ui.general.views.images.SIPAvatar;
@@ -24,12 +25,13 @@ import java.util.Map;
 /**
  * @author e.matsyuk
  */
-public class MessagesRecyclerAdapter extends AutoLoadingRecyclerViewAdapter<TdApi.Message> {
+public class MessagesRecyclerAdapter extends AutoLoadingRecyclerViewAdapter<MessageItem> {
 
     private static final int TEMP_SEND_STATE_IS_SENDING = 1000000000;
     private static final int TEMP_SEND_STATE_IS_ERROR = 0;
 
     private static final int MAIN_VIEW = 0;
+    private static final int PHOTO_VIEW = 1;
     private static final int ACTION_VIEW = 3;
     private static final int UNSUPPORTED_VIEW = 4;
 
@@ -50,6 +52,24 @@ public class MessagesRecyclerAdapter extends AutoLoadingRecyclerViewAdapter<TdAp
             avatar = (SIPAvatar) itemView.findViewById(R.id.avatar);
             messageName = (TextView) itemView.findViewById(R.id.message_name);
             messageText = (TextView) itemView.findViewById(R.id.message_text);
+            messageSendingTime = (TextView) itemView.findViewById(R.id.message_sending_time);
+            messageUnreadOutbox = (ImageView) itemView.findViewById(R.id.message_unread_outbox);
+        }
+    }
+
+    static class PhotoViewHolder extends RecyclerView.ViewHolder {
+
+        SIPAvatar avatar;
+        TextView messageName;
+        SIPAvatar photo;
+        TextView messageSendingTime;
+        ImageView messageUnreadOutbox;
+
+        public PhotoViewHolder(View itemView) {
+            super(itemView);
+            avatar = (SIPAvatar) itemView.findViewById(R.id.avatar);
+            messageName = (TextView) itemView.findViewById(R.id.message_name);
+            photo = (SIPAvatar) itemView.findViewById(R.id.photo);
             messageSendingTime = (TextView) itemView.findViewById(R.id.message_sending_time);
             messageUnreadOutbox = (ImageView) itemView.findViewById(R.id.message_unread_outbox);
         }
@@ -85,7 +105,7 @@ public class MessagesRecyclerAdapter extends AutoLoadingRecyclerViewAdapter<TdAp
 
     @Override
     public long getItemId(int position) {
-        return getItem(position).id;
+        return getItem(position).getMessage().id;
     }
 
     @Override
@@ -93,6 +113,9 @@ public class MessagesRecyclerAdapter extends AutoLoadingRecyclerViewAdapter<TdAp
         if (viewType == MAIN_VIEW) {
             View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_message_list_text, parent, false);
             return new MainViewHolder(v);
+        } else if (viewType == PHOTO_VIEW) {
+            View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_message_list_photo, parent, false);
+            return new PhotoViewHolder(v);
         } else if (viewType == ACTION_VIEW) {
             View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_message_list_actions, parent, false);
             return new ActionViewHolder(v);
@@ -106,13 +129,16 @@ public class MessagesRecyclerAdapter extends AutoLoadingRecyclerViewAdapter<TdAp
 
     @Override
     public int getItemViewType(int position) {
-        if (getItem(position).message.getClass() == TdApi.MessageText.class) {
+        TdApi.MessageContent messageContent = getItem(position).getMessage().message;
+        if (messageContent.getClass() == TdApi.MessageText.class) {
             return MAIN_VIEW;
-        } else if (getItem(position).message.getClass() == TdApi.MessageChatAddParticipant.class ||
-                getItem(position).message.getClass() == TdApi.MessageChatChangePhoto.class ||
-                getItem(position).message.getClass() == TdApi.MessageChatChangeTitle.class ||
-                getItem(position).message.getClass() == TdApi.MessageChatDeleteParticipant.class ||
-                getItem(position).message.getClass() == TdApi.MessageChatDeletePhoto.class) {
+        } else if (messageContent.getClass() == TdApi.MessagePhoto.class) {
+            return PHOTO_VIEW;
+        } else if (messageContent.getClass() == TdApi.MessageChatAddParticipant.class ||
+                messageContent.getClass() == TdApi.MessageChatChangePhoto.class ||
+                messageContent.getClass() == TdApi.MessageChatChangeTitle.class ||
+                messageContent.getClass() == TdApi.MessageChatDeleteParticipant.class ||
+                messageContent.getClass() == TdApi.MessageChatDeletePhoto.class) {
             return ACTION_VIEW;
         }
         return UNSUPPORTED_VIEW;
@@ -123,6 +149,9 @@ public class MessagesRecyclerAdapter extends AutoLoadingRecyclerViewAdapter<TdAp
         switch (getItemViewType(position)) {
             case MAIN_VIEW:
                 onBindTextHolder(holder, position);
+                break;
+            case PHOTO_VIEW:
+                onBindPhotoHolder(holder, position);
                 break;
             case ACTION_VIEW:
                 onBindActionHolder(holder, position);
@@ -135,7 +164,7 @@ public class MessagesRecyclerAdapter extends AutoLoadingRecyclerViewAdapter<TdAp
 
     private void onBindTextHolder(RecyclerView.ViewHolder holder, int position) {
         MainViewHolder mainHolder = (MainViewHolder) holder;
-        TdApi.Message message = getItem(position);
+        TdApi.Message message = getItem(position).getMessage();
         if (message == null) {
             return;
         }
@@ -174,6 +203,46 @@ public class MessagesRecyclerAdapter extends AutoLoadingRecyclerViewAdapter<TdAp
         }
     }
 
+    private void onBindPhotoHolder(RecyclerView.ViewHolder holder, int position) {
+        PhotoViewHolder photoViewHolder = (PhotoViewHolder) holder;
+        TdApi.Message message = getItem(position).getMessage();
+        if (message == null) {
+            return;
+        }
+        TdApi.MessageContent messageContent = message.message;
+        if (messageContent == null) {
+            return;
+        }
+        if (getItem(position).isPhotoMessage()) {
+            photoViewHolder.photo.setImageLoaderI(getItem(position).getPhotoItemM());
+        }
+
+        UserItem user = usersMap.get(message.fromId);
+        // set name
+        String name = user.getName();
+        photoViewHolder.messageName.setText(name);
+        // Set avatar
+        photoViewHolder.avatar.setImageLoaderI(user);
+
+        String dataString = TimeUtils.stringForMessageListDate(message.date);
+        photoViewHolder.messageSendingTime.setText(dataString);
+
+        // set unread outbox image
+        if (message.date == TEMP_SEND_STATE_IS_ERROR) {
+            photoViewHolder.messageUnreadOutbox.setVisibility(View.VISIBLE);
+            photoViewHolder.messageUnreadOutbox.setImageDrawable(ResourcesCompat.getDrawable(ApplicationSIP.applicationContext.getResources(), R.drawable.ic_message_error, ApplicationSIP.applicationContext.getTheme()));
+        } else if (myUserId == message.fromId) {
+            if (lastChatReadOutboxId >= message.id) {
+                photoViewHolder.messageUnreadOutbox.setVisibility(View.GONE);
+            } else {
+                photoViewHolder.messageUnreadOutbox.setVisibility(View.VISIBLE);
+                setSendStateMessage(message, photoViewHolder.messageUnreadOutbox);
+            }
+        } else {
+            photoViewHolder.messageUnreadOutbox.setVisibility(View.GONE);
+        }
+    }
+
     private void setSendStateMessage(TdApi.Message message, ImageView imageView) {
         if (message.id >= TEMP_SEND_STATE_IS_SENDING) {
             imageView.setImageDrawable(ResourcesCompat.getDrawable(ApplicationSIP.applicationContext.getResources(), R.drawable.ic_clock, ApplicationSIP.applicationContext.getTheme()));
@@ -184,7 +253,7 @@ public class MessagesRecyclerAdapter extends AutoLoadingRecyclerViewAdapter<TdAp
 
     private void onBindActionHolder(RecyclerView.ViewHolder holder, int position) {
         ActionViewHolder actionHolder = (ActionViewHolder) holder;
-        TdApi.Message message = getItem(position);
+        TdApi.Message message = getItem(position).getMessage();
         if (message == null) {
             return;
         }
@@ -243,10 +312,11 @@ public class MessagesRecyclerAdapter extends AutoLoadingRecyclerViewAdapter<TdAp
 
     private void onBindUnsupportedHolder(RecyclerView.ViewHolder holder, int position) {
         UnsupportedViewHolder unsupportedHolder = (UnsupportedViewHolder) holder;
-        TdApi.Message message = getItem(position);
+        TdApi.Message message = getItem(position).getMessage();
         if (message == null) {
             return;
         }
+
         TdApi.MessageContent messageContent = message.message;
         if (messageContent == null) {
             return;

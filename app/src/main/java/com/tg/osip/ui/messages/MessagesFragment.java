@@ -13,6 +13,7 @@ import android.widget.ProgressBar;
 
 import com.tg.osip.R;
 import com.tg.osip.business.messages.MessagesController;
+import com.tg.osip.business.models.MessageItem;
 import com.tg.osip.ui.activities.MainActivity;
 import com.tg.osip.ui.general.views.auto_loading.AutoLoadingRecyclerView;
 
@@ -26,7 +27,7 @@ public class MessagesFragment extends Fragment {
     public static final String CHAT_ID = "chat_id";
     private static final int LIMIT = 50;
 
-    private AutoLoadingRecyclerView<TdApi.Message> recyclerView;
+    private AutoLoadingRecyclerView<MessageItem> recyclerView;
     private Toolbar toolbar;
     private MessagesController messagesController;
 

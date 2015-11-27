@@ -22,6 +22,7 @@
 
     <dimen name="size_padding_common">64dp</dimen>
     <dimen name="size_navigation_header_avatar">72dp</dimen>
+    <dimen name="size_photo_message">120dp</dimen>
     <dimen name="size_reg_edittext_width">166dp</dimen>
     <dimen name="size_medium_plus_negative">-20dp</dimen>
 
