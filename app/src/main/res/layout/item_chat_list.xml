@@ -9,7 +9,7 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin">
 
-    <com.tg.osip.ui.general.views.images.PhotoAvatar
+    <com.tg.osip.ui.general.views.images.PhotoView
         android:id="@+id/avatar"
         android:layout_width="@dimen/size_xxxlarge"
         android:layout_height="@dimen/size_xxxlarge"

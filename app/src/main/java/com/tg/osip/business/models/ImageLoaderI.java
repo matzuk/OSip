@@ -2,10 +2,10 @@ package com.tg.osip.business.models;
 
 import android.graphics.drawable.Drawable;
 
-import com.tg.osip.ui.general.views.images.PhotoAvatar;
+import com.tg.osip.ui.general.views.images.PhotoView;
 
 /**
- * Interface for download setting in {@link PhotoAvatar SIPAvatar}
+ * Interface for download setting in {@link PhotoView SIPAvatar}
  *
  * @author e.matsyuk
  */

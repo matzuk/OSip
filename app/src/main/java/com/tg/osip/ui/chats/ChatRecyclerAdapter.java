@@ -12,7 +12,7 @@ import com.tg.osip.ApplicationSIP;
 import com.tg.osip.R;
 import com.tg.osip.business.models.ChatItem;
 import com.tg.osip.ui.general.views.auto_loading.AutoLoadingRecyclerViewAdapter;
-import com.tg.osip.ui.general.views.images.PhotoAvatar;
+import com.tg.osip.ui.general.views.images.PhotoView;
 
 import org.drinkless.td.libcore.telegram.TdApi;
 
@@ -30,7 +30,7 @@ public class ChatRecyclerAdapter extends AutoLoadingRecyclerViewAdapter<ChatItem
 
     static class MainViewHolder extends RecyclerView.ViewHolder {
 
-        PhotoAvatar avatar;
+        PhotoView avatar;
         TextView chatUserName;
         ImageView chatGroupIcon;
         TextView chatUserLastMessage;
@@ -40,7 +40,7 @@ public class ChatRecyclerAdapter extends AutoLoadingRecyclerViewAdapter<ChatItem
 
         public MainViewHolder(View itemView) {
             super(itemView);
-            avatar = (PhotoAvatar) itemView.findViewById(R.id.avatar);
+            avatar = (PhotoView) itemView.findViewById(R.id.avatar);
             chatUserName = (TextView) itemView.findViewById(R.id.chat_user_name);
             chatGroupIcon = (ImageView) itemView.findViewById(R.id.chat_group_icon);
             chatUserLastMessage = (TextView) itemView.findViewById(R.id.chat_user_last_message);
@@ -119,6 +119,7 @@ public class ChatRecyclerAdapter extends AutoLoadingRecyclerViewAdapter<ChatItem
             //  Set name
             mainHolder.chatUserName.setText(chatItem.getUserName());
             // Set avatar
+            mainHolder.avatar.setCircleRounds(true);
             mainHolder.avatar.setImageLoaderI(chatItem);
         }
         // is chat group?

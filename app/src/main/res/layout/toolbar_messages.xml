@@ -10,7 +10,7 @@
     android:paddingRight="@dimen/size_small"
     android:orientation="horizontal">
 
-    <com.tg.osip.ui.general.views.images.PhotoAvatar
+    <com.tg.osip.ui.general.views.images.PhotoView
         android:id="@+id/avatar"
         android:layout_width="@dimen/size_xxlarge"
         android:layout_height="@dimen/size_xxlarge"

@@ -13,7 +13,7 @@ import com.tg.osip.R;
 import com.tg.osip.business.models.MessageItem;
 import com.tg.osip.business.models.UserItem;
 import com.tg.osip.ui.general.views.auto_loading.AutoLoadingRecyclerViewAdapter;
-import com.tg.osip.ui.general.views.images.PhotoAvatar;
+import com.tg.osip.ui.general.views.images.PhotoView;
 import com.tg.osip.utils.log.Logger;
 import com.tg.osip.utils.time.TimeUtils;
 
@@ -41,7 +41,7 @@ public class MessagesRecyclerAdapter extends AutoLoadingRecyclerViewAdapter<Mess
 
     static class MainViewHolder extends RecyclerView.ViewHolder {
 
-        PhotoAvatar avatar;
+        PhotoView avatar;
         TextView messageName;
         TextView messageText;
         TextView messageSendingTime;
@@ -49,7 +49,7 @@ public class MessagesRecyclerAdapter extends AutoLoadingRecyclerViewAdapter<Mess
 
         public MainViewHolder(View itemView) {
             super(itemView);
-            avatar = (PhotoAvatar) itemView.findViewById(R.id.avatar);
+            avatar = (PhotoView) itemView.findViewById(R.id.avatar);
             messageName = (TextView) itemView.findViewById(R.id.message_name);
             messageText = (TextView) itemView.findViewById(R.id.message_text);
             messageSendingTime = (TextView) itemView.findViewById(R.id.message_sending_time);
@@ -59,17 +59,17 @@ public class MessagesRecyclerAdapter extends AutoLoadingRecyclerViewAdapter<Mess
 
     static class PhotoViewHolder extends RecyclerView.ViewHolder {
 
-        PhotoAvatar avatar;
+        PhotoView avatar;
         TextView messageName;
-        PhotoAvatar photo;
+        PhotoView photo;
         TextView messageSendingTime;
         ImageView messageUnreadOutbox;
 
         public PhotoViewHolder(View itemView) {
             super(itemView);
-            avatar = (PhotoAvatar) itemView.findViewById(R.id.avatar);
+            avatar = (PhotoView) itemView.findViewById(R.id.avatar);
             messageName = (TextView) itemView.findViewById(R.id.message_name);
-            photo = (PhotoAvatar) itemView.findViewById(R.id.photo);
+            photo = (PhotoView) itemView.findViewById(R.id.photo);
             messageSendingTime = (TextView) itemView.findViewById(R.id.message_sending_time);
             messageUnreadOutbox = (ImageView) itemView.findViewById(R.id.message_unread_outbox);
         }
@@ -89,14 +89,14 @@ public class MessagesRecyclerAdapter extends AutoLoadingRecyclerViewAdapter<Mess
 
     static class UnsupportedViewHolder extends RecyclerView.ViewHolder {
 
-        PhotoAvatar avatar;
+        PhotoView avatar;
         TextView messageName;
         TextView messageText;
         TextView messageSendingTime;
 
         public UnsupportedViewHolder(View itemView) {
             super(itemView);
-            avatar = (PhotoAvatar) itemView.findViewById(R.id.avatar);
+            avatar = (PhotoView) itemView.findViewById(R.id.avatar);
             messageName = (TextView) itemView.findViewById(R.id.message_name);
             messageText = (TextView) itemView.findViewById(R.id.message_text);
             messageSendingTime = (TextView) itemView.findViewById(R.id.message_sending_time);
@@ -182,6 +182,7 @@ public class MessagesRecyclerAdapter extends AutoLoadingRecyclerViewAdapter<Mess
         String name = user.getName();
         mainHolder.messageName.setText(name);
         // Set avatar
+        mainHolder.avatar.setCircleRounds(true);
         mainHolder.avatar.setImageLoaderI(user);
 
         String dataString = TimeUtils.stringForMessageListDate(message.date);
@@ -222,6 +223,7 @@ public class MessagesRecyclerAdapter extends AutoLoadingRecyclerViewAdapter<Mess
         String name = user.getName();
         photoViewHolder.messageName.setText(name);
         // Set avatar
+        photoViewHolder.avatar.setCircleRounds(true);
         photoViewHolder.avatar.setImageLoaderI(user);
 
         String dataString = TimeUtils.stringForMessageListDate(message.date);
@@ -332,6 +334,7 @@ public class MessagesRecyclerAdapter extends AutoLoadingRecyclerViewAdapter<Mess
         String name = user.getName();
         unsupportedHolder.messageName.setText(name);
         // Set avatar
+        unsupportedHolder.avatar.setCircleRounds(true);
         unsupportedHolder.avatar.setImageLoaderI(user);
 
         String dataString = TimeUtils.stringForMessageListDate(message.date);

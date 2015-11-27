@@ -24,22 +24,23 @@ import rx.schedulers.Schedulers;
  *
  * @author e.matsyuk
  */
-public class PhotoAvatar extends ImageView {
+public class PhotoView extends ImageView {
 
     private final static String ADD_TO_PATH = "file://";
 
     private int fileId;
     private Subscription updateChannelSubscription;
+    private boolean circleRounds;
 
-    public PhotoAvatar(Context context) {
+    public PhotoView(Context context) {
         super(context);
     }
 
-    public PhotoAvatar(Context context, AttributeSet attrs) {
+    public PhotoView(Context context, AttributeSet attrs) {
         super(context, attrs);
     }
 
-    public PhotoAvatar(Context context, AttributeSet attrs, int defStyleAttr) {
+    public PhotoView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
     }
 
@@ -67,14 +68,31 @@ public class PhotoAvatar extends ImageView {
         subscribeToUpdateChannel();
     }
 
+    /**
+     * Request before startImageLoading method!
+     * Or value == false
+     */
+    public void setCircleRounds(boolean circleRounds) {
+        this.circleRounds = circleRounds;
+    }
+
     private void setFileToView(String fileToPath) {
-        Picasso.with(
-                ApplicationSIP.applicationContext).
-                load(fileToPath).
-                placeholder(getDrawable()).
-                transform(new CirclePicassoTransformation()).
-                into(this
-                );
+        if (circleRounds) {
+            Picasso.with(
+                    ApplicationSIP.applicationContext).
+                    load(fileToPath).
+                    placeholder(getDrawable()).
+                    transform(new CirclePicassoTransformation()).
+                    into(this
+                    );
+        } else {
+            Picasso.with(
+                    ApplicationSIP.applicationContext).
+                    load(fileToPath).
+                    placeholder(getDrawable()).
+                    into(this
+                    );
+        }
     }
 
     private void subscribeToUpdateChannel() {

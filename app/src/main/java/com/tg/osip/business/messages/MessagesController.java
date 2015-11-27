@@ -15,7 +15,7 @@ import com.tg.osip.business.models.UserItem;
 import com.tg.osip.business.update_managers.FileDownloaderManager;
 import com.tg.osip.tdclient.TGProxy;
 import com.tg.osip.ui.messages.MessagesRecyclerAdapter;
-import com.tg.osip.ui.general.views.images.PhotoAvatar;
+import com.tg.osip.ui.general.views.images.PhotoView;
 import com.tg.osip.utils.log.Logger;
 import com.tg.osip.ui.general.views.auto_loading.AutoLoadingRecyclerView;
 import com.tg.osip.ui.general.views.auto_loading.ILoading;
@@ -198,7 +198,7 @@ public class MessagesController {
         LayoutInflater layoutInflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         headerView = layoutInflater.inflate(R.layout.toolbar_messages, null);
 
-        PhotoAvatar headerAvatar = (PhotoAvatar)headerView.findViewById(R.id.avatar);
+        PhotoView headerAvatar = (PhotoView)headerView.findViewById(R.id.avatar);
         headerAvatar.setImageLoaderI(chatItem);
         // not start file downloading because all chats avatars downloading was started in ChatsController
 
