@@ -332,11 +332,6 @@ public class MessagesRecyclerAdapter extends AutoLoadingRecyclerViewAdapter<Mess
             return;
         }
 
-        //
-        if (messageContent.getClass() == TdApi.MessagePhoto.class) {
-            Logger.debug("Photo: " + messageContent);
-        }
-
         UserItem user = usersMap.get(message.fromId);
         // set name
         String name = user.getName();
