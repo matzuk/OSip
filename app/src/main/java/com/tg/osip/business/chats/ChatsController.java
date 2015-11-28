@@ -65,6 +65,7 @@ public class ChatsController {
             return;
         }
         firstStartRecyclerViewSubscription = TGProxy.getInstance()
+                // get my info
                 .sendTD(new TdApi.GetMe(), TdApi.User.class)
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Subscriber<TdApi.User>() {
@@ -84,6 +85,7 @@ public class ChatsController {
     }
 
     private void successLoadData(TdApi.User user) {
+        // set myUserId to adapter
         chatRecyclerAdapter.setMyUserId(user.id);
         if (recyclerViewWeakReference != null && recyclerViewWeakReference.get() != null) {
             AutoLoadingRecyclerView<ChatItem> autoLoadingRecyclerView = recyclerViewWeakReference.get();
@@ -103,9 +105,11 @@ public class ChatsController {
                 .toList()
                 .observeOn(AndroidSchedulers.mainThread())
                 .doOnNext(mainListItems -> {
-                    if (progressBarWeakReference != null && progressBarWeakReference.get() != null) {
+                    // hide start progressbar
+                    if (progressBarWeakReference != null && progressBarWeakReference.get() != null && progressBarWeakReference.get().getVisibility() == View.VISIBLE) {
                         progressBarWeakReference.get().setVisibility(View.GONE);
                     }
+                    // send photo items to FileDownloaderManager
                     FileDownloaderManager.getInstance().startFileListDownloading(mainListItems);
                 });
     }

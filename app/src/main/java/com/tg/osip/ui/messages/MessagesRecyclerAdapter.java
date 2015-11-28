@@ -1,5 +1,6 @@
 package com.tg.osip.ui.messages;
 
+import android.os.Looper;
 import android.support.v4.content.res.ResourcesCompat;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;

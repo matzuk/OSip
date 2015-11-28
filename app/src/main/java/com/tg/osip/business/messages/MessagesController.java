@@ -90,20 +90,19 @@ public class MessagesController {
         }
         // load needed data (in adapters and members) in the first start
         firstStartRecyclerViewSubscription = TGProxy.getInstance()
+                // get // get my info
                 .sendTD(new TdApi.GetMe(), TdApi.User.class)
                 .observeOn(AndroidSchedulers.mainThread())
+                // set myUserId to adapter
                 .doOnNext(user -> messagesRecyclerAdapter.setMyUserId(user.id))
                 .concatMap(user -> TGProxy.getInstance().sendTD(new TdApi.GetChat(chatId), TdApi.Chat.class))
                 .concatMap(chat -> {
                     List<MessageItem> messages = new ArrayList<>(1);
                     messages.add(new MessageItem(chat.topMessage));
-                    getUsersDownloadingObservable(messages).subscribe();
-                    return Observable.just(chat);
-                })
-                .doOnNext(chat -> {
-                    List<MessageItem> messages = new ArrayList<>(1);
-                    messages.add(new MessageItem(chat.topMessage));
+                    // download photo content from messages in another Stream
                     getPhotoTypeMDownloadingObservable(messages).subscribe();
+                    // download users info for messages adapter in this Stream
+                    return Observable.zip(getUsersDownloadingObservable(messages), Observable.just(chat), (integerUserItemMap, chat1) -> chat1);
                 })
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Subscriber<TdApi.Chat>() {
@@ -145,13 +144,15 @@ public class MessagesController {
                     return messageItemList;
                 })
                 .concatMap(messages -> {
-                    getUsersDownloadingObservable(messages).subscribe();
-                    return Observable.just(messages);
+                    // download photo content from messages in another Stream
+                    getPhotoTypeMDownloadingObservable(messages).subscribe();
+                    // download users info for messages adapter in this Stream
+                    return Observable.zip(getUsersDownloadingObservable(messages), Observable.just(messages), (integerUserItemMap, messageItems) -> messageItems);
                 })
                 .observeOn(AndroidSchedulers.mainThread())
                 .doOnNext((messageList) -> {
-                    getPhotoTypeMDownloadingObservable(messageList).subscribe();
-                    if (progressBarWeakReference != null && progressBarWeakReference.get() != null) {
+                    // hide start progressbar
+                    if (progressBarWeakReference != null && progressBarWeakReference.get() != null && progressBarWeakReference.get().getVisibility() == View.VISIBLE) {
                         progressBarWeakReference.get().setVisibility(View.GONE);
                     }
                 });
@@ -172,6 +173,7 @@ public class MessagesController {
                     }
                     return map;
                 })
+                .observeOn(AndroidSchedulers.mainThread())
                 .doOnNext(integerUserItemMap -> {
                     if (messagesRecyclerAdapter != null) {
                         messagesRecyclerAdapter.setChatUsers(integerUserItemMap);
