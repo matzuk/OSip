@@ -1,5 +1,6 @@
 package com.tg.osip.ui.messages;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -14,10 +15,16 @@ import android.widget.ProgressBar;
 import com.tg.osip.R;
 import com.tg.osip.business.messages.MessagesController;
 import com.tg.osip.business.models.MessageItem;
+import com.tg.osip.business.models.PhotoItem;
 import com.tg.osip.ui.activities.MainActivity;
+import com.tg.osip.ui.activities.PhotoMediaActivity;
 import com.tg.osip.ui.general.views.auto_loading.AutoLoadingRecyclerView;
+import com.tg.osip.utils.log.Logger;
 
 import org.drinkless.td.libcore.telegram.TdApi;
+
+import java.io.Serializable;
+import java.util.List;
 
 /**
  * @author e.matsyuk
@@ -79,7 +86,7 @@ public class MessagesFragment extends Fragment {
             messagesController = new MessagesController(chatId);
         }
         messagesController.setProgressBar(progressBar);
-        messagesController.setRecyclerView(recyclerView);
+        messagesController.setRecyclerView(recyclerView, onMessageClickListener);
         messagesController.setToolbar(getContext(), toolbar);
         messagesController.loadData();
     }
@@ -89,7 +96,7 @@ public class MessagesFragment extends Fragment {
         super.onViewStateRestored(savedInstanceState);
         // start loading after reorientation
         if (savedInstanceState != null) {
-            messagesController.setRecyclerView(recyclerView);
+            messagesController.setRecyclerView(recyclerView, onMessageClickListener);
             messagesController.restoreDataToViews();
         }
     }
@@ -103,6 +110,17 @@ public class MessagesFragment extends Fragment {
         getSupportActivity().getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         toolbar.setNavigationOnClickListener(v -> getSupportActivity().onBackPressed());
     }
+
+    private OnMessageClickListener onMessageClickListener = new OnMessageClickListener() {
+        @Override
+        public void onPhotoMessageClick(List<PhotoItem> photoMItemList) {
+            Intent intent = new Intent(getActivity(), PhotoMediaActivity.class);
+            Bundle bundle = new Bundle();
+            bundle.putSerializable(PhotoMediaActivity.PHOTO_M, (Serializable) photoMItemList);
+            intent.putExtras(bundle);
+            startActivity(intent);
+        }
+    };
 
     private AppCompatActivity getSupportActivity() {
         return (AppCompatActivity)getActivity();

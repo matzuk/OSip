@@ -16,6 +16,7 @@ import com.tg.osip.business.update_managers.FileDownloaderManager;
 import com.tg.osip.tdclient.TGProxy;
 import com.tg.osip.ui.messages.MessagesRecyclerAdapter;
 import com.tg.osip.ui.general.views.images.PhotoView;
+import com.tg.osip.ui.messages.OnMessageClickListener;
 import com.tg.osip.utils.log.Logger;
 import com.tg.osip.ui.general.views.auto_loading.AutoLoadingRecyclerView;
 import com.tg.osip.ui.general.views.auto_loading.ILoading;
@@ -69,9 +70,10 @@ public class MessagesController {
         progressBarWeakReference = new WeakReference<>(progressBar);
     }
 
-    public void setRecyclerView(AutoLoadingRecyclerView<MessageItem> autoLoadingRecyclerView) {
+    public void setRecyclerView(AutoLoadingRecyclerView<MessageItem> autoLoadingRecyclerView, OnMessageClickListener onMessageClickListener) {
         recyclerViewWeakReference = new WeakReference<>(autoLoadingRecyclerView);
         // set adapter to new or recreated recyclerView
+        messagesRecyclerAdapter.setOnMessageClickListener(onMessageClickListener);
         autoLoadingRecyclerView.setAdapter(messagesRecyclerAdapter);
     }
 

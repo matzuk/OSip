@@ -5,34 +5,38 @@ import android.text.TextUtils;
 
 import org.drinkless.td.libcore.telegram.TdApi;
 
+import java.io.Serializable;
+
 /**
  * Photo model for messages and photo activities
  *
  * @author e.matsyul
  */
-public class PhotoItem implements ImageLoaderI {
+public class PhotoItem implements ImageLoaderI, Serializable {
 
     private final static int EMPTY_FILE_ID = 0;
     private final static String ADD_TO_PATH = "file://";
     private final static String EMPTY_STRING = "";
 
-    private TdApi.PhotoSize photoSize;
     private int photoFileId;
     private String photoFilePath;
-    private Drawable plug;
+    private int width;
+    private int height;
+    transient private Drawable plug;
 
     public PhotoItem (TdApi.PhotoSize photoSize) {
-        this.photoSize = photoSize;
-        initFileId();
-        initFilePath();
+        initFileId(photoSize);
+        initFilePath(photoSize);
         initPlug();
+        width = photoSize.width;
+        height = photoSize.height;
     }
 
-    private void initFileId() {
+    private void initFileId(TdApi.PhotoSize photoSize) {
         photoFileId = photoSize.photo.id;
     }
 
-    private void initFilePath() {
+    private void initFilePath(TdApi.PhotoSize photoSize) {
         String filePath = photoSize.photo.path;
         if (!TextUtils.isEmpty(filePath)) {
             photoFilePath = ADD_TO_PATH + filePath;
@@ -47,11 +51,11 @@ public class PhotoItem implements ImageLoaderI {
     }
 
     public int getWidth() {
-        return photoSize.width;
+        return width;
     }
 
     public int getHeight() {
-        return photoSize.height;
+        return height;
     }
 
     @Override

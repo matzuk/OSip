@@ -7,6 +7,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.tg.osip.ApplicationSIP;
@@ -22,7 +23,10 @@ import com.tg.osip.utils.time.TimeUtils;
 
 import org.drinkless.td.libcore.telegram.TdApi;
 
+import java.lang.ref.WeakReference;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -41,6 +45,7 @@ public class MessagesRecyclerAdapter extends AutoLoadingRecyclerViewAdapter<Mess
     private int myUserId;
     private int lastChatReadOutboxId;
     private Map<Integer, UserItem> usersMap = new HashMap<>();
+    private WeakReference<OnMessageClickListener> onMessageClickListenerWeakReference;
 
     static class MainViewHolder extends RecyclerView.ViewHolder {
 
@@ -62,6 +67,7 @@ public class MessagesRecyclerAdapter extends AutoLoadingRecyclerViewAdapter<Mess
 
     static class PhotoViewHolder extends RecyclerView.ViewHolder {
 
+        LinearLayout photoLayout;
         PhotoView avatar;
         TextView messageName;
         PhotoView photo;
@@ -70,6 +76,7 @@ public class MessagesRecyclerAdapter extends AutoLoadingRecyclerViewAdapter<Mess
 
         public PhotoViewHolder(View itemView) {
             super(itemView);
+            photoLayout = (LinearLayout) itemView.findViewById(R.id.photo_layout);
             avatar = (PhotoView) itemView.findViewById(R.id.avatar);
             messageName = (TextView) itemView.findViewById(R.id.message_name);
             photo = (PhotoView) itemView.findViewById(R.id.photo);
@@ -104,6 +111,10 @@ public class MessagesRecyclerAdapter extends AutoLoadingRecyclerViewAdapter<Mess
             messageText = (TextView) itemView.findViewById(R.id.message_text);
             messageSendingTime = (TextView) itemView.findViewById(R.id.message_sending_time);
         }
+    }
+
+    public void setOnMessageClickListener(OnMessageClickListener onMessageClickListener) {
+        this.onMessageClickListenerWeakReference = new WeakReference<>(onMessageClickListener);
     }
 
     @Override
@@ -251,6 +262,24 @@ public class MessagesRecyclerAdapter extends AutoLoadingRecyclerViewAdapter<Mess
         } else {
             photoViewHolder.messageUnreadOutbox.setVisibility(View.GONE);
         }
+        // set photo OnClickListener
+        photoViewHolder.photoLayout.setOnClickListener(v -> {
+            if (onMessageClickListenerWeakReference != null && onMessageClickListenerWeakReference.get() != null) {
+                OnMessageClickListener onMessageClickListener = onMessageClickListenerWeakReference.get();
+                onMessageClickListener.onPhotoMessageClick(getPhotoMItems());
+            }
+        });
+    }
+
+    // temp method for PhotoItems getting
+    private List<PhotoItem> getPhotoMItems() {
+        List<PhotoItem> photoMItemList = new ArrayList<>();
+        for (MessageItem messageItem : getItems()) {
+            if (messageItem.isPhotoMessage()) {
+                photoMItemList.add(messageItem.getPhotoItemM());
+            }
+        }
+        return photoMItemList;
     }
 
     private void setSendStateMessage(TdApi.Message message, ImageView imageView) {
