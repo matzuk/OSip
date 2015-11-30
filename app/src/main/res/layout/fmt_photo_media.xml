@@ -1,16 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@color/color_photo_gallery_bg">
+<com.tg.osip.ui.general.views.images.PhotoView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/photo"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_centerInParent="true"
+    android:scaleType="fitCenter"/>
 
-    <com.tg.osip.ui.general.views.images.PhotoView
-        android:id="@+id/photo"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
-        android:scaleType="fitCenter"/>
 
-</RelativeLayout>
 

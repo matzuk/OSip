@@ -7,6 +7,7 @@ import android.support.v7.app.AppCompatActivity;
 
 import com.tg.osip.R;
 import com.tg.osip.business.models.PhotoItem;
+import com.tg.osip.ui.media.DepthPageTransformer;
 import com.tg.osip.ui.media.PhotoSlidePagerAdapter;
 import com.tg.osip.ui.media.ZoomOutPageTransformer;
 
@@ -32,7 +33,7 @@ public class PhotoMediaActivity extends AppCompatActivity {
         // Instantiate a ViewPager and a PagerAdapter.
         ViewPager pager = (ViewPager) findViewById(R.id.pager);
         pager.setAdapter(pagerAdapter);
-        pager.setPageTransformer(true, new ZoomOutPageTransformer());
+        pager.setPageTransformer(true, new DepthPageTransformer());
     }
 
     private void initAdapter() {
