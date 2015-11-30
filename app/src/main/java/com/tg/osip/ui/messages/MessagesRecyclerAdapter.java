@@ -1,7 +1,7 @@
 package com.tg.osip.ui.messages;
 
-import android.os.Looper;
 import android.support.v4.content.res.ResourcesCompat;
+import android.support.v4.util.Pair;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,7 +18,6 @@ import com.tg.osip.business.models.UserItem;
 import com.tg.osip.ui.general.views.auto_loading.AutoLoadingRecyclerViewAdapter;
 import com.tg.osip.ui.general.views.images.PhotoView;
 import com.tg.osip.utils.common.AndroidUtils;
-import com.tg.osip.utils.log.Logger;
 import com.tg.osip.utils.time.TimeUtils;
 
 import org.drinkless.td.libcore.telegram.TdApi;
@@ -266,20 +265,27 @@ public class MessagesRecyclerAdapter extends AutoLoadingRecyclerViewAdapter<Mess
         photoViewHolder.photoLayout.setOnClickListener(v -> {
             if (onMessageClickListenerWeakReference != null && onMessageClickListenerWeakReference.get() != null) {
                 OnMessageClickListener onMessageClickListener = onMessageClickListenerWeakReference.get();
-                onMessageClickListener.onPhotoMessageClick(getPhotoYItems());
+                Pair<Integer, List<PhotoItem>> clickedPair = getPhotoYItemsWithClickedPos(getItem(position).getPhotoItemY().getPhotoFileId());
+                onMessageClickListener.onPhotoMessageClick(clickedPair.first, clickedPair.second);
             }
         });
     }
 
     // temp method for PhotoItems getting
-    private List<PhotoItem> getPhotoYItems() {
-        List<PhotoItem> photoMItemList = new ArrayList<>();
+    private Pair<Integer, List<PhotoItem>> getPhotoYItemsWithClickedPos(int photoFileId) {
+        int currentPosInPhotoList = 0;
+        int clickedPosInPhotoList = currentPosInPhotoList;
+        List<PhotoItem> photoYItemList = new ArrayList<>();
         for (MessageItem messageItem : getItems()) {
             if (messageItem.isPhotoMessage()) {
-                photoMItemList.add(messageItem.getPhotoItemY());
+                photoYItemList.add(messageItem.getPhotoItemY());
+                if (photoFileId == messageItem.getPhotoItemY().getPhotoFileId()) {
+                    clickedPosInPhotoList = currentPosInPhotoList;
+                }
+                currentPosInPhotoList++;
             }
         }
-        return photoMItemList;
+        return new Pair<>(clickedPosInPhotoList, photoYItemList);
     }
 
     private void setSendStateMessage(TdApi.Message message, ImageView imageView) {

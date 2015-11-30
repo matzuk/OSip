@@ -10,5 +10,5 @@ import java.util.List;
  * @author e.matsyuk
  */
 public interface OnMessageClickListener {
-    void onPhotoMessageClick(List<PhotoItem> photoMItemList);
+    void onPhotoMessageClick(int clickedPosition, List<PhotoItem> photoMItemList);
 }

@@ -89,6 +89,9 @@
     <string name="emoji_no_recent">No recent used emoji</string>
 
     <!-- Dialogs -->
+    <string name="toolbar_title_in_photo_gallery">%1$d of %2$d</string>
+
+    <!-- Dialogs -->
     <string name="wait">Please wait…</string>
 
 

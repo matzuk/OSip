@@ -45,6 +45,7 @@ public class PhotoMediaFragment extends Fragment {
         View rootView = inflater.inflate(R.layout.fmt_photo_media, container, false);
         setRetainInstance(true);
         init(rootView);
+        initToolbar();
         return rootView;
     }
 
@@ -58,6 +59,10 @@ public class PhotoMediaFragment extends Fragment {
             photoView.setLayoutParams(layoutParams);
             photoView.setImageLoaderI(photoItem);
         }
+    }
+
+    private void initToolbar() {
+
     }
 
 }

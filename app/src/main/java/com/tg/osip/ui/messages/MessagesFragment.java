@@ -113,9 +113,10 @@ public class MessagesFragment extends Fragment {
 
     private OnMessageClickListener onMessageClickListener = new OnMessageClickListener() {
         @Override
-        public void onPhotoMessageClick(List<PhotoItem> photoYItemList) {
+        public void onPhotoMessageClick(int clickedPosition, List<PhotoItem> photoYItemList) {
             Intent intent = new Intent(getActivity(), PhotoMediaActivity.class);
             Bundle bundle = new Bundle();
+            bundle.putInt(PhotoMediaActivity.CLICKED_POSITION, clickedPosition);
             bundle.putSerializable(PhotoMediaActivity.PHOTO_Y, (Serializable) photoYItemList);
             intent.putExtras(bundle);
             startActivity(intent);
