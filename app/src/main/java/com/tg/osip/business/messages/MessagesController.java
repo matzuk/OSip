@@ -203,8 +203,8 @@ public class MessagesController {
         headerView = layoutInflater.inflate(R.layout.toolbar_messages, null);
 
         PhotoView headerAvatar = (PhotoView)headerView.findViewById(R.id.avatar);
-        headerAvatar.setImageLoaderI(chatItem);
         headerAvatar.setCircleRounds(true);
+        headerAvatar.setImageLoaderI(chatItem);
         // not start file downloading because all chats avatars downloading was started in ChatsController
 
         TextView chatNameView = (TextView)headerView.findViewById(R.id.chat_name);
