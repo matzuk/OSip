@@ -10,6 +10,7 @@ import com.tg.osip.business.models.PhotoItem;
 import com.tg.osip.business.update_managers.FileDownloaderManager;
 import com.tg.osip.ui.media.DepthPageTransformer;
 import com.tg.osip.ui.media.PhotoSlidePagerAdapter;
+import com.tg.osip.ui.media.ZoomOutPageTransformer;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,6 +23,7 @@ import java.util.List;
 public class PhotoMediaActivity extends AppCompatActivity {
 
     public static final String PHOTO_Y = "photoY";
+    private static final int PAGER_OFFSET = 2;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,6 +42,7 @@ public class PhotoMediaActivity extends AppCompatActivity {
         PagerAdapter pagerAdapter = new PhotoSlidePagerAdapter(getSupportFragmentManager(), photoYItemList);
         // Instantiate a ViewPager and a PagerAdapter.
         ViewPager pager = (ViewPager) findViewById(R.id.pager);
+        pager.setOffscreenPageLimit(PAGER_OFFSET);
         pager.setAdapter(pagerAdapter);
         pager.setPageTransformer(true, new DepthPageTransformer());
     }
