@@ -102,7 +102,7 @@ public class MessagesController {
                     List<MessageItem> messages = new ArrayList<>(1);
                     messages.add(new MessageItem(chat.topMessage));
                     // download photo content from messages in another Stream
-                    getPhotoTypeMDownloadingObservable(messages).subscribe();
+                    getPhotoTypeMediumDownloadingObservable(messages).subscribe();
                     // download users info for messages adapter in this Stream
                     return Observable.zip(getUsersDownloadingObservable(messages), Observable.just(chat), (integerUserItemMap, chat1) -> chat1);
                 })
@@ -147,7 +147,7 @@ public class MessagesController {
                 })
                 .concatMap(messages -> {
                     // download photo content from messages in another Stream
-                    getPhotoTypeMDownloadingObservable(messages).subscribe();
+                    getPhotoTypeMediumDownloadingObservable(messages).subscribe();
                     // download users info for messages adapter in this Stream
                     return Observable.zip(getUsersDownloadingObservable(messages), Observable.just(messages), (integerUserItemMap, messageItems) -> messageItems);
                 })
@@ -183,10 +183,10 @@ public class MessagesController {
                 });
     }
 
-    private Observable<List<PhotoItem>> getPhotoTypeMDownloadingObservable(List<MessageItem> mainListItems) {
+    private Observable<List<PhotoItem>> getPhotoTypeMediumDownloadingObservable(List<MessageItem> mainListItems) {
         return Observable.from(mainListItems)
                 .filter(MessageItem::isPhotoMessage)
-                .map(MessageItem::getPhotoItemM)
+                .map(MessageItem::getPhotoItemMedium)
                 .toList()
                 .doOnNext(photoItems -> FileDownloaderManager.getInstance().startFileListDownloading(photoItems));
     }

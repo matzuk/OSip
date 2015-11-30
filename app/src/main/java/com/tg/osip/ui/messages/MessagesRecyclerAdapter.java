@@ -228,7 +228,7 @@ public class MessagesRecyclerAdapter extends AutoLoadingRecyclerViewAdapter<Mess
             return;
         }
         if (getItem(position).isPhotoMessage()) {
-            PhotoItem photoItem = getItem(position).getPhotoItemM();
+            PhotoItem photoItem = getItem(position).getPhotoItemMedium();
             android.view.ViewGroup.LayoutParams layoutParams = photoViewHolder.photo.getLayoutParams();
             layoutParams.width = AndroidUtils.dp(photoItem.getWidth());
             layoutParams.height = AndroidUtils.dp(photoItem.getHeight());
@@ -265,7 +265,7 @@ public class MessagesRecyclerAdapter extends AutoLoadingRecyclerViewAdapter<Mess
         photoViewHolder.photoLayout.setOnClickListener(v -> {
             if (onMessageClickListenerWeakReference != null && onMessageClickListenerWeakReference.get() != null) {
                 OnMessageClickListener onMessageClickListener = onMessageClickListenerWeakReference.get();
-                Pair<Integer, List<PhotoItem>> clickedPair = getPhotoYItemsWithClickedPos(getItem(position).getPhotoItemY().getPhotoFileId());
+                Pair<Integer, List<PhotoItem>> clickedPair = getPhotoYItemsWithClickedPos(getItem(position).getPhotoItemLarge().getPhotoFileId());
                 onMessageClickListener.onPhotoMessageClick(clickedPair.first, clickedPair.second);
             }
         });
@@ -275,17 +275,17 @@ public class MessagesRecyclerAdapter extends AutoLoadingRecyclerViewAdapter<Mess
     private Pair<Integer, List<PhotoItem>> getPhotoYItemsWithClickedPos(int photoFileId) {
         int currentPosInPhotoList = 0;
         int clickedPosInPhotoList = currentPosInPhotoList;
-        List<PhotoItem> photoYItemList = new ArrayList<>();
+        List<PhotoItem> photoLargeItemList = new ArrayList<>();
         for (MessageItem messageItem : getItems()) {
             if (messageItem.isPhotoMessage()) {
-                photoYItemList.add(messageItem.getPhotoItemY());
-                if (photoFileId == messageItem.getPhotoItemY().getPhotoFileId()) {
+                photoLargeItemList.add(messageItem.getPhotoItemLarge());
+                if (photoFileId == messageItem.getPhotoItemLarge().getPhotoFileId()) {
                     clickedPosInPhotoList = currentPosInPhotoList;
                 }
                 currentPosInPhotoList++;
             }
         }
-        return new Pair<>(clickedPosInPhotoList, photoYItemList);
+        return new Pair<>(clickedPosInPhotoList, photoLargeItemList);
     }
 
     private void setSendStateMessage(TdApi.Message message, ImageView imageView) {

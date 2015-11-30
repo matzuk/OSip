@@ -11,13 +11,15 @@ import org.drinkless.td.libcore.telegram.TdApi;
  */
 public class MessageItem {
 
+    private static final String PHOTO_TYPE_S = "s";
     private static final String PHOTO_TYPE_M = "m";
+    private static final String PHOTO_TYPE_X = "x";
     private static final String PHOTO_TYPE_Y = "y";
 
     private TdApi.Message message;
 
-    private PhotoItem photoItemM;
-    private PhotoItem photoItemY;
+    private PhotoItem photoItemMedium;
+    private PhotoItem photoItemLarge;
 
     public MessageItem(TdApi.Message message) {
         this.message = message;
@@ -32,10 +34,27 @@ public class MessageItem {
         TdApi.PhotoSize[] photoSizes = messagePhoto.photo.photos;
         for (TdApi.PhotoSize photoSize : photoSizes) {
             if (photoSize.type.equals(PHOTO_TYPE_M)) {
-                photoItemM = new PhotoItem(photoSize);
+                photoItemMedium = new PhotoItem(photoSize);
             } else if (photoSize.type.equals(PHOTO_TYPE_Y)) {
-                photoItemY = new PhotoItem(photoSize);
-                photoItemY.setPlugFile(photoItemM);
+                photoItemLarge = new PhotoItem(photoSize);
+                photoItemLarge.setPlugFile(photoItemMedium);
+            }
+        }
+        // if type there is not TYPE_M then set TYPE_S
+        if (photoItemMedium == null) {
+            for (TdApi.PhotoSize photoSize : photoSizes) {
+                if (photoSize.type.equals(PHOTO_TYPE_S)) {
+                    photoItemMedium = new PhotoItem(photoSize);
+                }
+            }
+        }
+        // if type there is not TYPE_Y then set TYPE_X
+        if (photoItemLarge == null) {
+            for (TdApi.PhotoSize photoSize : photoSizes) {
+                if (photoSize.type.equals(PHOTO_TYPE_X)) {
+                    photoItemLarge = new PhotoItem(photoSize);
+                    photoItemLarge.setPlugFile(photoItemMedium);
+                }
             }
         }
     }
@@ -51,15 +70,15 @@ public class MessageItem {
     /**
      * @return if isPhotoMessage == true then PhotoItem M type or null
      */
-    public PhotoItem getPhotoItemM() {
-        return photoItemM;
+    public PhotoItem getPhotoItemMedium() {
+        return photoItemMedium;
     }
 
     /**
      * @return if isPhotoMessage == true then PhotoItem Y type or null
      */
-    public PhotoItem getPhotoItemY() {
-        return photoItemY;
+    public PhotoItem getPhotoItemLarge() {
+        return photoItemLarge;
     }
 
 }

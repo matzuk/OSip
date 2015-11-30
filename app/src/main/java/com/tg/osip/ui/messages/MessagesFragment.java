@@ -19,9 +19,6 @@ import com.tg.osip.business.models.PhotoItem;
 import com.tg.osip.ui.activities.MainActivity;
 import com.tg.osip.ui.activities.PhotoMediaActivity;
 import com.tg.osip.ui.general.views.auto_loading.AutoLoadingRecyclerView;
-import com.tg.osip.utils.log.Logger;
-
-import org.drinkless.td.libcore.telegram.TdApi;
 
 import java.io.Serializable;
 import java.util.List;
@@ -113,11 +110,11 @@ public class MessagesFragment extends Fragment {
 
     private OnMessageClickListener onMessageClickListener = new OnMessageClickListener() {
         @Override
-        public void onPhotoMessageClick(int clickedPosition, List<PhotoItem> photoYItemList) {
+        public void onPhotoMessageClick(int clickedPosition, List<PhotoItem> photoLargeItemList) {
             Intent intent = new Intent(getActivity(), PhotoMediaActivity.class);
             Bundle bundle = new Bundle();
             bundle.putInt(PhotoMediaActivity.CLICKED_POSITION, clickedPosition);
-            bundle.putSerializable(PhotoMediaActivity.PHOTO_Y, (Serializable) photoYItemList);
+            bundle.putSerializable(PhotoMediaActivity.PHOTO_LARGE, (Serializable) photoLargeItemList);
             intent.putExtras(bundle);
             startActivity(intent);
         }

@@ -11,9 +11,7 @@ import com.tg.osip.business.models.PhotoItem;
 import com.tg.osip.business.update_managers.FileDownloaderManager;
 import com.tg.osip.ui.media.DepthPageTransformer;
 import com.tg.osip.ui.media.PhotoSlidePagerAdapter;
-import com.tg.osip.ui.media.ZoomOutPageTransformer;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -23,12 +21,12 @@ import java.util.List;
  */
 public class PhotoMediaActivity extends AppCompatActivity {
 
-    public static final String PHOTO_Y = "photoY";
+    public static final String PHOTO_LARGE = "photoLarge";
     public static final String CLICKED_POSITION = "clickedPosition";
 
     private static final int PAGER_OFFSET = 2;
 
-    private List<PhotoItem> photoYItemList;
+    private List<PhotoItem> photoLargeItemList;
     private int clickedPosition;
 
     @Override
@@ -45,16 +43,16 @@ public class PhotoMediaActivity extends AppCompatActivity {
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
             clickedPosition = extras.getInt(CLICKED_POSITION);
-            photoYItemList = (List<PhotoItem>)extras.getSerializable(PHOTO_Y);
+            photoLargeItemList = (List<PhotoItem>)extras.getSerializable(PHOTO_LARGE);
         }
     }
 
     private void downloadPhotoY() {
-        FileDownloaderManager.getInstance().startFileListDownloading(photoYItemList);
+        FileDownloaderManager.getInstance().startFileListDownloading(photoLargeItemList);
     }
 
     private void initPager() {
-        PagerAdapter pagerAdapter = new PhotoSlidePagerAdapter(getSupportFragmentManager(), photoYItemList);
+        PagerAdapter pagerAdapter = new PhotoSlidePagerAdapter(getSupportFragmentManager(), photoLargeItemList);
         // Instantiate a ViewPager and a PagerAdapter.
         ViewPager pager = (ViewPager) findViewById(R.id.pager);
         pager.setOffscreenPageLimit(PAGER_OFFSET);
@@ -67,7 +65,7 @@ public class PhotoMediaActivity extends AppCompatActivity {
 
             @Override
             public void onPageSelected(int position) {
-                String title = String.format(getResources().getString(R.string.toolbar_title_in_photo_gallery), position + 1, photoYItemList.size());
+                String title = String.format(getResources().getString(R.string.toolbar_title_in_photo_gallery), position + 1, photoLargeItemList.size());
                 getSupportActionBar().setTitle(title);
             }
 
@@ -85,7 +83,7 @@ public class PhotoMediaActivity extends AppCompatActivity {
         if (getSupportActionBar() == null) {
             return;
         }
-        String title = String.format(getResources().getString(R.string.toolbar_title_in_photo_gallery), clickedPosition + 1, photoYItemList.size());
+        String title = String.format(getResources().getString(R.string.toolbar_title_in_photo_gallery), clickedPosition + 1, photoLargeItemList.size());
         getSupportActionBar().setTitle(title);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);

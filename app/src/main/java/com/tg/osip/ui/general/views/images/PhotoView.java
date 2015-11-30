@@ -44,6 +44,16 @@ public class PhotoView extends ImageView {
 
     private void startImageLoading(ImageLoaderI imageLoaderI) {
         unSubscribe();
+        // set default drawable
+        if (imageLoaderI.getPlugFile() != null && ImageLoaderUtils.isPhotoFileIdValid(imageLoaderI.getPlugFile().getPhotoFileId())) {
+            if (ImageLoaderUtils.isPhotoFilePathValid(imageLoaderI.getPlugFile().getPhotoFilePath())) {
+                setFileToView(imageLoaderI.getPlugFile().getPhotoFilePath());
+            } else if (FileDownloaderManager.getInstance().isFileInCache(imageLoaderI.getPlugFile().getPhotoFileId())) {
+                setFileToView(FileDownloaderManager.getInstance().getFilePath(imageLoaderI.getPlugFile().getPhotoFileId()));
+            }
+        } else {
+            setImageDrawable(imageLoaderI.getPlug());
+        }
         if (ImageLoaderUtils.isPhotoFileIdValid(imageLoaderI.getPhotoFileId())) {
             if (ImageLoaderUtils.isPhotoFilePathValid(imageLoaderI.getPhotoFilePath())) {
                 setFileToView(imageLoaderI.getPhotoFilePath());
@@ -54,16 +64,6 @@ public class PhotoView extends ImageView {
                 setFileToView(FileDownloaderManager.getInstance().getFilePath(imageLoaderI.getPhotoFileId()));
                 return;
             }
-        }
-        // set default drawable
-        if (imageLoaderI.getPlugFile() != null && ImageLoaderUtils.isPhotoFileIdValid(imageLoaderI.getPlugFile().getPhotoFileId())) {
-            if (ImageLoaderUtils.isPhotoFilePathValid(imageLoaderI.getPlugFile().getPhotoFilePath())) {
-                setFileToView(imageLoaderI.getPlugFile().getPhotoFilePath());
-            } else if (FileDownloaderManager.getInstance().isFileInCache(imageLoaderI.getPlugFile().getPhotoFileId())) {
-                setFileToView(FileDownloaderManager.getInstance().getFilePath(imageLoaderI.getPlugFile().getPhotoFileId()));
-            }
-        } else {
-            setImageDrawable(imageLoaderI.getPlug());
         }
         // start update manager listening
         fileId = imageLoaderI.getPhotoFileId();
