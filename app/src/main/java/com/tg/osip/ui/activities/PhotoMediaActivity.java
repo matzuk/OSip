@@ -67,7 +67,7 @@ public class PhotoMediaActivity extends AppCompatActivity {
 
             @Override
             public void onPageSelected(int position) {
-                String title = String.format(getResources().getString(R.string.toolbar_title_in_photo_gallery), position, photoYItemList.size());
+                String title = String.format(getResources().getString(R.string.toolbar_title_in_photo_gallery), position + 1, photoYItemList.size());
                 getSupportActionBar().setTitle(title);
             }
 
@@ -85,7 +85,7 @@ public class PhotoMediaActivity extends AppCompatActivity {
         if (getSupportActionBar() == null) {
             return;
         }
-        String title = String.format(getResources().getString(R.string.toolbar_title_in_photo_gallery), clickedPosition, photoYItemList.size());
+        String title = String.format(getResources().getString(R.string.toolbar_title_in_photo_gallery), clickedPosition + 1, photoYItemList.size());
         getSupportActionBar().setTitle(title);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);

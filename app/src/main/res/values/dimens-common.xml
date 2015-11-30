@@ -20,6 +20,7 @@
     <dimen name="size_xxlarge_plus">44dp</dimen>
     <dimen name="size_xxxlarge">48dp</dimen>
 
+    <dimen name="size_chat_avatar">54dp</dimen>
     <dimen name="size_padding_common">64dp</dimen>
     <dimen name="size_navigation_header_avatar">72dp</dimen>
     <dimen name="size_reg_edittext_width">166dp</dimen>

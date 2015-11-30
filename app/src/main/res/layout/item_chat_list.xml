@@ -4,15 +4,15 @@
     android:id="@+id/main_translate"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:paddingBottom="@dimen/size_small"
-    android:paddingTop="@dimen/size_small"
+    android:paddingBottom="@dimen/size_small_plus"
+    android:paddingTop="@dimen/size_small_plus"
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin">
 
     <com.tg.osip.ui.general.views.images.PhotoView
         android:id="@+id/avatar"
-        android:layout_width="@dimen/size_xxxlarge"
-        android:layout_height="@dimen/size_xxxlarge"
+        android:layout_width="@dimen/size_chat_avatar"
+        android:layout_height="@dimen/size_chat_avatar"
         android:scaleType="centerCrop"/>
 
     <LinearLayout
@@ -35,7 +35,7 @@
             android:id="@+id/chat_user_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="@dimen/text_size_medium_plus"
+            android:textSize="@dimen/text_size_large"
             android:textColor="@color/color_text_primary"
             android:text="Username"
             android:singleLine="true"
@@ -48,10 +48,10 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginLeft="@dimen/size_padding_common"
-        android:layout_marginRight="@dimen/size_padding_common"
+        android:layout_marginRight="@dimen/size_large_plus"
         android:layout_marginTop="@dimen/size_xxsmall"
         android:layout_alignParentBottom="true"
-        android:textSize="@dimen/text_size_medium"
+        android:textSize="@dimen/text_size_medium_plus"
         android:textColor="@color/color_text_secondary"
         android:text="user"
         android:singleLine="true"
@@ -79,7 +79,7 @@
             android:id="@+id/message_sending_time"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="@dimen/text_size_small"
+            android:textSize="@dimen/text_size_medium"
             android:textColor="@color/color_text_secondary"
             android:text="12:05 PM"
             android:singleLine="true"

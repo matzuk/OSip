@@ -36,7 +36,7 @@ public class ChatsFragment extends BaseFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.fmt_main, container, false);
+        View rootView = inflater.inflate(R.layout.fmt_chats, container, false);
         setRetainInstance(true);
         init(rootView);
         initToolbar();
