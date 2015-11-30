@@ -7,9 +7,9 @@ import android.support.v7.app.AppCompatActivity;
 
 import com.tg.osip.R;
 import com.tg.osip.business.models.PhotoItem;
+import com.tg.osip.business.update_managers.FileDownloaderManager;
 import com.tg.osip.ui.media.DepthPageTransformer;
 import com.tg.osip.ui.media.PhotoSlidePagerAdapter;
-import com.tg.osip.ui.media.ZoomOutPageTransformer;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,26 +23,34 @@ public class PhotoMediaActivity extends AppCompatActivity {
 
     public static final String PHOTO_Y = "photoY";
 
-    private PagerAdapter pagerAdapter;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.ac_photo_media);
-        initAdapter();
+        downloadPhotoY();
+        initPager();
+    }
+
+    private void initPager() {
+        List<PhotoItem> photoYItemList = new ArrayList<>();
+        Bundle extras = getIntent().getExtras();
+        if (extras != null) {
+            photoYItemList = (List<PhotoItem>)extras.getSerializable(PHOTO_Y);
+        }
+        PagerAdapter pagerAdapter = new PhotoSlidePagerAdapter(getSupportFragmentManager(), photoYItemList);
         // Instantiate a ViewPager and a PagerAdapter.
         ViewPager pager = (ViewPager) findViewById(R.id.pager);
         pager.setAdapter(pagerAdapter);
         pager.setPageTransformer(true, new DepthPageTransformer());
     }
 
-    private void initAdapter() {
+    private void downloadPhotoY() {
         List<PhotoItem> photoYItemList = new ArrayList<>();
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
             photoYItemList = (List<PhotoItem>)extras.getSerializable(PHOTO_Y);
         }
-        pagerAdapter = new PhotoSlidePagerAdapter(getSupportFragmentManager(), photoYItemList);
+        FileDownloaderManager.getInstance().startFileListDownloading(photoYItemList);
     }
 
 }
