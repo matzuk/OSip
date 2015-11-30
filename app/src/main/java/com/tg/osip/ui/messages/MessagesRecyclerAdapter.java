@@ -36,7 +36,7 @@ public class MessagesRecyclerAdapter extends AutoLoadingRecyclerViewAdapter<Mess
     private static final int TEMP_SEND_STATE_IS_SENDING = 1000000000;
     private static final int TEMP_SEND_STATE_IS_ERROR = 0;
 
-    private static final int MAIN_VIEW = 0;
+    private static final int TEXT_VIEW = 0;
     private static final int PHOTO_VIEW = 1;
     private static final int ACTION_VIEW = 3;
     private static final int UNSUPPORTED_VIEW = 4;
@@ -46,16 +46,18 @@ public class MessagesRecyclerAdapter extends AutoLoadingRecyclerViewAdapter<Mess
     private Map<Integer, UserItem> usersMap = new HashMap<>();
     private WeakReference<OnMessageClickListener> onMessageClickListenerWeakReference;
 
-    static class MainViewHolder extends RecyclerView.ViewHolder {
+    static class TextViewHolder extends RecyclerView.ViewHolder {
 
+        LinearLayout textLayout;
         PhotoView avatar;
         TextView messageName;
         TextView messageText;
         TextView messageSendingTime;
         ImageView messageUnreadOutbox;
 
-        public MainViewHolder(View itemView) {
+        public TextViewHolder(View itemView) {
             super(itemView);
+            textLayout = (LinearLayout) itemView.findViewById(R.id.text_layout);
             avatar = (PhotoView) itemView.findViewById(R.id.avatar);
             messageName = (TextView) itemView.findViewById(R.id.message_name);
             messageText = (TextView) itemView.findViewById(R.id.message_text);
@@ -98,6 +100,7 @@ public class MessagesRecyclerAdapter extends AutoLoadingRecyclerViewAdapter<Mess
 
     static class UnsupportedViewHolder extends RecyclerView.ViewHolder {
 
+        LinearLayout unsupportLayout;
         PhotoView avatar;
         TextView messageName;
         TextView messageText;
@@ -105,6 +108,7 @@ public class MessagesRecyclerAdapter extends AutoLoadingRecyclerViewAdapter<Mess
 
         public UnsupportedViewHolder(View itemView) {
             super(itemView);
+            unsupportLayout = (LinearLayout) itemView.findViewById(R.id.unsupport_layout);
             avatar = (PhotoView) itemView.findViewById(R.id.avatar);
             messageName = (TextView) itemView.findViewById(R.id.message_name);
             messageText = (TextView) itemView.findViewById(R.id.message_text);
@@ -123,9 +127,9 @@ public class MessagesRecyclerAdapter extends AutoLoadingRecyclerViewAdapter<Mess
 
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        if (viewType == MAIN_VIEW) {
+        if (viewType == TEXT_VIEW) {
             View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_message_list_text, parent, false);
-            return new MainViewHolder(v);
+            return new TextViewHolder(v);
         } else if (viewType == PHOTO_VIEW) {
             View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_message_list_photo, parent, false);
             return new PhotoViewHolder(v);
@@ -144,7 +148,7 @@ public class MessagesRecyclerAdapter extends AutoLoadingRecyclerViewAdapter<Mess
     public int getItemViewType(int position) {
         TdApi.MessageContent messageContent = getItem(position).getMessage().message;
         if (messageContent.getClass() == TdApi.MessageText.class) {
-            return MAIN_VIEW;
+            return TEXT_VIEW;
         } else if (messageContent.getClass() == TdApi.MessagePhoto.class) {
             return PHOTO_VIEW;
         } else if (messageContent.getClass() == TdApi.MessageChatAddParticipant.class ||
@@ -160,7 +164,7 @@ public class MessagesRecyclerAdapter extends AutoLoadingRecyclerViewAdapter<Mess
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
         switch (getItemViewType(position)) {
-            case MAIN_VIEW:
+            case TEXT_VIEW:
                 onBindTextHolder(holder, position);
                 break;
             case PHOTO_VIEW:
@@ -176,7 +180,7 @@ public class MessagesRecyclerAdapter extends AutoLoadingRecyclerViewAdapter<Mess
     }
 
     private void onBindTextHolder(RecyclerView.ViewHolder holder, int position) {
-        MainViewHolder mainHolder = (MainViewHolder) holder;
+        TextViewHolder textHolder = (TextViewHolder) holder;
         TdApi.Message message = getItem(position).getMessage();
         if (message == null) {
             return;
@@ -185,36 +189,52 @@ public class MessagesRecyclerAdapter extends AutoLoadingRecyclerViewAdapter<Mess
         if (messageContent == null) {
             return;
         }
-        if (messageContent instanceof TdApi.MessageText) {
+        if (messageContent.getClass() == TdApi.MessageText.class) {
             TdApi.MessageText messageText = (TdApi.MessageText)messageContent;
-            mainHolder.messageText.setText(messageText.text);
+            textHolder.messageText.setText(messageText.text);
         }
-
+        // get user
         UserItem user = usersMap.get(message.fromId);
         // set name
         String name = user.getName();
-        mainHolder.messageName.setText(name);
+        textHolder.messageName.setText(name);
         // Set avatar
-        mainHolder.avatar.setCircleRounds(true);
-        mainHolder.avatar.setImageLoaderI(user);
-
+        textHolder.avatar.setCircleRounds(true);
+        textHolder.avatar.setImageLoaderI(user);
+        // set data
         String dataString = TimeUtils.stringForMessageListDate(message.date);
-        mainHolder.messageSendingTime.setText(dataString);
+        textHolder.messageSendingTime.setText(dataString);
 
         // set unread outbox image
         if (message.date == TEMP_SEND_STATE_IS_ERROR) {
-            mainHolder.messageUnreadOutbox.setVisibility(View.VISIBLE);
-            mainHolder.messageUnreadOutbox.setImageDrawable(ResourcesCompat.getDrawable(ApplicationSIP.applicationContext.getResources(), R.drawable.ic_message_error, ApplicationSIP.applicationContext.getTheme()));
+            textHolder.messageUnreadOutbox.setVisibility(View.VISIBLE);
+            textHolder.messageUnreadOutbox.setImageDrawable(ResourcesCompat.getDrawable(ApplicationSIP.applicationContext.getResources(), R.drawable.ic_message_error, ApplicationSIP.applicationContext.getTheme()));
         } else if (myUserId == message.fromId) {
             if (lastChatReadOutboxId >= message.id) {
-                mainHolder.messageUnreadOutbox.setVisibility(View.GONE);
+                textHolder.messageUnreadOutbox.setVisibility(View.GONE);
             } else {
-                mainHolder.messageUnreadOutbox.setVisibility(View.VISIBLE);
-                setSendStateMessage(message, mainHolder.messageUnreadOutbox);
+                textHolder.messageUnreadOutbox.setVisibility(View.VISIBLE);
+                setSendStateMessage(message, textHolder.messageUnreadOutbox);
             }
         } else {
-            mainHolder.messageUnreadOutbox.setVisibility(View.GONE);
+            textHolder.messageUnreadOutbox.setVisibility(View.GONE);
         }
+    }
+
+    private boolean isItemsEqual(int position) {
+        if (position == getItemCount() - 1) {
+            return false;
+        }
+        int nextPosition = position + 1;
+        if (getItemViewType(position) != getItemViewType(nextPosition)) {
+            return false;
+        }
+        String dataString = TimeUtils.stringForMessageListDate(getItem(position).getMessage().date);
+        String dataPreviousString = TimeUtils.stringForMessageListDate(getItem(nextPosition).getMessage().date);
+        if (!dataPreviousString.equals(dataString)) {
+            return false;
+        }
+        return getItem(position).getMessage().fromId == getItem(nextPosition).getMessage().fromId;
     }
 
     private void onBindPhotoHolder(RecyclerView.ViewHolder holder, int position) {
@@ -229,10 +249,6 @@ public class MessagesRecyclerAdapter extends AutoLoadingRecyclerViewAdapter<Mess
         }
         if (getItem(position).isPhotoMessage()) {
             PhotoItem photoItem = getItem(position).getPhotoItemMedium();
-            android.view.ViewGroup.LayoutParams layoutParams = photoViewHolder.photo.getLayoutParams();
-            layoutParams.width = AndroidUtils.dp(photoItem.getWidth());
-            layoutParams.height = AndroidUtils.dp(photoItem.getHeight());
-            photoViewHolder.photo.setLayoutParams(layoutParams);
             photoViewHolder.photo.setImageLoaderI(photoItem);
         }
 
@@ -265,14 +281,14 @@ public class MessagesRecyclerAdapter extends AutoLoadingRecyclerViewAdapter<Mess
         photoViewHolder.photoLayout.setOnClickListener(v -> {
             if (onMessageClickListenerWeakReference != null && onMessageClickListenerWeakReference.get() != null) {
                 OnMessageClickListener onMessageClickListener = onMessageClickListenerWeakReference.get();
-                Pair<Integer, List<PhotoItem>> clickedPair = getPhotoYItemsWithClickedPos(getItem(position).getPhotoItemLarge().getPhotoFileId());
+                Pair<Integer, List<PhotoItem>> clickedPair = getPhotoLargeItemsWithClickedPos(getItem(position).getPhotoItemLarge().getPhotoFileId());
                 onMessageClickListener.onPhotoMessageClick(clickedPair.first, clickedPair.second);
             }
         });
     }
 
     // temp method for PhotoItems getting
-    private Pair<Integer, List<PhotoItem>> getPhotoYItemsWithClickedPos(int photoFileId) {
+    private Pair<Integer, List<PhotoItem>> getPhotoLargeItemsWithClickedPos(int photoFileId) {
         int currentPosInPhotoList = 0;
         int clickedPosInPhotoList = currentPosInPhotoList;
         List<PhotoItem> photoLargeItemList = new ArrayList<>();

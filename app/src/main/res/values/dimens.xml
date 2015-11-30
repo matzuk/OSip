@@ -7,9 +7,9 @@
     <dimen name="ctrl_plain_radius">@dimen/size_xxsmall</dimen>
 
     <!-- Dimens for message items -->
-    <dimen name="message_avatar_size">@dimen/size_xxlarge_plus</dimen>
-    <dimen name="message_name_text_size">@dimen/text_size_medium_plus</dimen>
-    <dimen name="message_sending_time_text_size">@dimen/text_size_medium</dimen>
-    <dimen name="message_text_text_size">@dimen/text_size_medium_plus</dimen>
-    <dimen name="message_padding_top_bottom">@dimen/size_small_plus_half</dimen>
+    <dimen name="message_avatar_size">@dimen/size_xxlarge</dimen>
+    <dimen name="message_name_text_size">@dimen/text_size_medium</dimen>
+    <dimen name="message_sending_time_text_size">@dimen/text_size_small</dimen>
+    <dimen name="message_text_text_size">@dimen/text_size_medium</dimen>
+    <dimen name="message_padding_top_bottom">@dimen/size_small</dimen>
 </resources>
