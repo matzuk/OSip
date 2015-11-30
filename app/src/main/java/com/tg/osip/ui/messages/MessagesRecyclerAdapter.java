@@ -103,6 +103,7 @@ public class MessagesRecyclerAdapter extends AutoLoadingRecyclerViewAdapter<Mess
         TextView messageName;
         TextView messageText;
         TextView messageSendingTime;
+        ImageView messageUnreadOutbox;
 
         public UnsupportedViewHolder(View itemView) {
             super(itemView);
@@ -110,6 +111,7 @@ public class MessagesRecyclerAdapter extends AutoLoadingRecyclerViewAdapter<Mess
             messageName = (TextView) itemView.findViewById(R.id.message_name);
             messageText = (TextView) itemView.findViewById(R.id.message_text);
             messageSendingTime = (TextView) itemView.findViewById(R.id.message_sending_time);
+            messageUnreadOutbox = (ImageView) itemView.findViewById(R.id.message_unread_outbox);
         }
     }
 
@@ -391,6 +393,20 @@ public class MessagesRecyclerAdapter extends AutoLoadingRecyclerViewAdapter<Mess
         String dataString = TimeUtils.stringForMessageListDate(message.date);
         unsupportedHolder.messageSendingTime.setText(dataString);
 
+        // set unread outbox image
+        if (message.date == TEMP_SEND_STATE_IS_ERROR) {
+            unsupportedHolder.messageUnreadOutbox.setVisibility(View.VISIBLE);
+            unsupportedHolder.messageUnreadOutbox.setImageDrawable(ResourcesCompat.getDrawable(ApplicationSIP.applicationContext.getResources(), R.drawable.ic_message_error, ApplicationSIP.applicationContext.getTheme()));
+        } else if (myUserId == message.fromId) {
+            if (lastChatReadOutboxId >= message.id) {
+                unsupportedHolder.messageUnreadOutbox.setVisibility(View.GONE);
+            } else {
+                unsupportedHolder.messageUnreadOutbox.setVisibility(View.VISIBLE);
+                setSendStateMessage(message, unsupportedHolder.messageUnreadOutbox);
+            }
+        } else {
+            unsupportedHolder.messageUnreadOutbox.setVisibility(View.GONE);
+        }
     }
 
     public void setMyUserId(int myUserId) {
