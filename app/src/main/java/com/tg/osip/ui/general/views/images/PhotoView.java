@@ -6,7 +6,6 @@ import android.widget.ImageView;
 
 import com.squareup.picasso.Picasso;
 import com.tg.osip.ApplicationSIP;
-import com.tg.osip.business.models.ImageLoaderI;
 import com.tg.osip.business.update_managers.FileDownloaderManager;
 import com.tg.osip.utils.common.BackgroundExecutor;
 import com.tg.osip.utils.log.Logger;
@@ -45,18 +44,26 @@ public class PhotoView extends ImageView {
 
     private void startImageLoading(ImageLoaderI imageLoaderI) {
         unSubscribe();
-        setImageDrawable(imageLoaderI.getPlug());
-        if (!imageLoaderI.isPhotoFileIdValid()) {
-            return;
+        if (ImageLoaderUtils.isPhotoFileIdValid(imageLoaderI.getPhotoFileId())) {
+            if (ImageLoaderUtils.isPhotoFilePathValid(imageLoaderI.getPhotoFilePath())) {
+                setFileToView(imageLoaderI.getPhotoFilePath());
+                return;
+            }
+            // test file downloaded cache
+            if (FileDownloaderManager.getInstance().isFileInCache(imageLoaderI.getPhotoFileId())) {
+                setFileToView(FileDownloaderManager.getInstance().getFilePath(imageLoaderI.getPhotoFileId()));
+                return;
+            }
         }
-        if (imageLoaderI.isPhotoFilePathValid()) {
-            setFileToView(imageLoaderI.getPhotoFilePath());
-            return;
-        }
-        // test file downloaded cache
-        if (FileDownloaderManager.getInstance().isFileInCache(imageLoaderI.getPhotoFileId())) {
-            setFileToView(FileDownloaderManager.getInstance().getFilePath(imageLoaderI.getPhotoFileId()));
-            return;
+        // set default drawable
+        if (imageLoaderI.getPlugFile() != null && ImageLoaderUtils.isPhotoFileIdValid(imageLoaderI.getPlugFile().getPhotoFileId())) {
+            if (ImageLoaderUtils.isPhotoFilePathValid(imageLoaderI.getPlugFile().getPhotoFilePath())) {
+                setFileToView(imageLoaderI.getPlugFile().getPhotoFilePath());
+            } else if (FileDownloaderManager.getInstance().isFileInCache(imageLoaderI.getPlugFile().getPhotoFileId())) {
+                setFileToView(FileDownloaderManager.getInstance().getFilePath(imageLoaderI.getPlugFile().getPhotoFileId()));
+            }
+        } else {
+            setImageDrawable(imageLoaderI.getPlug());
         }
         // start update manager listening
         fileId = imageLoaderI.getPhotoFileId();

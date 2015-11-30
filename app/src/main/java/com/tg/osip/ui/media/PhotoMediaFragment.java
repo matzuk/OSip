@@ -9,6 +9,7 @@ import android.view.ViewGroup;
 import com.tg.osip.R;
 import com.tg.osip.business.models.PhotoItem;
 import com.tg.osip.ui.general.views.images.PhotoView;
+import com.tg.osip.utils.common.AndroidUtils;
 
 /**
  * Fragment of Photo media
@@ -50,6 +51,11 @@ public class PhotoMediaFragment extends Fragment {
     private void init(View rootView) {
         PhotoView photoView = (PhotoView) rootView.findViewById(R.id.photo);
         if (photoItem != null) {
+            photoView.setImageLoaderI(photoItem);
+            android.view.ViewGroup.LayoutParams layoutParams = photoView.getLayoutParams();
+            layoutParams.width = AndroidUtils.dp(photoItem.getWidth());
+            layoutParams.height = AndroidUtils.dp(photoItem.getHeight());
+            photoView.setLayoutParams(layoutParams);
             photoView.setImageLoaderI(photoItem);
         }
     }

@@ -27,4 +27,7 @@
     <!-- Divider color -->
     <color name="common_cool_grey">#B6B6B6</color>
 
+    <!-- Background color for photo gallery -->
+    <color name="common_black_bg">#000000</color>
+
 </resources>

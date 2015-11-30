@@ -8,6 +8,7 @@
     <color name="color_text_secondary">@color/common_grey</color>
     <color name="color_divider">@color/common_cool_grey</color>
     <color name="color_background">@color/common_white</color>
+    <color name="color_photo_gallery_bg">@color/common_black_bg</color>
     <!-- Others -->
     <color name="color_edit_text_background_line">#c5c5c5</color>
     <color name="color_btn_plain_1_pressed">#255375</color>

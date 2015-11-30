@@ -8,6 +8,7 @@ import com.amulyakhare.textdrawable.util.ColorGenerator;
 import com.tg.osip.ApplicationSIP;
 import com.tg.osip.R;
 import com.tg.osip.ui.chats.ChatRecyclerAdapter;
+import com.tg.osip.ui.general.views.images.ImageLoaderI;
 import com.tg.osip.utils.common.AndroidUtils;
 import com.tg.osip.utils.time.TimeUtils;
 
@@ -20,7 +21,6 @@ import org.drinkless.td.libcore.telegram.TdApi;
  */
 public class ChatItem implements ImageLoaderI {
 
-    private final static int EMPTY_FILE_ID = 0;
     private final static String ADD_TO_PATH = "file://";
     private final static String EMPTY_STRING = "";
     private final static String SPACE = " ";
@@ -77,24 +77,20 @@ public class ChatItem implements ImageLoaderI {
     }
 
     @Override
-    public boolean isPhotoFileIdValid() {
-        return photoFileId != EMPTY_FILE_ID;
-    }
-
-    @Override
     public String getPhotoFilePath() {
         return photoFilePath;
-    }
-
-    @Override
-    public boolean isPhotoFilePathValid() {
-        return !photoFilePath.equals(EMPTY_STRING);
     }
 
     @Override
     public Drawable getPlug() {
         return plug;
     }
+
+    @Override
+    public PhotoItem getPlugFile() {
+        return null;
+    }
+
 
     public String getInfo() {
         return info;

@@ -35,6 +35,7 @@ public class MessageItem {
                 photoItemM = new PhotoItem(photoSize);
             } else if (photoSize.type.equals(PHOTO_TYPE_Y)) {
                 photoItemY = new PhotoItem(photoSize);
+                photoItemY.setPlugFile(photoItemM);
             }
         }
     }

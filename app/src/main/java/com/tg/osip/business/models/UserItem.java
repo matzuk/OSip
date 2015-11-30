@@ -5,6 +5,7 @@ import android.text.TextUtils;
 
 import com.amulyakhare.textdrawable.TextDrawable;
 import com.amulyakhare.textdrawable.util.ColorGenerator;
+import com.tg.osip.ui.general.views.images.ImageLoaderI;
 import com.tg.osip.ui.messages.MessagesRecyclerAdapter;
 import com.tg.osip.utils.common.AndroidUtils;
 
@@ -17,7 +18,6 @@ import org.drinkless.td.libcore.telegram.TdApi;
  */
 public class UserItem implements ImageLoaderI {
 
-    private final static int EMPTY_FILE_ID = 0;
     private final static String ADD_TO_PATH = "file://";
     private final static String EMPTY_STRING = "";
     private final static String SPACE = " ";
@@ -93,23 +93,18 @@ public class UserItem implements ImageLoaderI {
     }
 
     @Override
-    public boolean isPhotoFileIdValid() {
-        return photoFileId != EMPTY_FILE_ID;
-    }
-
-    @Override
     public String getPhotoFilePath() {
         return photoFilePath;
     }
 
     @Override
-    public boolean isPhotoFilePathValid() {
-        return !photoFilePath.equals(EMPTY_STRING);
+    public Drawable getPlug() {
+        return plug;
     }
 
     @Override
-    public Drawable getPlug() {
-        return plug;
+    public PhotoItem getPlugFile() {
+        return null;
     }
 
     public String getName() {

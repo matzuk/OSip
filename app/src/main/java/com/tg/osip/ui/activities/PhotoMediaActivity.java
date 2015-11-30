@@ -9,7 +9,6 @@ import com.tg.osip.R;
 import com.tg.osip.business.models.PhotoItem;
 import com.tg.osip.ui.media.PhotoSlidePagerAdapter;
 import com.tg.osip.ui.media.ZoomOutPageTransformer;
-import com.tg.osip.utils.log.Logger;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,33 +20,28 @@ import java.util.List;
  */
 public class PhotoMediaActivity extends AppCompatActivity {
 
-    public static final String PHOTO_M = "photoM";
     public static final String PHOTO_Y = "photoY";
 
-    private ViewPager mPager;
-    private PagerAdapter mPagerAdapter;
-
-    private List<PhotoItem> photoMItemList = new ArrayList<>();
+    private PagerAdapter pagerAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.ac_photo_media);
-        if (savedInstanceState != null) {
-            savePhotoFromExtras();
-        }
+        initAdapter();
         // Instantiate a ViewPager and a PagerAdapter.
-        mPager = (ViewPager) findViewById(R.id.pager);
-        mPagerAdapter = new PhotoSlidePagerAdapter(getSupportFragmentManager(), photoMItemList);
-        mPager.setAdapter(mPagerAdapter);
-        mPager.setPageTransformer(true, new ZoomOutPageTransformer());
+        ViewPager pager = (ViewPager) findViewById(R.id.pager);
+        pager.setAdapter(pagerAdapter);
+        pager.setPageTransformer(true, new ZoomOutPageTransformer());
     }
 
-    private void savePhotoFromExtras() {
+    private void initAdapter() {
+        List<PhotoItem> photoYItemList = new ArrayList<>();
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
-            photoMItemList = (List<PhotoItem>)extras.getSerializable(PHOTO_M);
+            photoYItemList = (List<PhotoItem>)extras.getSerializable(PHOTO_Y);
         }
+        pagerAdapter = new PhotoSlidePagerAdapter(getSupportFragmentManager(), photoYItemList);
     }
 
 }

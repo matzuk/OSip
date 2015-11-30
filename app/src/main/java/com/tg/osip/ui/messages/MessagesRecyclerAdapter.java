@@ -266,17 +266,17 @@ public class MessagesRecyclerAdapter extends AutoLoadingRecyclerViewAdapter<Mess
         photoViewHolder.photoLayout.setOnClickListener(v -> {
             if (onMessageClickListenerWeakReference != null && onMessageClickListenerWeakReference.get() != null) {
                 OnMessageClickListener onMessageClickListener = onMessageClickListenerWeakReference.get();
-                onMessageClickListener.onPhotoMessageClick(getPhotoMItems());
+                onMessageClickListener.onPhotoMessageClick(getPhotoYItems());
             }
         });
     }
 
     // temp method for PhotoItems getting
-    private List<PhotoItem> getPhotoMItems() {
+    private List<PhotoItem> getPhotoYItems() {
         List<PhotoItem> photoMItemList = new ArrayList<>();
         for (MessageItem messageItem : getItems()) {
             if (messageItem.isPhotoMessage()) {
-                photoMItemList.add(messageItem.getPhotoItemM());
+                photoMItemList.add(messageItem.getPhotoItemY());
             }
         }
         return photoMItemList;

@@ -1,7 +1,8 @@
 package com.tg.osip.business.update_managers;
 
 import com.tg.osip.tdclient.TGProxy;
-import com.tg.osip.business.models.ImageLoaderI;
+import com.tg.osip.ui.general.views.images.ImageLoaderI;
+import com.tg.osip.ui.general.views.images.ImageLoaderUtils;
 import com.tg.osip.utils.common.BackgroundExecutor;
 import com.tg.osip.utils.log.Logger;
 
@@ -80,7 +81,8 @@ public class FileDownloaderManager {
     }
 
     public <T extends ImageLoaderI> void startFileDownloading(T imageLoaderI) {
-        if (imageLoaderI.isPhotoFileIdValid() && !imageLoaderI.isPhotoFilePathValid() && !FileDownloaderManager.getInstance().isFileInCache(imageLoaderI.getPhotoFileId())) {
+        if (ImageLoaderUtils.isPhotoFileIdValid(imageLoaderI.getPhotoFileId()) && !ImageLoaderUtils.isPhotoFilePathValid(imageLoaderI.getPhotoFilePath()) &&
+                !FileDownloaderManager.getInstance().isFileInCache(imageLoaderI.getPhotoFileId())) {
             TGProxy.getInstance().sendTD(new TdApi.DownloadFile(imageLoaderI.getPhotoFileId()), TdApi.Ok.class)
                     .subscribe();
         }
@@ -89,7 +91,8 @@ public class FileDownloaderManager {
     public <T extends ImageLoaderI> void startFileListDownloading(List<T> imageLoaderIs) {
         Observable.from(imageLoaderIs)
                 .subscribeOn(Schedulers.from(BackgroundExecutor.getSafeBackgroundExecutor()))
-                .filter(imageLoaderI -> imageLoaderI.isPhotoFileIdValid() && !imageLoaderI.isPhotoFilePathValid() && !FileDownloaderManager.getInstance().isFileInCache(imageLoaderI.getPhotoFileId()))
+                .filter(imageLoaderI -> ImageLoaderUtils.isPhotoFileIdValid(imageLoaderI.getPhotoFileId()) && !ImageLoaderUtils.isPhotoFilePathValid(imageLoaderI.getPhotoFilePath()) &&
+                        !FileDownloaderManager.getInstance().isFileInCache(imageLoaderI.getPhotoFileId()))
                 .concatMap(imageLoaderI -> TGProxy.getInstance().sendTD(new TdApi.DownloadFile(imageLoaderI.getPhotoFileId()), TdApi.Ok.class))
                 .subscribe();
     }

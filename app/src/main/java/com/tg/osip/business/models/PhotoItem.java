@@ -3,6 +3,8 @@ package com.tg.osip.business.models;
 import android.graphics.drawable.Drawable;
 import android.text.TextUtils;
 
+import com.tg.osip.ui.general.views.images.ImageLoaderI;
+
 import org.drinkless.td.libcore.telegram.TdApi;
 
 import java.io.Serializable;
@@ -14,7 +16,6 @@ import java.io.Serializable;
  */
 public class PhotoItem implements ImageLoaderI, Serializable {
 
-    private final static int EMPTY_FILE_ID = 0;
     private final static String ADD_TO_PATH = "file://";
     private final static String EMPTY_STRING = "";
 
@@ -22,6 +23,7 @@ public class PhotoItem implements ImageLoaderI, Serializable {
     private String photoFilePath;
     private int width;
     private int height;
+    private PhotoItem plugFile;
     transient private Drawable plug;
 
     public PhotoItem (TdApi.PhotoSize photoSize) {
@@ -50,6 +52,10 @@ public class PhotoItem implements ImageLoaderI, Serializable {
         plug = null;
     }
 
+    public void setPlugFile(PhotoItem plugFile) {
+        this.plugFile = plugFile;
+    }
+
     public int getWidth() {
         return width;
     }
@@ -64,23 +70,18 @@ public class PhotoItem implements ImageLoaderI, Serializable {
     }
 
     @Override
-    public boolean isPhotoFileIdValid() {
-        return photoFileId != EMPTY_FILE_ID;
-    }
-
-    @Override
     public String getPhotoFilePath() {
         return photoFilePath;
     }
 
     @Override
-    public boolean isPhotoFilePathValid() {
-        return !photoFilePath.equals(EMPTY_STRING);
+    public Drawable getPlug() {
+        return plug;
     }
 
     @Override
-    public Drawable getPlug() {
-        return plug;
+    public ImageLoaderI getPlugFile() {
+        return plugFile;
     }
 
 }
