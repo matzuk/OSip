@@ -4,16 +4,16 @@
     android:id="@+id/photo_layout"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:paddingBottom="@dimen/size_small"
-    android:paddingTop="@dimen/size_small"
+    android:paddingBottom="@dimen/message_padding_top_bottom"
+    android:paddingTop="@dimen/message_padding_top_bottom"
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:orientation="horizontal">
 
     <com.tg.osip.ui.general.views.images.PhotoView
         android:id="@+id/avatar"
-        android:layout_width="@dimen/size_xxlarge"
-        android:layout_height="@dimen/size_xxlarge"
+        android:layout_width="@dimen/message_avatar_size"
+        android:layout_height="@dimen/message_avatar_size"
         android:scaleType="centerCrop"/>
 
     <LinearLayout
@@ -38,7 +38,7 @@
                 android:id="@+id/message_name"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textSize="@dimen/text_size_medium"
+                android:textSize="@dimen/message_name_text_size"
                 android:textColor="@color/color_primary_dark"
                 android:text="Username"
                 android:singleLine="true"
@@ -53,7 +53,7 @@
                 android:layout_height="wrap_content"
                 android:paddingLeft="@dimen/size_small"
                 android:gravity="center|start"
-                android:textSize="@dimen/text_size_small"
+                android:textSize="@dimen/message_sending_time_text_size"
                 android:textColor="@color/color_text_secondary"
                 android:text="12:05 PM"
                 android:singleLine="true"
@@ -71,8 +71,8 @@
 
         <com.tg.osip.ui.general.views.images.PhotoView
             android:id="@+id/photo"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="@dimen/size_message_photo"
+            android:layout_height="@dimen/size_message_photo"
             android:scaleType="centerCrop"/>
 
     </LinearLayout>
