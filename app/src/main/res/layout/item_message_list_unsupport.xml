@@ -1,77 +1,72 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/unsupport_layout"
+    android:id="@+id/text_layout"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:paddingBottom="@dimen/message_padding_top_bottom"
     android:paddingTop="@dimen/message_padding_top_bottom"
     android:paddingLeft="@dimen/activity_horizontal_margin"
-    android:paddingRight="@dimen/activity_horizontal_margin"
-    android:orientation="horizontal">
+    android:paddingRight="@dimen/activity_horizontal_margin">
 
     <com.tg.osip.ui.general.views.images.PhotoView
         android:id="@+id/avatar"
         android:layout_width="@dimen/message_avatar_size"
         android:layout_height="@dimen/message_avatar_size"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
         android:scaleType="centerCrop"/>
 
-    <LinearLayout
-        android:layout_width="match_parent"
+    <TextView
+        android:id="@+id/message_name"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:gravity="center_vertical"
-        android:paddingLeft="@dimen/size_medium"
-        android:paddingStart="@dimen/size_medium"
-        android:orientation="vertical">
+        android:layout_marginLeft="@dimen/size_yylarge"
+        android:layout_marginStart="@dimen/size_yylarge"
+        android:textSize="@dimen/message_name_text_size"
+        android:textColor="@color/color_primary_dark"
+        android:text="Username"
+        android:singleLine="true"
+        android:textStyle="bold"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:ellipsize="end" />
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
-            android:paddingBottom="4dp"
-            android:layout_gravity="start"
-            android:gravity="center_vertical"
-            android:orientation="horizontal">
+    <TextView
+        android:id="@+id/message_sending_time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingLeft="@dimen/size_small"
+        android:layout_toRightOf="@+id/message_name"
+        android:layout_toEndOf="@+id/message_name"
+        android:layout_alignBottom="@+id/message_name"
+        android:textSize="@dimen/message_sending_time_text_size"
+        android:textColor="@color/color_text_secondary"
+        android:text="12:05 PM"
+        android:singleLine="true"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:ellipsize="end" />
 
-            <TextView
-                android:id="@+id/message_name"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textSize="@dimen/message_name_text_size"
-                android:textColor="@color/color_primary_dark"
-                android:text="Username"
-                android:singleLine="true"
-                android:textStyle="bold"
-                android:textAppearance="?android:attr/textAppearanceMedium"
-                android:ellipsize="end" />
+    <ImageView
+        android:id="@+id/message_unread_outbox"
+        android:layout_width="@dimen/size_small_plus_half"
+        android:layout_height="@dimen/size_small_plus_half"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:layout_marginTop="@dimen/size_xsmall_half"
+        android:src="@drawable/ic_not_read"/>
 
-            <TextView
-                android:id="@+id/message_sending_time"
-                android:layout_width="0dp"
-                android:layout_weight="1"
-                android:layout_height="wrap_content"
-                android:paddingLeft="@dimen/size_small"
-                android:gravity="center|start"
-                android:textSize="@dimen/message_sending_time_text_size"
-                android:textColor="@color/color_text_secondary"
-                android:text="12:05 PM"
-                android:singleLine="true"
-                android:textAppearance="?android:attr/textAppearanceMedium"
-                android:ellipsize="end"/>
+    <TextView
+        android:id="@+id/message_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/message_name"
+        android:paddingTop="@dimen/size_xsmall"
+        android:layout_marginLeft="@dimen/size_yylarge"
+        android:layout_marginStart="@dimen/size_yylarge"
+        android:textSize="@dimen/message_text_text_size"
+        android:textColor="@android:color/holo_red_light"
+        android:text="@string/unsupported_type"
+        android:textAppearance="?android:attr/textAppearanceMedium"/>
 
-        </LinearLayout>
-
-        <TextView
-            android:id="@+id/message_text"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:gravity="center_vertical"
-            android:textSize="@dimen/message_text_text_size"
-            android:textColor="@android:color/holo_red_light"
-            android:text="@string/unsupported_type"
-            android:textAppearance="?android:attr/textAppearanceMedium"/>
-
-    </LinearLayout>
-
-</LinearLayout>
+</RelativeLayout>

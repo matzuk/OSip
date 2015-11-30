@@ -8,6 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.tg.osip.ApplicationSIP;
@@ -48,7 +49,6 @@ public class MessagesRecyclerAdapter extends AutoLoadingRecyclerViewAdapter<Mess
 
     static class TextViewHolder extends RecyclerView.ViewHolder {
 
-        LinearLayout textLayout;
         PhotoView avatar;
         TextView messageName;
         TextView messageText;
@@ -57,7 +57,6 @@ public class MessagesRecyclerAdapter extends AutoLoadingRecyclerViewAdapter<Mess
 
         public TextViewHolder(View itemView) {
             super(itemView);
-            textLayout = (LinearLayout) itemView.findViewById(R.id.text_layout);
             avatar = (PhotoView) itemView.findViewById(R.id.avatar);
             messageName = (TextView) itemView.findViewById(R.id.message_name);
             messageText = (TextView) itemView.findViewById(R.id.message_text);
@@ -68,7 +67,7 @@ public class MessagesRecyclerAdapter extends AutoLoadingRecyclerViewAdapter<Mess
 
     static class PhotoViewHolder extends RecyclerView.ViewHolder {
 
-        LinearLayout photoLayout;
+        RelativeLayout photoLayout;
         PhotoView avatar;
         TextView messageName;
         PhotoView photo;
@@ -77,7 +76,7 @@ public class MessagesRecyclerAdapter extends AutoLoadingRecyclerViewAdapter<Mess
 
         public PhotoViewHolder(View itemView) {
             super(itemView);
-            photoLayout = (LinearLayout) itemView.findViewById(R.id.photo_layout);
+            photoLayout = (RelativeLayout) itemView.findViewById(R.id.photo_layout);
             avatar = (PhotoView) itemView.findViewById(R.id.avatar);
             messageName = (TextView) itemView.findViewById(R.id.message_name);
             photo = (PhotoView) itemView.findViewById(R.id.photo);
@@ -100,7 +99,6 @@ public class MessagesRecyclerAdapter extends AutoLoadingRecyclerViewAdapter<Mess
 
     static class UnsupportedViewHolder extends RecyclerView.ViewHolder {
 
-        LinearLayout unsupportLayout;
         PhotoView avatar;
         TextView messageName;
         TextView messageText;
@@ -108,7 +106,6 @@ public class MessagesRecyclerAdapter extends AutoLoadingRecyclerViewAdapter<Mess
 
         public UnsupportedViewHolder(View itemView) {
             super(itemView);
-            unsupportLayout = (LinearLayout) itemView.findViewById(R.id.unsupport_layout);
             avatar = (PhotoView) itemView.findViewById(R.id.avatar);
             messageName = (TextView) itemView.findViewById(R.id.message_name);
             messageText = (TextView) itemView.findViewById(R.id.message_text);

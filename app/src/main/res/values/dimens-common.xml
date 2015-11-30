@@ -7,6 +7,7 @@
     <dimen name="size_xxxsmall">1dp</dimen>
     <dimen name="size_xxsmall">2dp</dimen>
     <dimen name="size_xsmall">4dp</dimen>
+    <dimen name="size_xsmall_half">6dp</dimen>
     <dimen name="size_small">8dp</dimen>
     <dimen name="size_small_plus_half">10dp</dimen>
     <dimen name="size_small_plus">12dp</dimen>
@@ -19,6 +20,8 @@
     <dimen name="size_xxlarge">40dp</dimen>
     <dimen name="size_xxlarge_plus">44dp</dimen>
     <dimen name="size_xxxlarge">48dp</dimen>
+    <dimen name="size_ylarge">52dp</dimen>
+    <dimen name="size_yylarge">56dp</dimen>
 
     <dimen name="size_chat_avatar">54dp</dimen>
     <dimen name="size_padding_common">64dp</dimen>
