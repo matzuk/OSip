@@ -1,25 +1,31 @@
 package com.tg.osip.ui.chats;
 
 import android.os.Bundle;
-import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewTreeObserver;
 import android.widget.ProgressBar;
 
 import com.tg.osip.R;
-import com.tg.osip.business.chats.ChatsController;
+import com.tg.osip.business.PersistentInfo;
+import com.tg.osip.business.chats.ChatsInteract;
 import com.tg.osip.business.models.ChatItem;
 import com.tg.osip.ui.activities.MainActivity;
+import com.tg.osip.ui.general.DefaultSubscriber;
+import com.tg.osip.ui.general.views.pagination.PaginationTool;
 import com.tg.osip.ui.messages.MessagesFragment;
 import com.tg.osip.ui.general.BaseFragment;
-import com.tg.osip.ui.general.views.auto_loading.AutoLoadingRecyclerView;
 import com.tg.osip.ui.general.views.RecyclerItemClickListener;
+
+import java.util.List;
+
+import rx.Subscription;
+import rx.android.schedulers.AndroidSchedulers;
 
 /**
  * Fragment show list of all chats
@@ -30,8 +36,10 @@ public class ChatsFragment extends BaseFragment {
 
     private static final int LIMIT = 50;
 
-    private AutoLoadingRecyclerView<ChatItem> recyclerView;
-    private ChatsController chatsController;
+    private RecyclerView recyclerView;
+    private ChatRecyclerAdapter chatRecyclerAdapter;
+    private ChatsInteract chatsInteract = new ChatsInteract();
+    private Subscription listPagingSubscription;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -44,44 +52,31 @@ public class ChatsFragment extends BaseFragment {
     }
 
     private void init(View view) {
-        recyclerView = (AutoLoadingRecyclerView) view.findViewById(R.id.RecyclerView);
+        recyclerView = (RecyclerView) view.findViewById(R.id.RecyclerView);
         ProgressBar progressBar = (ProgressBar) view.findViewById(R.id.progressBar);
         // init LayoutManager
         GridLayoutManager recyclerViewLayoutManager = new GridLayoutManager(getActivity(), 1);
         recyclerViewLayoutManager.supportsPredictiveItemAnimations();
         // recyclerView setting
         recyclerView.setLayoutManager(recyclerViewLayoutManager);
-        recyclerView.setLimit(LIMIT);
         recyclerView.addOnItemTouchListener(
                 new RecyclerItemClickListener(getActivity(), (view1, position) -> goToConcreteChat(position))
         );
         // first start
-        if (chatsController == null) {
+        if (chatRecyclerAdapter == null) {
             // start progressbar
             progressBar.setVisibility(View.VISIBLE);
             // init Controller
-            chatsController = new ChatsController();
-            // for more smoother RecyclerView appearing
-            recyclerView.setVisibility(View.GONE);
-            ViewTreeObserver textViewTreeObserver = recyclerView.getViewTreeObserver();
-            textViewTreeObserver.addOnGlobalLayoutListener(() -> recyclerView.setVisibility(View.VISIBLE));
+            chatRecyclerAdapter = new ChatRecyclerAdapter();
+            chatRecyclerAdapter.setMyUserId(PersistentInfo.getInstance().getMeUserId());
         }
-        chatsController.setProgressBar(progressBar);
-        chatsController.setRecyclerView(recyclerView);
-        chatsController.loadData();
-    }
+        recyclerView.setAdapter(chatRecyclerAdapter);
+        startListPaging(progressBar);
 
-    @Override
-    public void onViewStateRestored(@Nullable Bundle savedInstanceState) {
-        super.onViewStateRestored(savedInstanceState);
-        // start loading after reorientation
-        if (savedInstanceState != null) {
-            chatsController.restoreDataToViews();
-        }
     }
 
     private void goToConcreteChat(int position) {
-        long chatId = recyclerView.getAdapter().getItem(position).getChat().id;
+        long chatId = chatRecyclerAdapter.getItem(position).getChat().id;
         MessagesFragment messagesFragment = MessagesFragment.newInstance(chatId);
         startFragment(messagesFragment);
     }
@@ -105,10 +100,30 @@ public class ChatsFragment extends BaseFragment {
         ((MainActivity) getSupportActivity()).drawerToggleSyncState();
     }
 
+    private void startListPaging(ProgressBar progressBar) {
+        listPagingSubscription = PaginationTool
+                .paging(recyclerView, offset -> chatsInteract.getNextDataPortionInList(offset, LIMIT))
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new DefaultSubscriber<List<ChatItem>>() {
+                    @Override
+                    public void onNext(List<ChatItem> chatItems) {
+                        if (progressBar != null && progressBar.getVisibility() == View.VISIBLE) {
+                            progressBar.setVisibility(View.GONE);
+                        }
+                        chatRecyclerAdapter.addNewItems(chatItems);
+                        chatRecyclerAdapter.notifyItemInserted(chatRecyclerAdapter.getItemCount() - chatItems.size());
+                    }
+                });
+    }
+
     @Override
     public void onDestroyView() {
-        if (chatsController != null) {
-            chatsController.onDestroy();
+        if (listPagingSubscription != null && !listPagingSubscription.isUnsubscribed()) {
+            listPagingSubscription.unsubscribe();
+        }
+        // for memory leak prevention (RecycleView is not unsubscibed from adapter DataObserver)
+        if (recyclerView != null) {
+            recyclerView.setAdapter(null);
         }
         super.onDestroyView();
     }

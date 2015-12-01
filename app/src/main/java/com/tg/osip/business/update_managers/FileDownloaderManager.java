@@ -83,7 +83,10 @@ public class FileDownloaderManager {
     public <T extends ImageLoaderI> void startFileDownloading(T imageLoaderI) {
         if (ImageLoaderUtils.isPhotoFileIdValid(imageLoaderI.getPhotoFileId()) && !ImageLoaderUtils.isPhotoFilePathValid(imageLoaderI.getPhotoFilePath()) &&
                 !FileDownloaderManager.getInstance().isFileInCache(imageLoaderI.getPhotoFileId())) {
-            TGProxy.getInstance().sendTD(new TdApi.DownloadFile(imageLoaderI.getPhotoFileId()), TdApi.Ok.class)
+            TGProxy.getInstance()
+                    .sendTD(new TdApi.DownloadFile(imageLoaderI.getPhotoFileId()), TdApi.Ok.class)
+                    .subscribeOn(Schedulers.from(BackgroundExecutor.getSafeBackgroundExecutor()))
+                    .observeOn(Schedulers.from(BackgroundExecutor.getSafeBackgroundExecutor()))
                     .subscribe();
         }
     }
@@ -91,6 +94,7 @@ public class FileDownloaderManager {
     public <T extends ImageLoaderI> void startFileListDownloading(List<T> imageLoaderIs) {
         Observable.from(imageLoaderIs)
                 .subscribeOn(Schedulers.from(BackgroundExecutor.getSafeBackgroundExecutor()))
+                .observeOn(Schedulers.from(BackgroundExecutor.getSafeBackgroundExecutor()))
                 .filter(imageLoaderI -> ImageLoaderUtils.isPhotoFileIdValid(imageLoaderI.getPhotoFileId()) && !ImageLoaderUtils.isPhotoFilePathValid(imageLoaderI.getPhotoFilePath()) &&
                         !FileDownloaderManager.getInstance().isFileInCache(imageLoaderI.getPhotoFileId()))
                 .concatMap(imageLoaderI -> TGProxy.getInstance().sendTD(new TdApi.DownloadFile(imageLoaderI.getPhotoFileId()), TdApi.Ok.class))

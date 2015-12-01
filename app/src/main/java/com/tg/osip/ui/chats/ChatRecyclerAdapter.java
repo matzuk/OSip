@@ -11,22 +11,29 @@ import android.widget.TextView;
 import com.tg.osip.ApplicationSIP;
 import com.tg.osip.R;
 import com.tg.osip.business.models.ChatItem;
-import com.tg.osip.ui.general.views.auto_loading.AutoLoadingRecyclerViewAdapter;
 import com.tg.osip.ui.general.views.images.PhotoView;
 
 import org.drinkless.td.libcore.telegram.TdApi;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * @author e.matsyuk
  */
-public class ChatRecyclerAdapter extends AutoLoadingRecyclerViewAdapter<ChatItem> {
+public class ChatRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     private static final int TEMP_SEND_STATE_IS_ERROR = 0;
     private static final int TEMP_SEND_STATE_IS_SENDING = 1000000000;
+    private static final int EMPTY_LIST = 0;
 
     private static final int MAIN_VIEW = 0;
 
     private int myUserId;
+    protected List<ChatItem> listElements = new ArrayList<>();
+    // after reorientation test this member
+    // or one extra request will be sent after each reorientation
+    private boolean allItemsLoaded;
 
     static class MainViewHolder extends RecyclerView.ViewHolder {
 
@@ -67,6 +74,27 @@ public class ChatRecyclerAdapter extends AutoLoadingRecyclerViewAdapter<ChatItem
     @Override
     public long getItemId(int position) {
         return getItem(position).getChat().id;
+    }
+
+    public ChatItem getItem(int position) {
+        return listElements.get(position);
+    }
+
+    @Override
+    public int getItemCount() {
+        return listElements.size();
+    }
+
+    public boolean isAllItemsLoaded() {
+        return allItemsLoaded;
+    }
+
+    public void addNewItems(List<ChatItem> items) {
+        if (items.size() == EMPTY_LIST) {
+            allItemsLoaded = true;
+            return;
+        }
+        listElements.addAll(items);
     }
 
     @Override

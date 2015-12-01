@@ -9,6 +9,7 @@ import android.widget.TextView;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.tg.osip.R;
+import com.tg.osip.business.PersistentInfo;
 import com.tg.osip.business.models.UserItem;
 import com.tg.osip.business.update_managers.FileDownloaderManager;
 import com.tg.osip.tdclient.TGProxy;
@@ -73,6 +74,7 @@ public class MainController {
 
                     @Override
                     public void onNext(UserItem userItem) {
+                        PersistentInfo.getInstance().setMeUserId(userItem.getUser().id);
                         MainController.this.userItem = userItem;
                         FileDownloaderManager.getInstance().startFileDownloading(userItem);
                         bindView();
