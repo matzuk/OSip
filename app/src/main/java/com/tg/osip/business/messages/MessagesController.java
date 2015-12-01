@@ -127,7 +127,7 @@ public class MessagesController {
         chatItem = new ChatItem(chat);
         initToolbar();
         messagesRecyclerAdapter.setLastChatReadOutboxId(chat.lastReadOutboxMessageId);
-        messagesRecyclerAdapter.addNewItem(new MessageItem(chat.topMessage));
+//        messagesRecyclerAdapter.addNewItem(new MessageItem(chat.topMessage));
         messagesRecyclerAdapter.notifyItemInserted(0);
         if (recyclerViewWeakReference != null && recyclerViewWeakReference.get() != null) {
             AutoLoadingRecyclerView<MessageItem> autoLoadingRecyclerView = recyclerViewWeakReference.get();

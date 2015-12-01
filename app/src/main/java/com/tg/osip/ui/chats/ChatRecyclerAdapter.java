@@ -95,6 +95,7 @@ public class ChatRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
             return;
         }
         listElements.addAll(items);
+        notifyItemInserted(getItemCount() - listElements.size());
     }
 
     @Override

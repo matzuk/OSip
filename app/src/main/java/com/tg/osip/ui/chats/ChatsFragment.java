@@ -101,6 +101,9 @@ public class ChatsFragment extends BaseFragment {
     }
 
     private void startListPaging(ProgressBar progressBar) {
+        if (chatRecyclerAdapter.isAllItemsLoaded()) {
+            return;
+        }
         listPagingSubscription = PaginationTool
                 .paging(recyclerView, offset -> chatsInteract.getNextDataPortionInList(offset, LIMIT))
                 .observeOn(AndroidSchedulers.mainThread())
@@ -111,7 +114,6 @@ public class ChatsFragment extends BaseFragment {
                             progressBar.setVisibility(View.GONE);
                         }
                         chatRecyclerAdapter.addNewItems(chatItems);
-                        chatRecyclerAdapter.notifyItemInserted(chatRecyclerAdapter.getItemCount() - chatItems.size());
                     }
                 });
     }

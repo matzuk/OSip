@@ -7,18 +7,16 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.tg.osip.ApplicationSIP;
 import com.tg.osip.R;
+import com.tg.osip.business.models.MessageAdapterModel;
 import com.tg.osip.business.models.MessageItem;
 import com.tg.osip.business.models.PhotoItem;
 import com.tg.osip.business.models.UserItem;
-import com.tg.osip.ui.general.views.auto_loading.AutoLoadingRecyclerViewAdapter;
 import com.tg.osip.ui.general.views.images.PhotoView;
-import com.tg.osip.utils.common.AndroidUtils;
 import com.tg.osip.utils.time.TimeUtils;
 
 import org.drinkless.td.libcore.telegram.TdApi;
@@ -32,10 +30,11 @@ import java.util.Map;
 /**
  * @author e.matsyuk
  */
-public class MessagesRecyclerAdapter extends AutoLoadingRecyclerViewAdapter<MessageItem> {
+public class MessagesRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     private static final int TEMP_SEND_STATE_IS_SENDING = 1000000000;
     private static final int TEMP_SEND_STATE_IS_ERROR = 0;
+    private static final int EMPTY_LIST = 0;
 
     private static final int TEXT_VIEW = 0;
     private static final int PHOTO_VIEW = 1;
@@ -44,8 +43,12 @@ public class MessagesRecyclerAdapter extends AutoLoadingRecyclerViewAdapter<Mess
 
     private int myUserId;
     private int lastChatReadOutboxId;
+    private List<MessageItem> listElements = new ArrayList<>();
     private Map<Integer, UserItem> usersMap = new HashMap<>();
     private WeakReference<OnMessageClickListener> onMessageClickListenerWeakReference;
+    // after reorientation test this member
+    // or one extra request will be sent after each reorientation
+    private boolean allItemsLoaded;
 
     static class TextViewHolder extends RecyclerView.ViewHolder {
 
@@ -122,6 +125,37 @@ public class MessagesRecyclerAdapter extends AutoLoadingRecyclerViewAdapter<Mess
     @Override
     public long getItemId(int position) {
         return getItem(position).getMessage().id;
+    }
+
+    public MessageItem getItem(int position) {
+        return listElements.get(position);
+    }
+
+    @Override
+    public int getItemCount() {
+        return listElements.size();
+    }
+
+    public void addMessageAdapterModel(MessageAdapterModel messageAdapterModel) {
+        if (messageAdapterModel == null) {
+            allItemsLoaded = true;
+            return;
+        }
+        List<MessageItem> messageItemList = messageAdapterModel.getMessageItemList();
+        if (messageItemList == null || messageItemList.size() == EMPTY_LIST) {
+            allItemsLoaded = true;
+            return;
+        }
+        listElements.addAll(messageItemList);
+        Map<Integer, UserItem> integerUserItemMap = messageAdapterModel.getIntegerUserItemMap();
+        if (integerUserItemMap != null) {
+            usersMap.putAll(integerUserItemMap);
+        }
+        notifyItemInserted(getItemCount() - listElements.size());
+    }
+
+    public boolean isAllItemsLoaded() {
+        return allItemsLoaded;
     }
 
     @Override
@@ -291,7 +325,7 @@ public class MessagesRecyclerAdapter extends AutoLoadingRecyclerViewAdapter<Mess
         int currentPosInPhotoList = 0;
         int clickedPosInPhotoList = currentPosInPhotoList;
         List<PhotoItem> photoLargeItemList = new ArrayList<>();
-        for (MessageItem messageItem : getItems()) {
+        for (MessageItem messageItem : listElements) {
             if (messageItem.isPhotoMessage()) {
                 photoLargeItemList.add(messageItem.getPhotoItemLarge());
                 if (photoFileId == messageItem.getPhotoItemLarge().getPhotoFileId()) {
