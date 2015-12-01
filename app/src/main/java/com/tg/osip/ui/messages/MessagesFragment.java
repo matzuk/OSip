@@ -42,16 +42,14 @@ public class MessagesFragment extends Fragment {
     private static final int EMPTY_COUNT_LIST = 1;
 
     private RecyclerView recyclerView;
-    private MessagesRecyclerAdapter messagesRecyclerAdapter;
+    private MessagesRecyclerAdapter messagesRecyclerAdapter = new MessagesRecyclerAdapter();
     private Toolbar toolbar;
     private MessagesInteract messagesInteract = new MessagesInteract();
     private MessageToolbarAdapter messageToolbarAdapter;
 
-    private Subscription loadFirstDataSubscription;
-    private Subscription listPagingSubscription;
+    private Subscription loadDataSubscription;
 
     private long chatId;
-    private int topMessageId;
 
     public static MessagesFragment newInstance(long chatId) {
         MessagesFragment f = new MessagesFragment();
@@ -88,18 +86,9 @@ public class MessagesFragment extends Fragment {
         recyclerViewLayoutManager.setReverseLayout(true);
         // recyclerView setting
         recyclerView.setLayoutManager(recyclerViewLayoutManager);
-        // for first start
-        if (messagesRecyclerAdapter == null) {
-            // init MessagesController
-            messagesRecyclerAdapter = new MessagesRecyclerAdapter();
-            recyclerView.setAdapter(messagesRecyclerAdapter);
-            loadFirstData();
-        } else {
-            initToolbar();
-            recyclerView.setAdapter(messagesRecyclerAdapter);
-            startListPaging();
-        }
+        recyclerView.setAdapter(messagesRecyclerAdapter);
         messagesRecyclerAdapter.setOnMessageClickListener(onMessageClickListener);
+        loadData();
     }
 
     private void initEmptyToolbar() {
@@ -119,40 +108,30 @@ public class MessagesFragment extends Fragment {
         }
     }
 
-    private void loadFirstData() {
-        loadFirstDataSubscription = messagesInteract.getFirstChatData(chatId)
+    private void loadData() {
+        loadDataSubscription = messagesInteract.getFirstChatData(chatId)
                 .subscribeOn(Schedulers.from(BackgroundExecutor.getSafeBackgroundExecutor()))
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new DefaultSubscriber<Pair<TdApi.Chat, MessageAdapterModel>>() {
-                    @Override
-                    public void onNext(Pair<TdApi.Chat, MessageAdapterModel> chatMessageAdapterModelPair) {
-                        // toolbar
-                        messageToolbarAdapter = new MessageToolbarAdapter(getContext(), chatMessageAdapterModelPair.first);
-                        initToolbar();
-                        // fields
-                        topMessageId = chatMessageAdapterModelPair.first.topMessage.id;
-                        // adapter
-                        MessageAdapterModel messageAdapterModel = chatMessageAdapterModelPair.second;
-                        messagesRecyclerAdapter.addMessageAdapterModel(messageAdapterModel);
-                        startListPaging();
-                    }
-                });
+                .doOnNext(this::getChatLoadingSuccess)
+                .concatMap(chatMessageAdapterModelPair -> PaginationTool
+                        .paging(recyclerView, offset ->
+                                messagesInteract.getNextDataPortionInList(offset, LIMIT, chatId, chatMessageAdapterModelPair.first.topMessage.id), LIMIT, EMPTY_COUNT_LIST))
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(this::getNextDataPortionSuccess);
     }
 
-    private void startListPaging() {
-        if (messagesRecyclerAdapter.isAllItemsLoaded()) {
-            return;
-        }
-        listPagingSubscription = PaginationTool
-                .paging(recyclerView, offset -> messagesInteract.getNextDataPortionInList(offset, LIMIT, chatId, topMessageId), LIMIT, EMPTY_COUNT_LIST)
-                .subscribeOn(Schedulers.from(BackgroundExecutor.getSafeBackgroundExecutor()))
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new DefaultSubscriber<MessageAdapterModel>() {
-                    @Override
-                    public void onNext(MessageAdapterModel messageAdapterModel) {
-                        messagesRecyclerAdapter.addMessageAdapterModel(messageAdapterModel);
-                    }
-                });
+    private void getChatLoadingSuccess(Pair<TdApi.Chat, MessageAdapterModel> chatMessageAdapterModelPair) {
+        // toolbar
+        messageToolbarAdapter = new MessageToolbarAdapter(getContext(), chatMessageAdapterModelPair.first);
+        initToolbar();
+        // adapter
+        MessageAdapterModel messageAdapterModel = chatMessageAdapterModelPair.second;
+        messagesRecyclerAdapter.addMessageAdapterModel(messageAdapterModel);
+    }
+
+    private void getNextDataPortionSuccess(MessageAdapterModel messageAdapterModel) {
+        // adapter
+        messagesRecyclerAdapter.addMessageAdapterModel(messageAdapterModel);
     }
 
     private OnMessageClickListener onMessageClickListener = new OnMessageClickListener() {
@@ -173,11 +152,8 @@ public class MessagesFragment extends Fragment {
 
     @Override
     public void onDestroyView() {
-        if (listPagingSubscription != null && !listPagingSubscription.isUnsubscribed()) {
-            listPagingSubscription.unsubscribe();
-        }
-        if (loadFirstDataSubscription != null && !loadFirstDataSubscription.isUnsubscribed()) {
-            loadFirstDataSubscription.unsubscribe();
+        if (loadDataSubscription != null && !loadDataSubscription.isUnsubscribed()) {
+            loadDataSubscription.unsubscribe();
         }
         // for memory leak prevention (RecycleView is not unsubscibed from adapter DataObserver)
         if (recyclerView != null) {

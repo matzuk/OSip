@@ -25,22 +25,30 @@ import rx.Observable;
  */
 public class MessagesInteract {
 
+    // field for preventing extra requests
+    private Pair<TdApi.Chat, MessageAdapterModel> firstChatData;
+
     /**
      *
      * @param chatId chat id
      * @return Pair of TdApi.Chat(first) and MessageAdapterModel(second)
      */
     public Observable<Pair<TdApi.Chat, MessageAdapterModel>> getFirstChatData(long chatId) {
-        return TGProxy.getInstance().sendTD(new TdApi.GetChat(chatId), TdApi.Chat.class)
-                .concatMap(chat -> {
-                    List<MessageItem> messages = new ArrayList<>(1);
-                    messages.add(new MessageItem(chat.topMessage));
-                    // download photo content from messages in another Stream
-                    getPhotoTypeMediumDownloadingObservable(messages).subscribe();
-                    // download users info for messages adapter in this Stream
-                    return Observable.zip(Observable.just(messages), getUsersDownloadingObservable(messages), Observable.just(chat),
-                            (messages1, integerUserItemMap, chat1) -> new Pair<>(chat1, new MessageAdapterModel(messages1, integerUserItemMap)));
-                });
+        if (firstChatData == null) {
+            return TGProxy.getInstance().sendTD(new TdApi.GetChat(chatId), TdApi.Chat.class)
+                    .concatMap(chat -> {
+                        List<MessageItem> messages = new ArrayList<>(1);
+                        messages.add(new MessageItem(chat.topMessage));
+                        // download photo content from messages in another Stream
+                        getPhotoTypeMediumDownloadingObservable(messages).subscribe();
+                        // download users info for messages adapter in this Stream
+                        return Observable.zip(Observable.just(messages), getUsersDownloadingObservable(messages), Observable.just(chat),
+                                (messages1, integerUserItemMap, chat1) -> new Pair<>(chat1, new MessageAdapterModel(messages1, integerUserItemMap)));
+                    })
+                    .doOnNext(chatMessageAdapterModelPair -> firstChatData = chatMessageAdapterModelPair);
+        } else {
+            return Observable.just(firstChatData);
+        }
     }
 
     public Observable<MessageAdapterModel> getNextDataPortionInList(int offset, int limit, long chatId, int topMessageId) {
