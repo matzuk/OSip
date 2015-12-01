@@ -41,6 +41,7 @@ public class MainInteract {
 
     public Observable<TdApi.AuthState> getLogoutObservable(Runnable showLoading, Runnable hideLoading) {
         return Observable.timer(TIMER_IN_MS, TimeUnit.MILLISECONDS)
+                .observeOn(AndroidSchedulers.mainThread())
                 .doOnNext(aLong -> {
                     // clear FileDownloaderManager
                     FileDownloaderManager.getInstance().clearManager();
