@@ -133,6 +133,9 @@ public class LoginActivity extends AppCompatActivity {
         if (channelSubscription != null && !channelSubscription.isUnsubscribed()) {
             channelSubscription.unsubscribe();
         }
+        if (channelSubscriptionSubscriber != null && !channelSubscriptionSubscriber.isUnsubscribed()) {
+            channelSubscriptionSubscriber.unsubscribe();
+        }
         super.onDestroy();
     }
 

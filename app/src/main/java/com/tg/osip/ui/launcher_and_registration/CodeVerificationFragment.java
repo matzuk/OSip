@@ -168,6 +168,9 @@ public class CodeVerificationFragment extends Fragment {
         if (channelSubscription != null && !channelSubscription.isUnsubscribed()) {
             channelSubscription.unsubscribe();
         }
+        if (channelSubscriptionSubscriber != null && !channelSubscriptionSubscriber.isUnsubscribed()) {
+            channelSubscriptionSubscriber.unsubscribe();
+        }
     }
 
 }
