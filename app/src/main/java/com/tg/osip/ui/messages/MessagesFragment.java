@@ -45,6 +45,7 @@ public class MessagesFragment extends Fragment {
     private MessagesRecyclerAdapter messagesRecyclerAdapter;
     private Toolbar toolbar;
     private MessagesInteract messagesInteract = new MessagesInteract();
+    private MessageToolbarAdapter messageToolbarAdapter;
 
     private Subscription loadFirstDataSubscription;
     private Subscription listPagingSubscription;
@@ -74,14 +75,13 @@ public class MessagesFragment extends Fragment {
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fmt_messages, container, false);
         setRetainInstance(true);
+        initEmptyToolbar();
         init(rootView);
-        initToolbar();
         return rootView;
     }
 
     private void init(View view) {
         recyclerView = (RecyclerView) view.findViewById(R.id.RecyclerView);
-        toolbar = ((MainActivity)getSupportActivity()).getToolbar();
         // init LayoutManager
         GridLayoutManager recyclerViewLayoutManager = new GridLayoutManager(getActivity(), 1);
         recyclerViewLayoutManager.supportsPredictiveItemAnimations();
@@ -95,19 +95,28 @@ public class MessagesFragment extends Fragment {
             recyclerView.setAdapter(messagesRecyclerAdapter);
             loadFirstData();
         } else {
+            initToolbar();
             recyclerView.setAdapter(messagesRecyclerAdapter);
             startListPaging();
         }
+        messagesRecyclerAdapter.setOnMessageClickListener(onMessageClickListener);
     }
 
-    private void initToolbar() {
+    private void initEmptyToolbar() {
         if (getSupportActivity() == null || getSupportActivity().getSupportActionBar() == null) {
             return;
         }
+        toolbar = ((MainActivity)getSupportActivity()).getToolbar();
         getSupportActivity().getSupportActionBar().setTitle("");
         getSupportActivity().getSupportActionBar().setDisplayShowHomeEnabled(true);
         getSupportActivity().getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         toolbar.setNavigationOnClickListener(v -> getSupportActivity().onBackPressed());
+    }
+
+    private void initToolbar() {
+        if (messageToolbarAdapter != null && messageToolbarAdapter.getToolbarView() != null) {
+            toolbar.addView(messageToolbarAdapter.getToolbarView());
+        }
     }
 
     private void loadFirstData() {
@@ -117,7 +126,12 @@ public class MessagesFragment extends Fragment {
                 .subscribe(new DefaultSubscriber<Pair<TdApi.Chat, MessageAdapterModel>>() {
                     @Override
                     public void onNext(Pair<TdApi.Chat, MessageAdapterModel> chatMessageAdapterModelPair) {
+                        // toolbar
+                        messageToolbarAdapter = new MessageToolbarAdapter(getContext(), chatMessageAdapterModelPair.first);
+                        initToolbar();
+                        // fields
                         topMessageId = chatMessageAdapterModelPair.first.topMessage.id;
+                        // adapter
                         MessageAdapterModel messageAdapterModel = chatMessageAdapterModelPair.second;
                         messagesRecyclerAdapter.addMessageAdapterModel(messageAdapterModel);
                         startListPaging();
@@ -168,6 +182,9 @@ public class MessagesFragment extends Fragment {
         // for memory leak prevention (RecycleView is not unsubscibed from adapter DataObserver)
         if (recyclerView != null) {
             recyclerView.setAdapter(null);
+        }
+        if (toolbar != null && messageToolbarAdapter != null) {
+            toolbar.removeView(messageToolbarAdapter.getToolbarView());
         }
         super.onDestroyView();
     }
