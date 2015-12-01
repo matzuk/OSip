@@ -142,4 +142,8 @@ public class AuthManager {
         return authChannel;
     }
 
+    public Observable<TdApi.User> loadNeededInfo() {
+        return TGProxy.getInstance().sendTD(new TdApi.GetMe(), TdApi.User.class);
+    }
+
 }

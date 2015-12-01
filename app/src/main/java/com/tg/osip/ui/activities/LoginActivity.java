@@ -9,7 +9,9 @@ import android.os.Bundle;
 import com.tg.osip.R;
 import com.tg.osip.business.AuthManager;
 import com.tg.osip.business.AuthManager.AuthStateEnum;
+import com.tg.osip.business.PersistentInfo;
 import com.tg.osip.tdclient.exceptions.TdApiErrorException;
+import com.tg.osip.ui.general.DefaultSubscriber;
 import com.tg.osip.ui.launcher_and_registration.CodeVerificationFragment;
 import com.tg.osip.ui.launcher_and_registration.NameRegistrationFragment;
 import com.tg.osip.ui.launcher_and_registration.PhoneRegistrationFragment;
@@ -18,12 +20,15 @@ import com.tg.osip.utils.common.AndroidUtils;
 import com.tg.osip.utils.log.Logger;
 import com.tg.osip.ui.general.views.SimpleAlertDialog;
 
+import org.drinkless.td.libcore.telegram.TdApi;
+
 import rx.Subscriber;
 import rx.Subscription;
 
 public class LoginActivity extends AppCompatActivity {
 
     private Subscription channelSubscription;
+    private Subscription meUserLoadingSubscription;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,8 +82,7 @@ public class LoginActivity extends AppCompatActivity {
             case AUTH_STATE_LOGGING_OUT:
                 break;
             case AUTH_STATE_OK:
-                startActivity(new Intent(this, MainActivity.class));
-                finish();
+                loadDataAndGoToMain();
                 break;
             case AUTH_STATE_WAIT_CODE:
                 startFragment(new CodeVerificationFragment(), true);
@@ -89,6 +93,18 @@ public class LoginActivity extends AppCompatActivity {
             case AUTH_STATE_WAIT_PASSWORD:
                 break;
         }
+    }
+
+    private void loadDataAndGoToMain() {
+        meUserLoadingSubscription = AuthManager.getInstance().loadNeededInfo()
+                .subscribe(new DefaultSubscriber<TdApi.User>() {
+                    @Override
+                    public void onNext(TdApi.User user) {
+                        PersistentInfo.getInstance().setMeUserId(user.id);
+                        startActivity(new Intent(LoginActivity.this, MainActivity.class));
+                        finish();
+                    }
+                });
     }
 
     private void startFragment(Fragment fragment, boolean withBackStack) {
@@ -111,10 +127,13 @@ public class LoginActivity extends AppCompatActivity {
 
     @Override
     protected void onDestroy() {
-        super.onDestroy();
+        if (meUserLoadingSubscription != null && !meUserLoadingSubscription.isUnsubscribed()) {
+            meUserLoadingSubscription.unsubscribe();
+        }
         if (channelSubscription != null && !channelSubscription.isUnsubscribed()) {
             channelSubscription.unsubscribe();
         }
+        super.onDestroy();
     }
 
 }

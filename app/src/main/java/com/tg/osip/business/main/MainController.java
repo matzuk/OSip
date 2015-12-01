@@ -74,7 +74,6 @@ public class MainController {
 
                     @Override
                     public void onNext(UserItem userItem) {
-                        PersistentInfo.getInstance().setMeUserId(userItem.getUser().id);
                         MainController.this.userItem = userItem;
                         FileDownloaderManager.getInstance().startFileDownloading(userItem);
                         bindView();
