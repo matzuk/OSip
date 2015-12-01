@@ -11,6 +11,7 @@ import java.util.concurrent.TimeUnit;
 
 import rx.Observable;
 import rx.android.schedulers.AndroidSchedulers;
+import rx.functions.Func1;
 import rx.schedulers.Schedulers;
 
 /**
@@ -40,8 +41,6 @@ public class MainInteract {
 
     public Observable<TdApi.AuthState> getLogoutObservable(Runnable showLoading, Runnable hideLoading) {
         return Observable.timer(TIMER_IN_MS, TimeUnit.MILLISECONDS)
-                .subscribeOn(Schedulers.from(BackgroundExecutor.getSafeBackgroundExecutor()))
-                .observeOn(AndroidSchedulers.mainThread())
                 .doOnNext(aLong -> {
                     // clear FileDownloaderManager
                     FileDownloaderManager.getInstance().clearManager();

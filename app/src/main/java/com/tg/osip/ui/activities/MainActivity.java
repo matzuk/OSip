@@ -105,12 +105,14 @@ public class MainActivity extends AppCompatActivity {
                 logoutProgressDialog.dismiss();
             }
         })
-        .subscribe(new DefaultSubscriber<TdApi.AuthState>() {
-            @Override
-            public void onNext(TdApi.AuthState authState) {
-                startActivity(new Intent(MainActivity.this, LoginActivity.class));
-                finish();
-            }
+            .subscribeOn(Schedulers.from(BackgroundExecutor.getSafeBackgroundExecutor()))
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe(new DefaultSubscriber<TdApi.AuthState>() {
+                @Override
+                public void onNext(TdApi.AuthState authState) {
+                    startActivity(new Intent(MainActivity.this, LoginActivity.class));
+                    finish();
+                }
         });
     }
 
