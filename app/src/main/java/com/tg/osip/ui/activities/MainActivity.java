@@ -2,6 +2,7 @@ package com.tg.osip.ui.activities;
 
 import android.app.Dialog;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
@@ -13,11 +14,22 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.TextView;
 
+import com.afollestad.materialdialogs.MaterialDialog;
 import com.tg.osip.R;
-import com.tg.osip.business.main.MainController;
+import com.tg.osip.business.main.MainInteract;
+import com.tg.osip.business.models.UserItem;
 import com.tg.osip.ui.chats.ChatsFragment;
-import com.tg.osip.utils.log.Logger;
+import com.tg.osip.ui.general.DefaultSubscriber;
+import com.tg.osip.ui.general.views.images.PhotoView;
+import com.tg.osip.utils.common.BackgroundExecutor;
+
+import org.drinkless.td.libcore.telegram.TdApi;
+
+import rx.Subscription;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.schedulers.Schedulers;
 
 /**
  *
@@ -28,8 +40,10 @@ public class MainActivity extends AppCompatActivity {
     private View headerNavigationView;
     private DrawerLayout drawerLayout;
     private ActionBarDrawerToggle drawerToggle;
-
-    private MainController mainController;
+    private Dialog logoutProgressDialog;
+    private MainInteract mainInteract = new MainInteract();
+    private Subscription getMeUserSubscription;
+    private Subscription logoutSubscription;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,10 +52,7 @@ public class MainActivity extends AppCompatActivity {
         initNavigationHeaderView();
         setToolbar();
         initView();
-        if (mainController == null) {
-            mainController = new MainController();
-        }
-        mainController.setHeaderNavigationView(headerNavigationView);
+        loadDataForNavigationHeaderView();
         if (savedInstanceState == null) {
             startFragment(new ChatsFragment(), false);
         }
@@ -77,12 +88,58 @@ public class MainActivity extends AppCompatActivity {
                     switch (item.getItemId()) {
                         case R.id.navigation_item_logout:
                             drawerLayout.closeDrawers();
-                            mainController.logout(this);
+                            logout();
                             return true;
                         default:
                             return true;
                     }
                 });
+    }
+
+    private void logout() {
+        logoutSubscription = mainInteract.getLogoutObservable(() -> {
+            logoutProgressDialog = createProgressDialog(MainActivity.this);
+            logoutProgressDialog.show();
+        }, () -> {
+            if (logoutProgressDialog != null && logoutProgressDialog.isShowing()) {
+                logoutProgressDialog.dismiss();
+            }
+        })
+        .subscribe(new DefaultSubscriber<TdApi.AuthState>() {
+            @Override
+            public void onNext(TdApi.AuthState authState) {
+                startActivity(new Intent(MainActivity.this, LoginActivity.class));
+                finish();
+            }
+        });
+    }
+
+    private Dialog createProgressDialog(Context context) {
+        return new MaterialDialog.Builder(context)
+                .cancelable(false)
+                .content(context.getResources().getString(R.string.wait))
+                .progress(true, 0)
+                .show();
+    }
+
+    private void loadDataForNavigationHeaderView() {
+        getMeUserSubscription = mainInteract.getMeUserObservable()
+                .subscribeOn(Schedulers.from(BackgroundExecutor.getSafeBackgroundExecutor()))
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(this::bindView);
+    }
+
+    private void bindView(UserItem userItem) {
+        if (userItem == null || headerNavigationView == null) {
+            return;
+        }
+        PhotoView avatar = (PhotoView) headerNavigationView.findViewById(R.id.avatar);
+        avatar.setCircleRounds(true);
+        avatar.setImageLoaderI(userItem);
+        TextView name = (TextView) headerNavigationView.findViewById(R.id.name);
+        name.setText(userItem.getName());
+        TextView phone = (TextView) headerNavigationView.findViewById(R.id.phone);
+        phone.setText(userItem.getPhone());
     }
 
     @Override
@@ -130,8 +187,14 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public void onDestroy() {
-        if (mainController != null) {
-            mainController.onDestroy();
+        if (getMeUserSubscription != null && !getMeUserSubscription.isUnsubscribed()) {
+            getMeUserSubscription.unsubscribe();
+        }
+        if (logoutSubscription != null && !logoutSubscription.isUnsubscribed()) {
+            logoutSubscription.unsubscribe();
+        }
+        if (logoutProgressDialog != null && logoutProgressDialog.isShowing()) {
+            logoutProgressDialog.dismiss();
         }
         super.onDestroy();
     }

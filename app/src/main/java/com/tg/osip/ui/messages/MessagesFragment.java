@@ -18,7 +18,6 @@ import com.tg.osip.business.models.MessageAdapterModel;
 import com.tg.osip.business.models.PhotoItem;
 import com.tg.osip.ui.activities.MainActivity;
 import com.tg.osip.ui.activities.PhotoMediaActivity;
-import com.tg.osip.ui.general.DefaultSubscriber;
 import com.tg.osip.ui.general.views.pagination.PaginationTool;
 import com.tg.osip.utils.common.BackgroundExecutor;
 
@@ -125,8 +124,11 @@ public class MessagesFragment extends Fragment {
         messageToolbarAdapter = new MessageToolbarAdapter(getContext(), chatMessageAdapterModelPair.first);
         initToolbar();
         // adapter
-        MessageAdapterModel messageAdapterModel = chatMessageAdapterModelPair.second;
-        messagesRecyclerAdapter.addMessageAdapterModel(messageAdapterModel);
+        // add message from Chat topMessage only one
+        if (messagesRecyclerAdapter.getItemCount() < EMPTY_COUNT_LIST) {
+            MessageAdapterModel messageAdapterModel = chatMessageAdapterModelPair.second;
+            messagesRecyclerAdapter.addMessageAdapterModel(messageAdapterModel);
+        }
     }
 
     private void getNextDataPortionSuccess(MessageAdapterModel messageAdapterModel) {
