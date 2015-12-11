@@ -41,7 +41,7 @@ public class FileDownloaderManager {
         return downloadChannel;
     }
 
-    public void subscribeToUpdateChannel(PublishSubject<TdApi.Update> updateChannel) {
+    private void subscribeToUpdateChannel(PublishSubject<TdApi.Update> updateChannel) {
         updateChannel
                 .filter(update -> update.getClass() == TdApi.UpdateFile.class)
                 .map(update -> (TdApi.UpdateFile) update)
