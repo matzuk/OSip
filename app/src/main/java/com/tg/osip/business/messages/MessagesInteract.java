@@ -2,12 +2,14 @@ package com.tg.osip.business.messages;
 
 import android.support.v4.util.Pair;
 
+import com.tg.osip.ApplicationSIP;
 import com.tg.osip.business.models.MessageAdapterModel;
 import com.tg.osip.business.models.MessageItem;
 import com.tg.osip.business.models.PhotoItem;
 import com.tg.osip.business.models.UserItem;
 import com.tg.osip.business.update_managers.FileDownloaderManager;
-import com.tg.osip.tdclient.TGProxy;
+import com.tg.osip.tdclient.TGProxyI;
+import com.tg.osip.tdclient.TGProxyImpl;
 
 import org.drinkless.td.libcore.telegram.TdApi;
 
@@ -15,6 +17,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import javax.inject.Inject;
 
 import rx.Observable;
 
@@ -28,6 +32,13 @@ public class MessagesInteract {
     // field for preventing extra requests
     private Pair<TdApi.Chat, MessageAdapterModel> firstChatData;
 
+    @Inject
+    TGProxyI tgProxy;
+
+    public MessagesInteract() {
+        ApplicationSIP.get().applicationComponent().inject(this);
+    }
+
     /**
      *
      * @param chatId chat id
@@ -35,7 +46,7 @@ public class MessagesInteract {
      */
     public Observable<Pair<TdApi.Chat, MessageAdapterModel>> getFirstChatData(long chatId) {
         if (firstChatData == null) {
-            return TGProxy.getInstance().sendTD(new TdApi.GetChat(chatId), TdApi.Chat.class)
+            return tgProxy.sendTD(new TdApi.GetChat(chatId), TdApi.Chat.class)
                     .concatMap(chat -> {
                         List<MessageItem> messages = new ArrayList<>(1);
                         messages.add(new MessageItem(chat.topMessage));
@@ -52,7 +63,7 @@ public class MessagesInteract {
     }
 
     public Observable<MessageAdapterModel> getNextDataPortionInList(int offset, int limit, long chatId, int topMessageId) {
-        return TGProxy.getInstance().sendTD(new TdApi.GetChatHistory(chatId, topMessageId, offset, limit), TdApi.Messages.class)
+        return tgProxy.sendTD(new TdApi.GetChatHistory(chatId, topMessageId, offset, limit), TdApi.Messages.class)
                 .map(messages -> {
                     List<MessageItem> messageItemList = new ArrayList<>();
                     for (TdApi.Message message : messages.messages) {
@@ -73,7 +84,7 @@ public class MessagesInteract {
         return Observable.from(mainListItems)
                 .map(message -> message.getMessage().fromId)
                 .distinct()
-                .concatMap(integer -> TGProxy.getInstance().sendTD(new TdApi.GetUser(integer), TdApi.User.class))
+                .concatMap(integer -> tgProxy.sendTD(new TdApi.GetUser(integer), TdApi.User.class))
                 .map(UserItem::new)
                 .toList()
                 .doOnNext(userChatListItems -> FileDownloaderManager.getInstance().startFileListDownloading(userChatListItems))

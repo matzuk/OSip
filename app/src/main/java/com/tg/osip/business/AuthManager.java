@@ -1,17 +1,20 @@
 package com.tg.osip.business;
 
-import com.tg.osip.tdclient.TGProxy;
+import android.content.Context;
+
+import com.tg.osip.ApplicationSIP;
+import com.tg.osip.tdclient.TGProxyI;
 import com.tg.osip.utils.log.Logger;
 
 import org.drinkless.td.libcore.telegram.TdApi;
 
 import java.util.concurrent.TimeUnit;
 
+import javax.inject.Inject;
+
 import rx.Observable;
 import rx.Subscriber;
-import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
-import rx.functions.Func1;
 import rx.subjects.PublishSubject;
 
 /**
@@ -33,6 +36,9 @@ public class AuthManager {
     private static volatile AuthManager instance;
     private PublishSubject<AuthStateEnum> authChannel = PublishSubject.create();
 
+    @Inject
+    TGProxyI tgProxy;
+
     public static AuthManager getInstance() {
         if (instance == null) {
             synchronized (AuthManager.class) {
@@ -42,6 +48,10 @@ public class AuthManager {
             }
         }
         return instance;
+    }
+
+    private AuthManager() {
+        ApplicationSIP.get().applicationComponent().inject(this);
     }
 
     public void authStateRequest() {
@@ -56,7 +66,7 @@ public class AuthManager {
     }
 
     private Observable<AuthStateEnum> getAuthStateObs() {
-        return TGProxy.getInstance().sendTD(new TdApi.GetAuthState(), TdApi.AuthState.class)
+        return tgProxy.sendTD(new TdApi.GetAuthState(), TdApi.AuthState.class)
                 .map(this::mappingToAuthStateEnum);
     }
 
@@ -107,7 +117,7 @@ public class AuthManager {
     }
 
     private Observable<AuthStateEnum> setAuthPhoneNumberObs(String phoneNumber) {
-        return TGProxy.getInstance().sendTD(new TdApi.SetAuthPhoneNumber(phoneNumber), TdApi.AuthState.class)
+        return tgProxy.sendTD(new TdApi.SetAuthPhoneNumber(phoneNumber), TdApi.AuthState.class)
                 .map(this::mappingToAuthStateEnum);
     }
 
@@ -116,7 +126,7 @@ public class AuthManager {
     }
 
     private Observable<AuthStateEnum> setAuthNameObs(String firstName, String lastName) {
-        return TGProxy.getInstance().sendTD(new TdApi.SetAuthName(firstName, lastName), TdApi.AuthState.class)
+        return tgProxy.sendTD(new TdApi.SetAuthName(firstName, lastName), TdApi.AuthState.class)
                 .map(this::mappingToAuthStateEnum);
     }
 
@@ -125,7 +135,7 @@ public class AuthManager {
     }
 
     private Observable<AuthStateEnum> setAuthCodeObs(String code) {
-        return TGProxy.getInstance().sendTD(new TdApi.SetAuthCode(code), TdApi.AuthState.class)
+        return tgProxy.sendTD(new TdApi.SetAuthCode(code), TdApi.AuthState.class)
                 .map(this::mappingToAuthStateEnum);
     }
 
@@ -134,7 +144,7 @@ public class AuthManager {
     }
 
     private Observable<AuthStateEnum> resetAuthObs(boolean force) {
-        return TGProxy.getInstance().sendTD(new TdApi.ResetAuth(force), TdApi.AuthState.class)
+        return tgProxy.sendTD(new TdApi.ResetAuth(force), TdApi.AuthState.class)
                 .map(this::mappingToAuthStateEnum);
     }
 
@@ -143,7 +153,7 @@ public class AuthManager {
     }
 
     public Observable<TdApi.User> loadNeededInfo() {
-        return TGProxy.getInstance().sendTD(new TdApi.GetMe(), TdApi.User.class);
+        return tgProxy.sendTD(new TdApi.GetMe(), TdApi.User.class);
     }
 
 }

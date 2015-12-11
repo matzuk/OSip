@@ -21,29 +21,16 @@ import rx.Subscriber;
  *
  * @author e.matsyuk
  */
-public class TGProxy {
+public class TGProxyImpl implements TGProxyI {
 
-    private static final String LOG_REQUEST = "TGProxy request";
-    private static final String LOG_RESPONSE = "TGProxy response";
-
-    private static volatile TGProxy instance;
+    private static final String LOG_REQUEST = "TGProxyImpl request";
+    private static final String LOG_RESPONSE = "TGProxyImpl response";
 
     /**
      * this method is necessary, because setDir and setUpdatesHandler for TG in first calling
      * @return TG.getClientInstance()
      */
-    public static TGProxy getInstance() {
-        if (instance == null) {
-            synchronized (TGProxy.class) {
-                if (instance == null) {
-                    instance = new TGProxy();
-                }
-            }
-        }
-        return instance;
-    }
-
-    private TGProxy() {
+    public TGProxyImpl() {
         TG.setDir(AndroidUtils.getCacheDirPath());
         TG.setUpdatesHandler(updatesHandler);
     }
@@ -66,7 +53,7 @@ public class TGProxy {
         Log.d(LOG_REQUEST, tlFunction.toString());
         return BackgroundExecutor.createSafeBackgroundObservable(subscriber -> {
             try {
-                TGProxy.getInstance().getClientInstance().send(tlFunction, object -> resultHandling(subscriber, object, clazz));
+                getClientInstance().send(tlFunction, object -> resultHandling(subscriber, object, clazz));
             } catch (Exception exception) {
                 subscriber.onError(exception);
             }

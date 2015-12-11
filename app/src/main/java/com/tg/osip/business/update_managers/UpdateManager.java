@@ -7,7 +7,7 @@ import org.drinkless.td.libcore.telegram.TdApi;
 import rx.subjects.PublishSubject;
 
 /**
- * Manager for updates from TGProxy UpdatesHandler
+ * Manager for updates from TGProxyImpl UpdatesHandler
  *
  * @author e.matsyuk
  */

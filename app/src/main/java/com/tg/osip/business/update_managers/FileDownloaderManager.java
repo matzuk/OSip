@@ -1,6 +1,10 @@
 package com.tg.osip.business.update_managers;
 
-import com.tg.osip.tdclient.TGProxy;
+import android.content.Context;
+
+import com.tg.osip.ApplicationSIP;
+import com.tg.osip.tdclient.TGProxyI;
+import com.tg.osip.tdclient.TGProxyImpl;
 import com.tg.osip.ui.general.views.images.ImageLoaderI;
 import com.tg.osip.ui.general.views.images.ImageLoaderUtils;
 import com.tg.osip.utils.common.BackgroundExecutor;
@@ -10,6 +14,8 @@ import org.drinkless.td.libcore.telegram.TdApi;
 
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
+
+import javax.inject.Inject;
 
 import rx.Observable;
 import rx.Subscriber;
@@ -31,6 +37,9 @@ public class FileDownloaderManager {
     private ConcurrentHashMap<Integer, TdApi.File> fileHashMap = new ConcurrentHashMap<>();
     private PublishSubject<Integer> downloadChannel = PublishSubject.create();
 
+    @Inject
+    TGProxyI tgProxy;
+
     public static FileDownloaderManager getInstance() {
         if (instance == null) {
             synchronized (FileDownloaderManager.class) {
@@ -40,6 +49,10 @@ public class FileDownloaderManager {
             }
         }
         return instance;
+    }
+
+    private FileDownloaderManager() {
+        ApplicationSIP.get().applicationComponent().inject(this);
     }
 
     public PublishSubject<Integer> getDownloadChannel() {
@@ -83,7 +96,7 @@ public class FileDownloaderManager {
     public <T extends ImageLoaderI> void startFileDownloading(T imageLoaderI) {
         if (ImageLoaderUtils.isPhotoFileIdValid(imageLoaderI.getPhotoFileId()) && !ImageLoaderUtils.isPhotoFilePathValid(imageLoaderI.getPhotoFilePath()) &&
                 !FileDownloaderManager.getInstance().isFileInCache(imageLoaderI.getPhotoFileId())) {
-            TGProxy.getInstance()
+            tgProxy
                     .sendTD(new TdApi.DownloadFile(imageLoaderI.getPhotoFileId()), TdApi.Ok.class)
                     .subscribeOn(Schedulers.from(BackgroundExecutor.getSafeBackgroundExecutor()))
                     .observeOn(Schedulers.from(BackgroundExecutor.getSafeBackgroundExecutor()))
@@ -97,7 +110,7 @@ public class FileDownloaderManager {
                 .observeOn(Schedulers.from(BackgroundExecutor.getSafeBackgroundExecutor()))
                 .filter(imageLoaderI -> ImageLoaderUtils.isPhotoFileIdValid(imageLoaderI.getPhotoFileId()) && !ImageLoaderUtils.isPhotoFilePathValid(imageLoaderI.getPhotoFilePath()) &&
                         !FileDownloaderManager.getInstance().isFileInCache(imageLoaderI.getPhotoFileId()))
-                .concatMap(imageLoaderI -> TGProxy.getInstance().sendTD(new TdApi.DownloadFile(imageLoaderI.getPhotoFileId()), TdApi.Ok.class))
+                .concatMap(imageLoaderI -> tgProxy.sendTD(new TdApi.DownloadFile(imageLoaderI.getPhotoFileId()), TdApi.Ok.class))
                 .subscribe();
     }
 
