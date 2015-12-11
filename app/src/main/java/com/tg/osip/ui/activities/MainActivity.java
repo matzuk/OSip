@@ -4,6 +4,7 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
@@ -17,9 +18,12 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.afollestad.materialdialogs.MaterialDialog;
+import com.tg.osip.ApplicationSIP;
 import com.tg.osip.R;
 import com.tg.osip.business.main.MainInteract;
 import com.tg.osip.business.models.UserItem;
+import com.tg.osip.tdclient.TGProxyI;
+import com.tg.osip.tdclient.update_managers.FileDownloaderManager;
 import com.tg.osip.ui.chats.ChatsFragment;
 import com.tg.osip.ui.general.DefaultSubscriber;
 import com.tg.osip.ui.general.views.images.PhotoView;
@@ -27,6 +31,11 @@ import com.tg.osip.utils.common.BackgroundExecutor;
 
 import org.drinkless.td.libcore.telegram.TdApi;
 
+import javax.inject.Inject;
+
+import dagger.Module;
+import dagger.Provides;
+import dagger.Subcomponent;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
@@ -36,18 +45,22 @@ import rx.schedulers.Schedulers;
  */
 public class MainActivity extends AppCompatActivity {
 
+    @Inject
+    MainInteract mainInteract;
+
     private Toolbar toolbar;
     private View headerNavigationView;
     private DrawerLayout drawerLayout;
     private ActionBarDrawerToggle drawerToggle;
     private Dialog logoutProgressDialog;
-    private MainInteract mainInteract = new MainInteract();
     private Subscription getMeUserSubscription;
     private Subscription logoutSubscription;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        ApplicationSIP.get().applicationComponent().plus(new MainActivityModule()).inject(this);
+
         setContentView(R.layout.ac_main);
         initNavigationHeaderView();
         setToolbar();
@@ -199,6 +212,24 @@ public class MainActivity extends AppCompatActivity {
             logoutProgressDialog.dismiss();
         }
         super.onDestroy();
+    }
+
+    @Subcomponent(modules = MainActivityModule.class)
+    public interface MainActivityComponent {
+        void inject(MainActivity mainActivity);
+    }
+
+    @Module
+    public static class MainActivityModule {
+
+        @Provides
+        @NonNull
+        public MainInteract provideMainInteract(@NonNull TGProxyI tgProxyI, @NonNull FileDownloaderManager fileDownloaderManager) {
+            return new MainInteract(
+                    tgProxyI,
+                    fileDownloaderManager
+            );
+        }
     }
 
 }

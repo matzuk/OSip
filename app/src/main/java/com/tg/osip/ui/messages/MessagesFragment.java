@@ -2,6 +2,8 @@ package com.tg.osip.ui.messages;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.util.Pair;
 import android.support.v7.app.AppCompatActivity;
@@ -12,10 +14,14 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.tg.osip.ApplicationSIP;
 import com.tg.osip.R;
+import com.tg.osip.business.chats.ChatsInteract;
 import com.tg.osip.business.messages.MessagesInteract;
 import com.tg.osip.business.models.MessageAdapterModel;
 import com.tg.osip.business.models.PhotoItem;
+import com.tg.osip.tdclient.TGProxyI;
+import com.tg.osip.tdclient.update_managers.FileDownloaderManager;
 import com.tg.osip.ui.activities.MainActivity;
 import com.tg.osip.ui.activities.PhotoMediaActivity;
 import com.tg.osip.ui.general.views.pagination.PaginationTool;
@@ -26,6 +32,11 @@ import org.drinkless.td.libcore.telegram.TdApi;
 import java.io.Serializable;
 import java.util.List;
 
+import javax.inject.Inject;
+
+import dagger.Module;
+import dagger.Provides;
+import dagger.Subcomponent;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
@@ -40,10 +51,12 @@ public class MessagesFragment extends Fragment {
     // one item from previous screen (chats)
     private static final int EMPTY_COUNT_LIST = 1;
 
+    @Inject
+    MessagesInteract messagesInteract;
+
     private RecyclerView recyclerView;
-    private MessagesRecyclerAdapter messagesRecyclerAdapter = new MessagesRecyclerAdapter();
     private Toolbar toolbar;
-    private MessagesInteract messagesInteract = new MessagesInteract();
+    private MessagesRecyclerAdapter messagesRecyclerAdapter = new MessagesRecyclerAdapter();
     private MessageToolbarAdapter messageToolbarAdapter;
 
     private Subscription loadDataSubscription;
@@ -64,6 +77,7 @@ public class MessagesFragment extends Fragment {
         if (getArguments() == null) {
             return;
         }
+        ApplicationSIP.get().applicationComponent().plus(new MessagesModule()).inject(this);
         chatId = getArguments().getLong(CHAT_ID);
     }
 
@@ -165,6 +179,24 @@ public class MessagesFragment extends Fragment {
             toolbar.removeView(messageToolbarAdapter.getToolbarView());
         }
         super.onDestroyView();
+    }
+
+    @Subcomponent(modules = MessagesModule.class)
+    public interface MessagesComponent {
+        void inject(MessagesFragment messagesFragment);
+    }
+
+    @Module
+    public static class MessagesModule {
+
+        @Provides
+        @NonNull
+        public MessagesInteract provideMessagesInteract(@NonNull TGProxyI tgProxyI, @NonNull FileDownloaderManager fileDownloaderManager) {
+            return new MessagesInteract(
+                    tgProxyI,
+                    fileDownloaderManager
+            );
+        }
     }
 
 }

@@ -25,13 +25,12 @@ public class MainInteract {
     // field for preventing extra requests
     private UserItem userItem;
 
-    @Inject
     TGProxyI tgProxy;
-    @Inject
     FileDownloaderManager fileDownloaderManager;
 
-    public MainInteract() {
-        ApplicationSIP.get().applicationComponent().inject(this);
+    public MainInteract(TGProxyI tgProxy, FileDownloaderManager fileDownloaderManager) {
+        this.tgProxy = tgProxy;
+        this.fileDownloaderManager = fileDownloaderManager;
     }
 
     public Observable<UserItem> getMeUserObservable() {

@@ -22,13 +22,12 @@ import rx.Observable;
  */
 public class ChatsInteract {
 
-    @Inject
     TGProxyI tgProxy;
-    @Inject
     FileDownloaderManager fileDownloaderManager;
 
-    public ChatsInteract() {
-        ApplicationSIP.get().applicationComponent().inject(this);
+    public ChatsInteract(TGProxyI tgProxy, FileDownloaderManager fileDownloaderManager) {
+        this.tgProxy = tgProxy;
+        this.fileDownloaderManager = fileDownloaderManager;
     }
 
     public Observable<List<ChatItem>> getNextDataPortionInList(int offset, int limit) {

@@ -2,7 +2,6 @@ package com.tg.osip.business.messages;
 
 import android.support.v4.util.Pair;
 
-import com.tg.osip.ApplicationSIP;
 import com.tg.osip.business.models.MessageAdapterModel;
 import com.tg.osip.business.models.MessageItem;
 import com.tg.osip.business.models.PhotoItem;
@@ -17,8 +16,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.inject.Inject;
-
 import rx.Observable;
 
 /**
@@ -31,13 +28,12 @@ public class MessagesInteract {
     // field for preventing extra requests
     private Pair<TdApi.Chat, MessageAdapterModel> firstChatData;
 
-    @Inject
     TGProxyI tgProxy;
-    @Inject
     FileDownloaderManager fileDownloaderManager;
 
-    public MessagesInteract() {
-        ApplicationSIP.get().applicationComponent().inject(this);
+    public MessagesInteract(TGProxyI tgProxy, FileDownloaderManager fileDownloaderManager) {
+        this.tgProxy = tgProxy;
+        this.fileDownloaderManager = fileDownloaderManager;
     }
 
     /**

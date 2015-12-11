@@ -1,6 +1,8 @@
 package com.tg.osip.ui.chats;
 
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.GridLayoutManager;
@@ -11,10 +13,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
 
+import com.tg.osip.ApplicationSIP;
 import com.tg.osip.R;
 import com.tg.osip.business.PersistentInfo;
 import com.tg.osip.business.chats.ChatsInteract;
 import com.tg.osip.business.models.ChatItem;
+import com.tg.osip.tdclient.TGProxyI;
+import com.tg.osip.tdclient.update_managers.FileDownloaderManager;
 import com.tg.osip.ui.activities.MainActivity;
 import com.tg.osip.ui.general.DefaultSubscriber;
 import com.tg.osip.ui.general.views.pagination.PaginationTool;
@@ -24,6 +29,11 @@ import com.tg.osip.ui.general.views.RecyclerItemClickListener;
 
 import java.util.List;
 
+import javax.inject.Inject;
+
+import dagger.Module;
+import dagger.Provides;
+import dagger.Subcomponent;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
 
@@ -36,10 +46,18 @@ public class ChatsFragment extends BaseFragment {
 
     private static final int LIMIT = 50;
 
+    @Inject
+    ChatsInteract chatsInteract;
+
     private RecyclerView recyclerView;
     private ChatRecyclerAdapter chatRecyclerAdapter;
-    private ChatsInteract chatsInteract = new ChatsInteract();
     private Subscription listPagingSubscription;
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        ApplicationSIP.get().applicationComponent().plus(new ChatsModule()).inject(this);
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -128,6 +146,24 @@ public class ChatsFragment extends BaseFragment {
             recyclerView.setAdapter(null);
         }
         super.onDestroyView();
+    }
+
+    @Subcomponent(modules = ChatsModule.class)
+    public interface ChatsComponent {
+        void inject(ChatsFragment chatsFragment);
+    }
+
+    @Module
+    public static class ChatsModule {
+
+        @Provides
+        @NonNull
+        public ChatsInteract provideChatsInteract(@NonNull TGProxyI tgProxyI, @NonNull FileDownloaderManager fileDownloaderManager) {
+            return new ChatsInteract(
+                    tgProxyI,
+                    fileDownloaderManager
+            );
+        }
     }
 
 }
