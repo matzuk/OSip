@@ -1,7 +1,6 @@
 package com.tg.osip;
 
 import com.tg.osip.business.AuthManager;
-import com.tg.osip.tdclient.update_managers.FileDownloaderManager;
 import com.tg.osip.tdclient.TGModule;
 import com.tg.osip.ui.activities.MainActivity;
 import com.tg.osip.ui.activities.PhotoMediaActivity;
@@ -20,8 +19,6 @@ import dagger.Component;
 @Component(modules = {AppModule.class, TGModule.class})
 @Singleton
 public interface AppComponent {
-
-    FileDownloaderManager fileDownloaderManager();
 
     MainActivity.MainActivityComponent plus( MainActivity.MainActivityModule mainActivityModule);
     ChatsFragment.ChatsComponent plus( ChatsFragment.ChatsModule chatsModule);
