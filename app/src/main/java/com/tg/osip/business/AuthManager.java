@@ -1,7 +1,5 @@
 package com.tg.osip.business;
 
-import android.content.Context;
-
 import com.tg.osip.ApplicationSIP;
 import com.tg.osip.tdclient.TGProxyI;
 import com.tg.osip.utils.log.Logger;

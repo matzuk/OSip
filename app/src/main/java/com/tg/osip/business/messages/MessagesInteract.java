@@ -7,9 +7,8 @@ import com.tg.osip.business.models.MessageAdapterModel;
 import com.tg.osip.business.models.MessageItem;
 import com.tg.osip.business.models.PhotoItem;
 import com.tg.osip.business.models.UserItem;
-import com.tg.osip.business.update_managers.FileDownloaderManager;
+import com.tg.osip.tdclient.update_managers.FileDownloaderManager;
 import com.tg.osip.tdclient.TGProxyI;
-import com.tg.osip.tdclient.TGProxyImpl;
 
 import org.drinkless.td.libcore.telegram.TdApi;
 
@@ -34,6 +33,8 @@ public class MessagesInteract {
 
     @Inject
     TGProxyI tgProxy;
+    @Inject
+    FileDownloaderManager fileDownloaderManager;
 
     public MessagesInteract() {
         ApplicationSIP.get().applicationComponent().inject(this);
@@ -87,7 +88,7 @@ public class MessagesInteract {
                 .concatMap(integer -> tgProxy.sendTD(new TdApi.GetUser(integer), TdApi.User.class))
                 .map(UserItem::new)
                 .toList()
-                .doOnNext(userChatListItems -> FileDownloaderManager.getInstance().startFileListDownloading(userChatListItems))
+                .doOnNext(fileDownloaderManager::startFileListDownloading)
                 .map(users -> {
                     Map<Integer, UserItem> map = new HashMap<>();
                     for (UserItem user : users) {
@@ -102,7 +103,7 @@ public class MessagesInteract {
                 .filter(MessageItem::isPhotoMessage)
                 .map(MessageItem::getPhotoItemMedium)
                 .toList()
-                .doOnNext(photoItems -> FileDownloaderManager.getInstance().startFileListDownloading(photoItems));
+                .doOnNext(fileDownloaderManager::startFileListDownloading);
     }
 
 }

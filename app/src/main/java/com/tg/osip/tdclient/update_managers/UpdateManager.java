@@ -1,4 +1,4 @@
-package com.tg.osip.business.update_managers;
+package com.tg.osip.tdclient.update_managers;
 
 import android.util.Log;
 
@@ -15,24 +15,7 @@ public class UpdateManager {
 
     private static final String LOG = "Updates";
 
-    private static volatile UpdateManager instance;
     private PublishSubject<TdApi.Update> updateChannel = PublishSubject.create();
-
-    public static UpdateManager getInstance() {
-        if (instance == null) {
-            synchronized (UpdateManager.class) {
-                if (instance == null) {
-                    instance = new UpdateManager();
-                }
-            }
-        }
-        return instance;
-    }
-
-    private UpdateManager() {
-        // init helper classes
-        FileDownloaderManager.getInstance().subscribeToUpdateChannel(updateChannel);
-    }
 
     public void sendUpdateEvent(TdApi.Update update) {
         Log.d(LOG, update.toString());

@@ -6,9 +6,11 @@ import android.widget.ImageView;
 
 import com.squareup.picasso.Picasso;
 import com.tg.osip.ApplicationSIP;
-import com.tg.osip.business.update_managers.FileDownloaderManager;
+import com.tg.osip.tdclient.update_managers.FileDownloaderManager;
 import com.tg.osip.utils.common.BackgroundExecutor;
 import com.tg.osip.utils.log.Logger;
+
+import javax.inject.Inject;
 
 import rx.Subscriber;
 import rx.Subscription;
@@ -22,20 +24,29 @@ import rx.schedulers.Schedulers;
  */
 public class PhotoView extends ImageView {
 
+    @Inject
+    FileDownloaderManager fileDownloaderManager;
     private int fileId;
     private Subscription downloadChannelSubscription;
     private boolean circleRounds;
 
     public PhotoView(Context context) {
         super(context);
+        provideDependency();
     }
 
     public PhotoView(Context context, AttributeSet attrs) {
         super(context, attrs);
+        provideDependency();
     }
 
     public PhotoView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
+        provideDependency();
+    }
+
+    private void provideDependency() {
+        ApplicationSIP.get().applicationComponent().inject(this);
     }
 
     public void setImageLoaderI(ImageLoaderI imageLoaderI) {
@@ -48,8 +59,8 @@ public class PhotoView extends ImageView {
         if (imageLoaderI.getPlugFile() != null && ImageLoaderUtils.isPhotoFileIdValid(imageLoaderI.getPlugFile().getPhotoFileId())) {
             if (ImageLoaderUtils.isPhotoFilePathValid(imageLoaderI.getPlugFile().getPhotoFilePath())) {
                 setFileToView(imageLoaderI.getPlugFile().getPhotoFilePath());
-            } else if (FileDownloaderManager.getInstance().isFileInCache(imageLoaderI.getPlugFile().getPhotoFileId())) {
-                setFileToView(FileDownloaderManager.getInstance().getFilePath(imageLoaderI.getPlugFile().getPhotoFileId()));
+            } else if (fileDownloaderManager.isFileInCache(imageLoaderI.getPlugFile().getPhotoFileId())) {
+                setFileToView(fileDownloaderManager.getFilePath(imageLoaderI.getPlugFile().getPhotoFileId()));
             }
         } else {
             setImageDrawable(imageLoaderI.getPlug());
@@ -60,8 +71,8 @@ public class PhotoView extends ImageView {
                 return;
             }
             // test file downloaded cache
-            if (FileDownloaderManager.getInstance().isFileInCache(imageLoaderI.getPhotoFileId())) {
-                setFileToView(FileDownloaderManager.getInstance().getFilePath(imageLoaderI.getPhotoFileId()));
+            if (fileDownloaderManager.isFileInCache(imageLoaderI.getPhotoFileId())) {
+                setFileToView(fileDownloaderManager.getFilePath(imageLoaderI.getPhotoFileId()));
                 return;
             }
         }
@@ -98,7 +109,7 @@ public class PhotoView extends ImageView {
     }
 
     private void subscribeToDownloadChannel() {
-        downloadChannelSubscription = FileDownloaderManager.getInstance().getDownloadChannel()
+        downloadChannelSubscription = fileDownloaderManager.getDownloadChannel()
                 .filter(downloadedFileId -> downloadedFileId == fileId)
                 .subscribeOn(Schedulers.from(BackgroundExecutor.getSafeBackgroundExecutor()))
                 .observeOn(AndroidSchedulers.mainThread())
@@ -114,8 +125,8 @@ public class PhotoView extends ImageView {
                     @Override
                     public void onNext(Integer downloadedFileId) {
                         unsubscribe();
-                        if (FileDownloaderManager.getInstance().isFileInCache(downloadedFileId)) {
-                            setFileToView(FileDownloaderManager.getInstance().getFilePath(downloadedFileId));
+                        if (fileDownloaderManager.isFileInCache(downloadedFileId)) {
+                            setFileToView(fileDownloaderManager.getFilePath(downloadedFileId));
                         }
                     }
                 });

@@ -6,13 +6,16 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 
+import com.tg.osip.ApplicationSIP;
 import com.tg.osip.R;
 import com.tg.osip.business.models.PhotoItem;
-import com.tg.osip.business.update_managers.FileDownloaderManager;
+import com.tg.osip.tdclient.update_managers.FileDownloaderManager;
 import com.tg.osip.ui.media.DepthPageTransformer;
 import com.tg.osip.ui.media.PhotoSlidePagerAdapter;
 
 import java.util.List;
+
+import javax.inject.Inject;
 
 /**
  * Activity of Photo slide show
@@ -26,6 +29,8 @@ public class PhotoMediaActivity extends AppCompatActivity {
 
     private static final int PAGER_OFFSET = 2;
 
+    @Inject
+    FileDownloaderManager fileDownloaderManager;
     private List<PhotoItem> photoLargeItemList;
     private int clickedPosition;
 
@@ -33,6 +38,7 @@ public class PhotoMediaActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.ac_photo_media);
+        ApplicationSIP.get().applicationComponent().inject(this);
         getExtras();
         downloadPhotoY();
         initPager();
@@ -48,7 +54,7 @@ public class PhotoMediaActivity extends AppCompatActivity {
     }
 
     private void downloadPhotoY() {
-        FileDownloaderManager.getInstance().startFileListDownloading(photoLargeItemList);
+        fileDownloaderManager.startFileListDownloading(photoLargeItemList);
     }
 
     private void initPager() {

@@ -1,12 +1,9 @@
 package com.tg.osip.business.chats;
 
-import android.content.Context;
-
 import com.tg.osip.ApplicationSIP;
 import com.tg.osip.business.models.ChatItem;
-import com.tg.osip.business.update_managers.FileDownloaderManager;
+import com.tg.osip.tdclient.update_managers.FileDownloaderManager;
 import com.tg.osip.tdclient.TGProxyI;
-import com.tg.osip.tdclient.TGProxyImpl;
 
 import org.drinkless.td.libcore.telegram.TdApi;
 
@@ -27,6 +24,8 @@ public class ChatsInteract {
 
     @Inject
     TGProxyI tgProxy;
+    @Inject
+    FileDownloaderManager fileDownloaderManager;
 
     public ChatsInteract() {
         ApplicationSIP.get().applicationComponent().inject(this);
@@ -41,10 +40,7 @@ public class ChatsInteract {
                 .concatMap(Observable::from)
                 .map(ChatItem::new)
                 .toList()
-                .doOnNext(mainListItems -> {
-                    // send photo items to FileDownloaderManager
-                    FileDownloaderManager.getInstance().startFileListDownloading(mainListItems);
-                });
+                .doOnNext(fileDownloaderManager::startFileListDownloading);
     }
 
 }

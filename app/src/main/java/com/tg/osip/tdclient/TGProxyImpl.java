@@ -2,7 +2,7 @@ package com.tg.osip.tdclient;
 
 import android.util.Log;
 
-import com.tg.osip.business.update_managers.UpdateManager;
+import com.tg.osip.tdclient.update_managers.UpdateManager;
 import com.tg.osip.tdclient.exceptions.TdApiClassCastException;
 import com.tg.osip.tdclient.exceptions.TdApiErrorException;
 import com.tg.osip.utils.common.AndroidUtils;
@@ -26,20 +26,27 @@ public class TGProxyImpl implements TGProxyI {
     private static final String LOG_REQUEST = "TGProxyImpl request";
     private static final String LOG_RESPONSE = "TGProxyImpl response";
 
+    UpdateManager updateManager;
+
     /**
      * this method is necessary, because setDir and setUpdatesHandler for TG in first calling
-     * @return TG.getClientInstance()
      */
-    public TGProxyImpl() {
+    public TGProxyImpl(UpdateManager updateManager) {
+        this.updateManager = updateManager;
+
         TG.setDir(AndroidUtils.getCacheDirPath());
         TG.setUpdatesHandler(updatesHandler);
+    }
+
+    public UpdateManager getUpdateManager() {
+        return updateManager;
     }
 
     private Client.ResultHandler updatesHandler = object -> {
         Class objectClass = object.getClass();
         if (objectClass == TdApi.Update.class || TdApi.Update.class.isAssignableFrom(objectClass)) {
             TdApi.Update update = (TdApi.Update)object;
-            UpdateManager.getInstance().sendUpdateEvent(update);
+            updateManager.sendUpdateEvent(update);
         } else {
             Logger.error("Incorrect update object class. Not TdApi.Update.");
         }

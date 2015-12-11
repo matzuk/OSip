@@ -2,9 +2,8 @@ package com.tg.osip.business.main;
 
 import com.tg.osip.ApplicationSIP;
 import com.tg.osip.business.models.UserItem;
-import com.tg.osip.business.update_managers.FileDownloaderManager;
+import com.tg.osip.tdclient.update_managers.FileDownloaderManager;
 import com.tg.osip.tdclient.TGProxyI;
-import com.tg.osip.tdclient.TGProxyImpl;
 
 import org.drinkless.td.libcore.telegram.TdApi;
 
@@ -28,6 +27,8 @@ public class MainInteract {
 
     @Inject
     TGProxyI tgProxy;
+    @Inject
+    FileDownloaderManager fileDownloaderManager;
 
     public MainInteract() {
         ApplicationSIP.get().applicationComponent().inject(this);
@@ -40,7 +41,7 @@ public class MainInteract {
                     .map(UserItem::new)
                     .doOnNext(item -> {
                         userItem = item;
-                        FileDownloaderManager.getInstance().startFileDownloading(userItem);
+                        fileDownloaderManager.startFileDownloading(userItem);
                     });
         } else {
             return Observable.just(userItem);
@@ -52,7 +53,7 @@ public class MainInteract {
                 .observeOn(AndroidSchedulers.mainThread())
                 .doOnNext(aLong -> {
                     // clear FileDownloaderManager
-                    FileDownloaderManager.getInstance().clearManager();
+                    fileDownloaderManager.clearManager();
                     showLoading.run();
                 })
                 .concatMap(aLong -> tgProxy.sendTD(new TdApi.ResetAuth(false), TdApi.AuthState.class))
