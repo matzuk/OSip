@@ -1,11 +1,9 @@
 package com.tg.osip.ui.messages;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v4.util.Pair;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -16,50 +14,30 @@ import android.view.ViewGroup;
 
 import com.tg.osip.ApplicationSIP;
 import com.tg.osip.R;
-import com.tg.osip.business.chats.ChatsInteract;
 import com.tg.osip.business.messages.MessagesInteract;
-import com.tg.osip.business.models.MessageAdapterModel;
-import com.tg.osip.business.models.PhotoItem;
 import com.tg.osip.tdclient.TGProxyI;
 import com.tg.osip.tdclient.update_managers.FileDownloaderManager;
 import com.tg.osip.ui.activities.MainActivity;
-import com.tg.osip.ui.activities.PhotoMediaActivity;
-import com.tg.osip.ui.general.views.pagination.PaginationTool;
-import com.tg.osip.utils.common.BackgroundExecutor;
-
-import org.drinkless.td.libcore.telegram.TdApi;
-
-import java.io.Serializable;
-import java.util.List;
 
 import javax.inject.Inject;
 
 import dagger.Module;
 import dagger.Provides;
 import dagger.Subcomponent;
-import rx.Subscription;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.schedulers.Schedulers;
 
 /**
  * @author e.matsyuk
  */
-public class MessagesFragment extends Fragment {
+public class MessagesFragment extends Fragment implements MessagesContract.View {
 
     public static final String CHAT_ID = "chat_id";
-    private static final int LIMIT = 50;
-    // one item from previous screen (chats)
-    private static final int EMPTY_COUNT_LIST = 1;
 
     @Inject
-    MessagesInteract messagesInteract;
+    MessagesPresenter messagesPresenter;
 
     private RecyclerView recyclerView;
     private Toolbar toolbar;
-    private MessagesRecyclerAdapter messagesRecyclerAdapter = new MessagesRecyclerAdapter();
-    private MessageToolbarAdapter messageToolbarAdapter;
-
-    private Subscription loadDataSubscription;
+    private View customToolbarView;
 
     private long chatId;
 
@@ -77,6 +55,7 @@ public class MessagesFragment extends Fragment {
         if (getArguments() == null) {
             return;
         }
+        setRetainInstance(true);
         ApplicationSIP.get().applicationComponent().plus(new MessagesModule()).inject(this);
         chatId = getArguments().getLong(CHAT_ID);
     }
@@ -84,11 +63,13 @@ public class MessagesFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.fmt_messages, container, false);
-        setRetainInstance(true);
+        return inflater.inflate(R.layout.fmt_messages, container, false);
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         initEmptyToolbar();
-        init(rootView);
-        return rootView;
+        init(view);
     }
 
     private void init(View view) {
@@ -99,9 +80,8 @@ public class MessagesFragment extends Fragment {
         recyclerViewLayoutManager.setReverseLayout(true);
         // recyclerView setting
         recyclerView.setLayoutManager(recyclerViewLayoutManager);
-        recyclerView.setAdapter(messagesRecyclerAdapter);
-        messagesRecyclerAdapter.setOnMessageClickListener(onMessageClickListener);
-        loadData();
+        messagesPresenter.bindView(this);
+        messagesPresenter.loadViewsData(getSupportActivity(), recyclerView, chatId);
     }
 
     private void initEmptyToolbar() {
@@ -115,68 +95,25 @@ public class MessagesFragment extends Fragment {
         toolbar.setNavigationOnClickListener(v -> getSupportActivity().onBackPressed());
     }
 
-    private void initToolbar() {
-        if (messageToolbarAdapter != null && messageToolbarAdapter.getToolbarView() != null) {
-            toolbar.addView(messageToolbarAdapter.getToolbarView());
-        }
-    }
-
-    private void loadData() {
-        loadDataSubscription = messagesInteract.getFirstChatData(chatId)
-                .subscribeOn(Schedulers.from(BackgroundExecutor.getSafeBackgroundExecutor()))
-                .observeOn(AndroidSchedulers.mainThread())
-                .doOnNext(this::getChatLoadingSuccess)
-                .concatMap(chatMessageAdapterModelPair -> PaginationTool
-                        .paging(recyclerView, offset ->
-                                messagesInteract.getNextDataPortionInList(offset, LIMIT, chatId, chatMessageAdapterModelPair.first.topMessage.id), LIMIT, EMPTY_COUNT_LIST))
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(this::getNextDataPortionSuccess);
-    }
-
-    private void getChatLoadingSuccess(Pair<TdApi.Chat, MessageAdapterModel> chatMessageAdapterModelPair) {
-        // toolbar
-        messageToolbarAdapter = new MessageToolbarAdapter(getContext(), chatMessageAdapterModelPair.first);
-        initToolbar();
-        // adapter
-        // add message from Chat topMessage only one
-        if (messagesRecyclerAdapter.getItemCount() < EMPTY_COUNT_LIST) {
-            MessageAdapterModel messageAdapterModel = chatMessageAdapterModelPair.second;
-            messagesRecyclerAdapter.addMessageAdapterModel(messageAdapterModel);
-        }
-    }
-
-    private void getNextDataPortionSuccess(MessageAdapterModel messageAdapterModel) {
-        // adapter
-        messagesRecyclerAdapter.addMessageAdapterModel(messageAdapterModel);
-    }
-
-    private OnMessageClickListener onMessageClickListener = new OnMessageClickListener() {
-        @Override
-        public void onPhotoMessageClick(int clickedPosition, List<PhotoItem> photoLargeItemList) {
-            Intent intent = new Intent(getActivity(), PhotoMediaActivity.class);
-            Bundle bundle = new Bundle();
-            bundle.putInt(PhotoMediaActivity.CLICKED_POSITION, clickedPosition);
-            bundle.putSerializable(PhotoMediaActivity.PHOTO_LARGE, (Serializable) photoLargeItemList);
-            intent.putExtras(bundle);
-            startActivity(intent);
-        }
-    };
-
     private AppCompatActivity getSupportActivity() {
         return (AppCompatActivity)getActivity();
     }
 
     @Override
+    public void updateToolBar(View toolbarView) {
+        this.customToolbarView = toolbarView;
+        toolbar.addView(toolbarView);
+    }
+
+    @Override
     public void onDestroyView() {
-        if (loadDataSubscription != null && !loadDataSubscription.isUnsubscribed()) {
-            loadDataSubscription.unsubscribe();
-        }
+        messagesPresenter.onDestroy();
         // for memory leak prevention (RecycleView is not unsubscibed from adapter DataObserver)
         if (recyclerView != null) {
             recyclerView.setAdapter(null);
         }
-        if (toolbar != null && messageToolbarAdapter != null) {
-            toolbar.removeView(messageToolbarAdapter.getToolbarView());
+        if (toolbar != null && customToolbarView != null) {
+            toolbar.removeView(customToolbarView);
         }
         super.onDestroyView();
     }
@@ -191,11 +128,14 @@ public class MessagesFragment extends Fragment {
 
         @Provides
         @NonNull
+        public MessagesPresenter provideMessagesPresenter(@NonNull MessagesInteract messagesInteract) {
+            return new MessagesPresenter(messagesInteract);
+        }
+
+        @Provides
+        @NonNull
         public MessagesInteract provideMessagesInteract(@NonNull TGProxyI tgProxyI, @NonNull FileDownloaderManager fileDownloaderManager) {
-            return new MessagesInteract(
-                    tgProxyI,
-                    fileDownloaderManager
-            );
+            return new MessagesInteract(tgProxyI, fileDownloaderManager);
         }
     }
 

@@ -16,25 +16,18 @@ import org.drinkless.td.libcore.telegram.TdApi;
  *
  * @author e.matsyuk
  */
-public class MessageToolbarAdapter {
+public class MessageToolbarViewFactory {
 
-    private Context context;
-    private ChatItem chatItem;
-    private View toolbarView;
+    public static View getUserToolbarView(Context context, TdApi.Chat chat) {
+        ChatItem chatItem = new ChatItem(chat);
 
-    public MessageToolbarAdapter(Context context, TdApi.Chat chat) {
-        this.context = context;
-        this.chatItem = new ChatItem(chat);
-        initToolbarView();
-    }
-
-    private void initToolbarView() {
         LayoutInflater layoutInflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View headerView = layoutInflater.inflate(R.layout.toolbar_messages, null);
 
         PhotoView headerAvatar = (PhotoView)headerView.findViewById(R.id.avatar);
         headerAvatar.setCircleRounds(true);
         headerAvatar.setImageLoaderI(chatItem);
+
         // not start file downloading because all chats avatars downloading was started in ChatsController
 
         TextView chatNameView = (TextView)headerView.findViewById(R.id.chat_name);
@@ -43,11 +36,7 @@ public class MessageToolbarAdapter {
         TextView chatInfoView = (TextView)headerView.findViewById(R.id.chat_info);
         chatInfoView.setText(chatItem.getInfo());
 
-        toolbarView = headerView;
-    }
-
-    public View getToolbarView() {
-        return toolbarView;
+        return headerView;
     }
 
 }

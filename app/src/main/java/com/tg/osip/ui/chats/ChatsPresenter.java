@@ -13,6 +13,7 @@ import com.tg.osip.ui.general.DefaultSubscriber;
 import com.tg.osip.ui.general.views.pagination.PaginationTool;
 import com.tg.osip.ui.messages.MessagesFragment;
 
+import java.lang.ref.WeakReference;
 import java.util.List;
 
 import rx.Subscription;
@@ -29,7 +30,7 @@ public class ChatsPresenter implements ChatsContract.UserActionsListener {
 
     private ChatRecyclerAdapter chatRecyclerAdapter;
     private Subscription listPagingSubscription;
-    private ChatsContract.View chatsContractView;
+    private WeakReference<ChatsContract.View> chatsContractViewWeak;
 
     public ChatsPresenter(ChatsInteract chatsInteract) {
         this.chatsInteract = chatsInteract;
@@ -37,7 +38,7 @@ public class ChatsPresenter implements ChatsContract.UserActionsListener {
 
     @Override
     public void bindView(ChatsContract.View chatsContractView) {
-        this.chatsContractView = chatsContractView;
+        this.chatsContractViewWeak = new WeakReference<>(chatsContractView);
     }
 
     @Override
@@ -45,7 +46,9 @@ public class ChatsPresenter implements ChatsContract.UserActionsListener {
         // first start
         if (chatRecyclerAdapter == null) {
             // start progressbar
-            chatsContractView.showProgress();
+            if (chatsContractViewWeak != null && chatsContractViewWeak.get() != null) {
+                chatsContractViewWeak.get().showProgress();
+            }
             // init Controller
             chatRecyclerAdapter = new ChatRecyclerAdapter();
             chatRecyclerAdapter.setMyUserId(PersistentInfo.getInstance().getMeUserId());
@@ -65,7 +68,9 @@ public class ChatsPresenter implements ChatsContract.UserActionsListener {
                     @Override
                     public void onNext(List<ChatItem> chatItems) {
                         // hide progressbar
-                        chatsContractView.hideProgress();
+                        if (chatsContractViewWeak != null && chatsContractViewWeak.get() != null) {
+                            chatsContractViewWeak.get().hideProgress();
+                        }
                         chatRecyclerAdapter.addNewItems(chatItems);
                     }
                 });
