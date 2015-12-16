@@ -2,7 +2,6 @@ package com.tg.osip.ui.activities;
 
 import android.app.Dialog;
 import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
@@ -15,57 +14,47 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.TextView;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.tg.osip.ApplicationSIP;
 import com.tg.osip.R;
 import com.tg.osip.business.main.MainInteract;
-import com.tg.osip.business.models.UserItem;
 import com.tg.osip.tdclient.TGProxyI;
 import com.tg.osip.tdclient.update_managers.FileDownloaderManager;
 import com.tg.osip.ui.chats.ChatsFragment;
-import com.tg.osip.ui.general.DefaultSubscriber;
-import com.tg.osip.ui.general.views.images.PhotoView;
-import com.tg.osip.utils.common.BackgroundExecutor;
-
-import org.drinkless.td.libcore.telegram.TdApi;
+import com.tg.osip.ui.main.MainContract;
+import com.tg.osip.ui.main.MainPresenter;
 
 import javax.inject.Inject;
 
 import dagger.Module;
 import dagger.Provides;
 import dagger.Subcomponent;
-import rx.Subscription;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.schedulers.Schedulers;
 
 /**
  *
  */
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements MainContract.View {
 
     @Inject
-    MainInteract mainInteract;
+    MainPresenter mainPresenter;
 
     private Toolbar toolbar;
     private View headerNavigationView;
     private DrawerLayout drawerLayout;
     private ActionBarDrawerToggle drawerToggle;
     private Dialog logoutProgressDialog;
-    private Subscription getMeUserSubscription;
-    private Subscription logoutSubscription;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         ApplicationSIP.get().applicationComponent().plus(new MainActivityModule()).inject(this);
+        mainPresenter.bindView(this);
 
         setContentView(R.layout.ac_main);
         initNavigationHeaderView();
         setToolbar();
         initView();
-        loadDataForNavigationHeaderView();
         if (savedInstanceState == null) {
             startFragment(new ChatsFragment(), false);
         }
@@ -74,6 +63,7 @@ public class MainActivity extends AppCompatActivity {
     private void initNavigationHeaderView() {
         LayoutInflater layoutInflater = (LayoutInflater)getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         headerNavigationView = layoutInflater.inflate(R.layout.navigation_header_layout, null);
+        mainPresenter.loadDataForNavigationHeaderView(headerNavigationView);
     }
 
     private void setToolbar() {
@@ -100,33 +90,12 @@ public class MainActivity extends AppCompatActivity {
                 item -> {
                     switch (item.getItemId()) {
                         case R.id.navigation_item_logout:
-                            drawerLayout.closeDrawers();
-                            logout();
+                            mainPresenter.logout(MainActivity.this, drawerLayout);
                             return true;
                         default:
                             return true;
                     }
                 });
-    }
-
-    private void logout() {
-        logoutSubscription = mainInteract.getLogoutObservable(() -> {
-            logoutProgressDialog = createProgressDialog(MainActivity.this);
-            logoutProgressDialog.show();
-        }, () -> {
-            if (logoutProgressDialog != null && logoutProgressDialog.isShowing()) {
-                logoutProgressDialog.dismiss();
-            }
-        })
-            .subscribeOn(Schedulers.from(BackgroundExecutor.getSafeBackgroundExecutor()))
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe(new DefaultSubscriber<TdApi.AuthState>() {
-                @Override
-                public void onNext(TdApi.AuthState authState) {
-                    startActivity(new Intent(MainActivity.this, LoginActivity.class));
-                    finish();
-                }
-        });
     }
 
     private Dialog createProgressDialog(Context context) {
@@ -135,26 +104,6 @@ public class MainActivity extends AppCompatActivity {
                 .content(context.getResources().getString(R.string.wait))
                 .progress(true, 0)
                 .show();
-    }
-
-    private void loadDataForNavigationHeaderView() {
-        getMeUserSubscription = mainInteract.getMeUserObservable()
-                .subscribeOn(Schedulers.from(BackgroundExecutor.getSafeBackgroundExecutor()))
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(this::bindView);
-    }
-
-    private void bindView(UserItem userItem) {
-        if (userItem == null || headerNavigationView == null) {
-            return;
-        }
-        PhotoView avatar = (PhotoView) headerNavigationView.findViewById(R.id.avatar);
-        avatar.setCircleRounds(true);
-        avatar.setImageLoaderI(userItem);
-        TextView name = (TextView) headerNavigationView.findViewById(R.id.name);
-        name.setText(userItem.getName());
-        TextView phone = (TextView) headerNavigationView.findViewById(R.id.phone);
-        phone.setText(userItem.getPhone());
     }
 
     @Override
@@ -201,18 +150,27 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
+    public void showProgress() {
+        logoutProgressDialog = createProgressDialog(MainActivity.this);
+        logoutProgressDialog.show();
+    }
+
+    @Override
+    public void hideProgress() {
+        if (logoutProgressDialog != null && logoutProgressDialog.isShowing()) {
+            logoutProgressDialog.dismiss();
+        }
+    }
+
+    @Override
     public void onDestroy() {
-        if (getMeUserSubscription != null && !getMeUserSubscription.isUnsubscribed()) {
-            getMeUserSubscription.unsubscribe();
-        }
-        if (logoutSubscription != null && !logoutSubscription.isUnsubscribed()) {
-            logoutSubscription.unsubscribe();
-        }
+        mainPresenter.onDestroy();
         if (logoutProgressDialog != null && logoutProgressDialog.isShowing()) {
             logoutProgressDialog.dismiss();
         }
         super.onDestroy();
     }
+
 
     @Subcomponent(modules = MainActivityModule.class)
     public interface MainActivityComponent {
@@ -224,11 +182,14 @@ public class MainActivity extends AppCompatActivity {
 
         @Provides
         @NonNull
+        public MainPresenter provideMainPresenter(@NonNull MainInteract mainInteract) {
+            return new MainPresenter(mainInteract);
+        }
+
+        @Provides
+        @NonNull
         public MainInteract provideMainInteract(@NonNull TGProxyI tgProxyI, @NonNull FileDownloaderManager fileDownloaderManager) {
-            return new MainInteract(
-                    tgProxyI,
-                    fileDownloaderManager
-            );
+            return new MainInteract(tgProxyI,fileDownloaderManager);
         }
     }
 

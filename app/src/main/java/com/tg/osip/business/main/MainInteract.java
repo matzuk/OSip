@@ -21,7 +21,6 @@ import rx.android.schedulers.AndroidSchedulers;
  */
 public class MainInteract {
 
-    private static final int TIMER_IN_MS = 200;
     // field for preventing extra requests
     private UserItem userItem;
 
@@ -47,17 +46,13 @@ public class MainInteract {
         }
     }
 
-    public Observable<TdApi.AuthState> getLogoutObservable(Runnable showLoading, Runnable hideLoading) {
-        return Observable.timer(TIMER_IN_MS, TimeUnit.MILLISECONDS)
-                .observeOn(AndroidSchedulers.mainThread())
+    public Observable<TdApi.AuthState> getLogoutObservable() {
+        return tgProxy.sendTD(new TdApi.ResetAuth(false), TdApi.AuthState.class)
                 .doOnNext(aLong -> {
                     // clear FileDownloaderManager
                     fileDownloaderManager.clearManager();
-                    showLoading.run();
                 })
-                .concatMap(aLong -> tgProxy.sendTD(new TdApi.ResetAuth(false), TdApi.AuthState.class))
-                .observeOn(AndroidSchedulers.mainThread())
-                .doOnNext(authState -> hideLoading.run());
+                .observeOn(AndroidSchedulers.mainThread());
     }
 
 }
