@@ -18,7 +18,6 @@ public class UpdateManager {
     private PublishSubject<TdApi.Update> updateChannel = PublishSubject.create();
 
     public void sendUpdateEvent(TdApi.Update update) {
-        Log.d(LOG, update.toString());
         updateChannel.onNext(update);
     }
 
