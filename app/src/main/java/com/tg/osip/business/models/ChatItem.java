@@ -1,7 +1,9 @@
 package com.tg.osip.business.models;
 
+import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.support.annotation.VisibleForTesting;
+import android.support.v4.util.Pair;
 import android.text.TextUtils;
 
 import com.amulyakhare.textdrawable.TextDrawable;
@@ -14,6 +16,15 @@ import com.tg.osip.utils.common.AndroidUtils;
 import com.tg.osip.utils.time.TimeUtils;
 
 import org.drinkless.td.libcore.telegram.TdApi;
+
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.concurrent.TimeUnit;
+
+import rx.Observable;
+import rx.Subscriber;
+import rx.functions.Func1;
+import rx.functions.Func2;
 
 /**
  * Comfortable model for {@link ChatRecyclerAdapter ChatRecyclerAdapter}
@@ -102,8 +113,12 @@ public class ChatItem implements ImageLoaderI {
         return info;
     }
 
-    void initChatLastMessage(TdApi.Message message) {
+    private void initChatLastMessage(TdApi.Message message) {
         TdApi.MessageContent messageContent = message.message;
+        initChatLastMessage(ApplicationSIP.applicationContext, messageContent);
+    }
+
+    void initChatLastMessage(Context context, TdApi.MessageContent messageContent) {
         if (messageContent == null) {
             lastMessageText = EMPTY_STRING;
             return;
@@ -111,15 +126,15 @@ public class ChatItem implements ImageLoaderI {
         if (messageContent.getClass() == TdApi.MessageText.class) {
             lastMessageText = ((TdApi.MessageText)messageContent).text != null ? ((TdApi.MessageText)messageContent).text : EMPTY_STRING;
         } else if (messageContent.getClass() == TdApi.MessageAudio.class) {
-            lastMessageText = ApplicationSIP.applicationContext.getResources().getString(R.string.chat_list_message_type_audio);
+            lastMessageText = context.getResources().getString(R.string.chat_list_message_type_audio);
         } else if (messageContent.getClass() == TdApi.MessageVideo.class) {
-            lastMessageText = ApplicationSIP.applicationContext.getResources().getString(R.string.chat_list_message_type_video);
+            lastMessageText = context.getResources().getString(R.string.chat_list_message_type_video);
         } else if (messageContent.getClass() == TdApi.MessagePhoto.class) {
-            lastMessageText = ApplicationSIP.applicationContext.getResources().getString(R.string.chat_list_message_type_photo);
+            lastMessageText = context.getResources().getString(R.string.chat_list_message_type_photo);
         } else if (messageContent.getClass() == TdApi.MessageSticker.class) {
-            lastMessageText = ApplicationSIP.applicationContext.getResources().getString(R.string.chat_list_message_type_sticker);
+            lastMessageText = context.getResources().getString(R.string.chat_list_message_type_sticker);
         } else {
-            lastMessageText = ApplicationSIP.applicationContext.getResources().getString(R.string.chat_list_message_type_other);
+            lastMessageText = context.getResources().getString(R.string.chat_list_message_type_other);
         }
     }
 
