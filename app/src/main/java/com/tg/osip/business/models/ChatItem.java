@@ -1,6 +1,7 @@
 package com.tg.osip.business.models;
 
 import android.graphics.drawable.Drawable;
+import android.support.annotation.VisibleForTesting;
 import android.text.TextUtils;
 
 import com.amulyakhare.textdrawable.TextDrawable;
@@ -34,6 +35,11 @@ public class ChatItem implements ImageLoaderI {
     private String photoFilePath;
     private Drawable plug;
     private String info;
+
+    @VisibleForTesting
+    ChatItem() {
+
+    }
 
     public ChatItem(TdApi.Chat chat) {
         this.chat = chat;
@@ -96,7 +102,7 @@ public class ChatItem implements ImageLoaderI {
         return info;
     }
 
-    private void initChatLastMessage(TdApi.Message message) {
+    void initChatLastMessage(TdApi.Message message) {
         TdApi.MessageContent messageContent = message.message;
         if (messageContent == null) {
             lastMessageText = EMPTY_STRING;

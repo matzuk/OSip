@@ -1,6 +1,5 @@
 package com.tg.osip.business.chats;
 
-import com.tg.osip.ApplicationSIP;
 import com.tg.osip.business.models.ChatItem;
 import com.tg.osip.tdclient.update_managers.FileDownloaderManager;
 import com.tg.osip.tdclient.TGProxyI;
@@ -11,9 +10,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import javax.inject.Inject;
-
 import rx.Observable;
+import rx.functions.Func1;
 
 /**
  * Interactor for presenter layout (ChatsFragment)
