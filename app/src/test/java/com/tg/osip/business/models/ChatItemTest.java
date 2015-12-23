@@ -61,9 +61,9 @@ public class ChatItemTest {
 
     @Test
     public void initChatLastMessage_textType() {
-        TdApi.MessageContent messageContent = new TdApi.MessageText("123");
+        TdApi.MessageContent messageContent = new TdApi.MessageText("message");
         chatItem.initChatLastMessage(context, messageContent);
-        assertThat(chatItem.getLastMessageText()).isEqualTo("123");
+        assertThat(chatItem.getLastMessageText()).isEqualTo("message");
     }
 
     @Test
