@@ -1,37 +1,38 @@
-package com.tg.osip.business.models;
+package com.tg.osip.business.models.messages.contents;
 
-import com.tg.osip.ui.messages.MessagesRecyclerAdapter;
+import android.support.annotation.Nullable;
+
+import com.tg.osip.business.models.PhotoItem;
 
 import org.drinkless.td.libcore.telegram.TdApi;
 
 /**
- * Comfortable model for {@link MessagesRecyclerAdapter MessagesRecyclerAdapter}
- *
  * @author e.matsyuk
  */
-public class MessageItem {
+public class MessageContentPhotoItem extends MessageContentItem {
 
     private static final String PHOTO_TYPE_S = "s";
     private static final String PHOTO_TYPE_M = "m";
     private static final String PHOTO_TYPE_X = "x";
     private static final String PHOTO_TYPE_Y = "y";
 
-    private TdApi.Message message;
-
     private PhotoItem photoItemMedium;
     private PhotoItem photoItemLarge;
 
-    public MessageItem(TdApi.Message message) {
-        this.message = message;
-        init();
+    public MessageContentPhotoItem(TdApi.MessageContent messageContent) {
+        init(messageContent);
     }
 
-    private void init() {
-        if (!isPhotoMessage()) {
+    private void init(TdApi.MessageContent messageContent) {
+        if (messageContent == null || messageContent.getClass() != TdApi.MessagePhoto.class) {
             return;
         }
-        TdApi.MessagePhoto messagePhoto = (TdApi.MessagePhoto)message.message;
+        TdApi.MessagePhoto messagePhoto = (TdApi.MessagePhoto)messageContent;
+        if (messagePhoto.photo == null || messagePhoto.photo.photos == null) {
+            return;
+        }
         TdApi.PhotoSize[] photoSizes = messagePhoto.photo.photos;
+
         for (TdApi.PhotoSize photoSize : photoSizes) {
             if (photoSize.type.equals(PHOTO_TYPE_M)) {
                 photoItemMedium = new PhotoItem(photoSize);
@@ -59,24 +60,12 @@ public class MessageItem {
         }
     }
 
-    public TdApi.Message getMessage() {
-        return message;
-    }
-
-    public boolean isPhotoMessage() {
-        return message.message.getClass() == TdApi.MessagePhoto.class;
-    }
-
-    /**
-     * @return if isPhotoMessage == true then PhotoItem M type or null
-     */
+    @Nullable
     public PhotoItem getPhotoItemMedium() {
         return photoItemMedium;
     }
 
-    /**
-     * @return if isPhotoMessage == true then PhotoItem Y type or null
-     */
+    @Nullable
     public PhotoItem getPhotoItemLarge() {
         return photoItemLarge;
     }

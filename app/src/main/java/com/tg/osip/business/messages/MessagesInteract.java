@@ -2,8 +2,8 @@ package com.tg.osip.business.messages;
 
 import android.support.v4.util.Pair;
 
-import com.tg.osip.business.models.MessageAdapterModel;
-import com.tg.osip.business.models.MessageItem;
+import com.tg.osip.business.models.messages.MessageAdapterModel;
+import com.tg.osip.business.models.messages.MessageItem;
 import com.tg.osip.business.models.PhotoItem;
 import com.tg.osip.business.models.UserItem;
 import com.tg.osip.tdclient.update_managers.FileDownloaderManager;

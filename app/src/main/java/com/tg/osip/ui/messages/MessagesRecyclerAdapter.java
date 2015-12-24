@@ -12,8 +12,8 @@ import android.widget.TextView;
 
 import com.tg.osip.ApplicationSIP;
 import com.tg.osip.R;
-import com.tg.osip.business.models.MessageAdapterModel;
-import com.tg.osip.business.models.MessageItem;
+import com.tg.osip.business.models.messages.MessageAdapterModel;
+import com.tg.osip.business.models.messages.MessageItem;
 import com.tg.osip.business.models.PhotoItem;
 import com.tg.osip.business.models.UserItem;
 import com.tg.osip.ui.general.views.images.PhotoView;

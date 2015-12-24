@@ -7,7 +7,7 @@ import android.support.v4.util.Pair;
 import android.support.v7.widget.RecyclerView;
 
 import com.tg.osip.business.messages.MessagesInteract;
-import com.tg.osip.business.models.MessageAdapterModel;
+import com.tg.osip.business.models.messages.MessageAdapterModel;
 import com.tg.osip.business.models.PhotoItem;
 import com.tg.osip.ui.activities.PhotoMediaActivity;
 import com.tg.osip.ui.general.views.pagination.PaginationTool;

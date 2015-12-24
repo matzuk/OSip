@@ -1,4 +1,6 @@
-package com.tg.osip.business.models;
+package com.tg.osip.business.models.messages;
+
+import com.tg.osip.business.models.UserItem;
 
 import java.util.List;
 import java.util.Map;
