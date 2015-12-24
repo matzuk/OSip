@@ -151,7 +151,7 @@ public class MessagesRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.V
         if (integerUserItemMap != null) {
             usersMap.putAll(integerUserItemMap);
         }
-        notifyItemInserted(getItemCount() - listElements.size());
+        notifyItemRangeInserted(getItemCount() - messageItemList.size(), messageItemList.size());
     }
 
     public boolean isAllItemsLoaded() {

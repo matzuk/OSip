@@ -61,8 +61,11 @@ public class ChatsPresenter implements ChatsContract.UserActionsListener {
         if (chatRecyclerAdapter.isAllItemsLoaded()) {
             return;
         }
-        listPagingSubscription = PaginationTool
-                .paging(recyclerView, offset -> chatsInteract.getNextDataPortionInList(offset, LIMIT))
+
+        PaginationTool<List<ChatItem>> paginationTool = PaginationTool.buildPagingObservable(recyclerView, offset -> chatsInteract.getNextDataPortionInList(offset, LIMIT))
+                .build();
+        listPagingSubscription = paginationTool
+                .getPagingObservable()
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new DefaultSubscriber<List<ChatItem>>() {
                     @Override

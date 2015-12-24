@@ -19,6 +19,7 @@ import java.io.Serializable;
 import java.lang.ref.WeakReference;
 import java.util.List;
 
+import rx.Observable;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
@@ -76,11 +77,19 @@ public class MessagesPresenter implements MessagesContract.UserActionsListener {
                 .subscribeOn(Schedulers.from(BackgroundExecutor.getSafeBackgroundExecutor()))
                 .observeOn(AndroidSchedulers.mainThread())
                 .doOnNext(chatMessageAdapterModelPair -> getChatLoadingSuccess(activity, chatMessageAdapterModelPair))
-                .concatMap(chatMessageAdapterModelPair -> PaginationTool
-                        .paging(recyclerView, offset ->
-                                messagesInteract.getNextDataPortionInList(offset, LIMIT, chatId, chatMessageAdapterModelPair.first.topMessage.id), LIMIT, EMPTY_COUNT_LIST))
+                .concatMap(chatMessageAdapterModelPair -> getMessagesPagingObservable(recyclerView, chatId, chatMessageAdapterModelPair.first.topMessage.id))
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(this::getNextDataPortionSuccess);
+    }
+
+    private Observable<MessageAdapterModel> getMessagesPagingObservable(RecyclerView recyclerView, long chatId, int topMessageId) {
+        PaginationTool<MessageAdapterModel> paginationTool = PaginationTool.buildPagingObservable(
+                recyclerView,
+                offset -> messagesInteract.getNextDataPortionInList(offset, LIMIT, chatId, topMessageId))
+                .setLimit(LIMIT)
+                .setEmptyListCount(EMPTY_COUNT_LIST)
+                .build();
+        return paginationTool.getPagingObservable();
     }
 
     private void getChatLoadingSuccess(Activity activity, Pair<TdApi.Chat, MessageAdapterModel> chatMessageAdapterModelPair) {
