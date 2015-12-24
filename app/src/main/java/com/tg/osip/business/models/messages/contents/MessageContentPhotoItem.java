@@ -60,11 +60,17 @@ public class MessageContentPhotoItem extends MessageContentItem {
         }
     }
 
+    /**
+     * @return if isPhotoMessage == true then PhotoItem M type or null
+     */
     @Nullable
     public PhotoItem getPhotoItemMedium() {
         return photoItemMedium;
     }
 
+    /**
+     * @return if isPhotoMessage == true then PhotoItem Y type or null
+     */
     @Nullable
     public PhotoItem getPhotoItemLarge() {
         return photoItemLarge;

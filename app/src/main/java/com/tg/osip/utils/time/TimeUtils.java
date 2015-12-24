@@ -40,6 +40,7 @@ public class TimeUtils {
         return formatter;
     }
 
+    // FIXME test with dif arguments
     public static String stringForMessageListDate(long date) {
         Calendar rightNow = Calendar.getInstance();
         int day = rightNow.get(Calendar.DAY_OF_YEAR);

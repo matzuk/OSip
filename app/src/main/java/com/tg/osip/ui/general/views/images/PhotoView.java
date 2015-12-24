@@ -1,6 +1,7 @@
 package com.tg.osip.ui.general.views.images;
 
 import android.content.Context;
+import android.support.annotation.NonNull;
 import android.util.AttributeSet;
 import android.widget.ImageView;
 
@@ -49,7 +50,7 @@ public class PhotoView extends ImageView {
         ApplicationSIP.get().applicationComponent().inject(this);
     }
 
-    public void setImageLoaderI(ImageLoaderI imageLoaderI) {
+    public void setImageLoaderI(@NonNull ImageLoaderI imageLoaderI) {
         startImageLoading(imageLoaderI);
     }
 

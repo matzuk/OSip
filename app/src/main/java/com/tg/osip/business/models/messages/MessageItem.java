@@ -19,18 +19,13 @@ import org.drinkless.td.libcore.telegram.TdApi;
  */
 public class MessageItem {
 
-    enum ContentType {
+    public enum ContentType {
         PHOTO_MESSAGE_TYPE,
         TEXT_MESSAGE_TYPE,
         ACTION_TYPE,
         UNSUPPORTED_TYPE,
         NULL_TYPE
     }
-
-    private static final String PHOTO_TYPE_S = "s";
-    private static final String PHOTO_TYPE_M = "m";
-    private static final String PHOTO_TYPE_X = "x";
-    private static final String PHOTO_TYPE_Y = "y";
 
     private int id;
     private int fromId;
@@ -40,23 +35,15 @@ public class MessageItem {
     private int forwardDate;
 
     private ContentType contentType;
-
     private MessageContentItem messageContentItem;
-
-    private TdApi.Message message;
-
-    private PhotoItem photoItemMedium;
-    private PhotoItem photoItemLarge;
 
     @VisibleForTesting
     MessageItem() { }
 
     public MessageItem(TdApi.Message message) {
-        this.message = message;
         initMessageFields(message);
         initMessageType(message);
         initMessageContent(message);
-        init(message);
     }
 
     void initMessageFields(TdApi.Message message) {
@@ -114,39 +101,6 @@ public class MessageItem {
         }
     }
 
-    private void init(TdApi.Message message) {
-        if (!isPhotoMessage()) {
-            return;
-        }
-        TdApi.MessagePhoto messagePhoto = (TdApi.MessagePhoto)message.message;
-        TdApi.PhotoSize[] photoSizes = messagePhoto.photo.photos;
-        for (TdApi.PhotoSize photoSize : photoSizes) {
-            if (photoSize.type.equals(PHOTO_TYPE_M)) {
-                photoItemMedium = new PhotoItem(photoSize);
-            } else if (photoSize.type.equals(PHOTO_TYPE_Y)) {
-                photoItemLarge = new PhotoItem(photoSize);
-                photoItemLarge.setPlugFile(photoItemMedium);
-            }
-        }
-        // if type there is not TYPE_M then set TYPE_S
-        if (photoItemMedium == null) {
-            for (TdApi.PhotoSize photoSize : photoSizes) {
-                if (photoSize.type.equals(PHOTO_TYPE_S)) {
-                    photoItemMedium = new PhotoItem(photoSize);
-                }
-            }
-        }
-        // if type there is not TYPE_Y then set TYPE_X
-        if (photoItemLarge == null) {
-            for (TdApi.PhotoSize photoSize : photoSizes) {
-                if (photoSize.type.equals(PHOTO_TYPE_X)) {
-                    photoItemLarge = new PhotoItem(photoSize);
-                    photoItemLarge.setPlugFile(photoItemMedium);
-                }
-            }
-        }
-    }
-
     public int getId() {
         return id;
     }
@@ -178,29 +132,6 @@ public class MessageItem {
     @Nullable
     public MessageContentItem getMessageContentItem() {
         return messageContentItem;
-    }
-
-
-    public TdApi.Message getMessage() {
-        return message;
-    }
-
-    public boolean isPhotoMessage() {
-        return message.message.getClass() == TdApi.MessagePhoto.class;
-    }
-
-    /**
-     * @return if isPhotoMessage == true then PhotoItem M type or null
-     */
-    public PhotoItem getPhotoItemMedium() {
-        return photoItemMedium;
-    }
-
-    /**
-     * @return if isPhotoMessage == true then PhotoItem Y type or null
-     */
-    public PhotoItem getPhotoItemLarge() {
-        return photoItemLarge;
     }
 
 }

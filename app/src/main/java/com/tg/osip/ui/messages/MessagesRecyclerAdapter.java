@@ -16,6 +16,9 @@ import com.tg.osip.business.models.messages.MessageAdapterModel;
 import com.tg.osip.business.models.messages.MessageItem;
 import com.tg.osip.business.models.PhotoItem;
 import com.tg.osip.business.models.UserItem;
+import com.tg.osip.business.models.messages.contents.MessageContentActionsItem;
+import com.tg.osip.business.models.messages.contents.MessageContentPhotoItem;
+import com.tg.osip.business.models.messages.contents.MessageContentTextItem;
 import com.tg.osip.ui.general.views.images.PhotoView;
 import com.tg.osip.utils.time.TimeUtils;
 
@@ -124,7 +127,7 @@ public class MessagesRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.V
 
     @Override
     public long getItemId(int position) {
-        return getItem(position).getMessage().id;
+        return getItem(position).getId();
     }
 
     public MessageItem getItem(int position) {
@@ -179,16 +182,12 @@ public class MessagesRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.V
 
     @Override
     public int getItemViewType(int position) {
-        TdApi.MessageContent messageContent = getItem(position).getMessage().message;
-        if (messageContent.getClass() == TdApi.MessageText.class) {
+        MessageItem.ContentType contentType = getItem(position).getContentType();
+        if (contentType == MessageItem.ContentType.TEXT_MESSAGE_TYPE) {
             return TEXT_VIEW;
-        } else if (messageContent.getClass() == TdApi.MessagePhoto.class) {
+        } else if (contentType == MessageItem.ContentType.PHOTO_MESSAGE_TYPE) {
             return PHOTO_VIEW;
-        } else if (messageContent.getClass() == TdApi.MessageChatAddParticipant.class ||
-                messageContent.getClass() == TdApi.MessageChatChangePhoto.class ||
-                messageContent.getClass() == TdApi.MessageChatChangeTitle.class ||
-                messageContent.getClass() == TdApi.MessageChatDeleteParticipant.class ||
-                messageContent.getClass() == TdApi.MessageChatDeletePhoto.class) {
+        } else if (contentType == MessageItem.ContentType.ACTION_TYPE) {
             return ACTION_VIEW;
         }
         return UNSUPPORTED_VIEW;
@@ -214,36 +213,32 @@ public class MessagesRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.V
 
     private void onBindTextHolder(RecyclerView.ViewHolder holder, int position) {
         TextViewHolder textHolder = (TextViewHolder) holder;
-        TdApi.Message message = getItem(position).getMessage();
-        if (message == null) {
+        MessageItem message = getItem(position);
+        MessageContentTextItem messageContentTextItem = (MessageContentTextItem)message.getMessageContentItem();
+        if (messageContentTextItem == null) {
             return;
         }
-        TdApi.MessageContent messageContent = message.message;
-        if (messageContent == null) {
-            return;
-        }
-        if (messageContent.getClass() == TdApi.MessageText.class) {
-            TdApi.MessageText messageText = (TdApi.MessageText)messageContent;
-            textHolder.messageText.setText(messageText.text);
-        }
+        textHolder.messageText.setText(messageContentTextItem.getText());
         // get user
-        UserItem user = usersMap.get(message.fromId);
-        // set name
-        String name = user.getName();
-        textHolder.messageName.setText(name);
-        // Set avatar
-        textHolder.avatar.setCircleRounds(true);
-        textHolder.avatar.setImageLoaderI(user);
+        UserItem user = usersMap.get(message.getFromId());
+        if (user != null) {
+            // set name
+            String name = user.getName();
+            textHolder.messageName.setText(name);
+            // Set avatar
+            textHolder.avatar.setCircleRounds(true);
+            textHolder.avatar.setImageLoaderI(user);
+        }
         // set data
-        String dataString = TimeUtils.stringForMessageListDate(message.date);
+        String dataString = TimeUtils.stringForMessageListDate(message.getDate());
         textHolder.messageSendingTime.setText(dataString);
 
         // set unread outbox image
-        if (message.date == TEMP_SEND_STATE_IS_ERROR) {
+        if (message.getDate() == TEMP_SEND_STATE_IS_ERROR) {
             textHolder.messageUnreadOutbox.setVisibility(View.VISIBLE);
             textHolder.messageUnreadOutbox.setImageDrawable(ResourcesCompat.getDrawable(ApplicationSIP.applicationContext.getResources(), R.drawable.ic_message_error, ApplicationSIP.applicationContext.getTheme()));
-        } else if (myUserId == message.fromId) {
-            if (lastChatReadOutboxId >= message.id) {
+        } else if (myUserId == message.getFromId()) {
+            if (lastChatReadOutboxId >= message.getId()) {
                 textHolder.messageUnreadOutbox.setVisibility(View.GONE);
             } else {
                 textHolder.messageUnreadOutbox.setVisibility(View.VISIBLE);
@@ -254,54 +249,54 @@ public class MessagesRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.V
         }
     }
 
-    private boolean isItemsEqual(int position) {
-        if (position == getItemCount() - 1) {
-            return false;
-        }
-        int nextPosition = position + 1;
-        if (getItemViewType(position) != getItemViewType(nextPosition)) {
-            return false;
-        }
-        String dataString = TimeUtils.stringForMessageListDate(getItem(position).getMessage().date);
-        String dataPreviousString = TimeUtils.stringForMessageListDate(getItem(nextPosition).getMessage().date);
-        if (!dataPreviousString.equals(dataString)) {
-            return false;
-        }
-        return getItem(position).getMessage().fromId == getItem(nextPosition).getMessage().fromId;
-    }
+//    private boolean isItemsEqual(int position) {
+//        if (position == getItemCount() - 1) {
+//            return false;
+//        }
+//        int nextPosition = position + 1;
+//        if (getItemViewType(position) != getItemViewType(nextPosition)) {
+//            return false;
+//        }
+//        String dataString = TimeUtils.stringForMessageListDate(getItem(position).getMessage().date);
+//        String dataPreviousString = TimeUtils.stringForMessageListDate(getItem(nextPosition).getMessage().date);
+//        if (!dataPreviousString.equals(dataString)) {
+//            return false;
+//        }
+//        return getItem(position).getMessage().fromId == getItem(nextPosition).getMessage().fromId;
+//    }
 
     private void onBindPhotoHolder(RecyclerView.ViewHolder holder, int position) {
         PhotoViewHolder photoViewHolder = (PhotoViewHolder) holder;
-        TdApi.Message message = getItem(position).getMessage();
-        if (message == null) {
+        MessageItem message = getItem(position);
+        MessageContentPhotoItem messageContentPhotoItem = (MessageContentPhotoItem)message.getMessageContentItem();
+        if (messageContentPhotoItem == null) {
             return;
         }
-        TdApi.MessageContent messageContent = message.message;
-        if (messageContent == null) {
-            return;
-        }
-        if (getItem(position).isPhotoMessage()) {
-            PhotoItem photoItem = getItem(position).getPhotoItemMedium();
+
+        PhotoItem photoItem = messageContentPhotoItem.getPhotoItemMedium();
+        if (photoItem != null) {
             photoViewHolder.photo.setImageLoaderI(photoItem);
         }
 
-        UserItem user = usersMap.get(message.fromId);
-        // set name
-        String name = user.getName();
-        photoViewHolder.messageName.setText(name);
-        // Set avatar
-        photoViewHolder.avatar.setCircleRounds(true);
-        photoViewHolder.avatar.setImageLoaderI(user);
+        UserItem user = usersMap.get(message.getFromId());
+        if (user != null) {
+            // set name
+            String name = user.getName();
+            photoViewHolder.messageName.setText(name);
+            // Set avatar
+            photoViewHolder.avatar.setCircleRounds(true);
+            photoViewHolder.avatar.setImageLoaderI(user);
+        }
 
-        String dataString = TimeUtils.stringForMessageListDate(message.date);
+        String dataString = TimeUtils.stringForMessageListDate(message.getDate());
         photoViewHolder.messageSendingTime.setText(dataString);
 
         // set unread outbox image
-        if (message.date == TEMP_SEND_STATE_IS_ERROR) {
+        if (message.getDate() == TEMP_SEND_STATE_IS_ERROR) {
             photoViewHolder.messageUnreadOutbox.setVisibility(View.VISIBLE);
             photoViewHolder.messageUnreadOutbox.setImageDrawable(ResourcesCompat.getDrawable(ApplicationSIP.applicationContext.getResources(), R.drawable.ic_message_error, ApplicationSIP.applicationContext.getTheme()));
-        } else if (myUserId == message.fromId) {
-            if (lastChatReadOutboxId >= message.id) {
+        } else if (myUserId == message.getFromId()) {
+            if (lastChatReadOutboxId >= message.getId()) {
                 photoViewHolder.messageUnreadOutbox.setVisibility(View.GONE);
             } else {
                 photoViewHolder.messageUnreadOutbox.setVisibility(View.VISIBLE);
@@ -312,9 +307,9 @@ public class MessagesRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.V
         }
         // set photo OnClickListener
         photoViewHolder.photoLayout.setOnClickListener(v -> {
-            if (onMessageClickListenerWeakReference != null && onMessageClickListenerWeakReference.get() != null) {
+            if (onMessageClickListenerWeakReference != null && onMessageClickListenerWeakReference.get() != null && messageContentPhotoItem.getPhotoItemLarge() != null) {
                 OnMessageClickListener onMessageClickListener = onMessageClickListenerWeakReference.get();
-                Pair<Integer, List<PhotoItem>> clickedPair = getPhotoLargeItemsWithClickedPos(getItem(position).getPhotoItemLarge().getPhotoFileId());
+                Pair<Integer, List<PhotoItem>> clickedPair = getPhotoLargeItemsWithClickedPos(messageContentPhotoItem.getPhotoItemLarge().getPhotoFileId());
                 onMessageClickListener.onPhotoMessageClick(clickedPair.first, clickedPair.second);
             }
         });
@@ -326,9 +321,17 @@ public class MessagesRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.V
         int clickedPosInPhotoList = currentPosInPhotoList;
         List<PhotoItem> photoLargeItemList = new ArrayList<>();
         for (MessageItem messageItem : listElements) {
-            if (messageItem.isPhotoMessage()) {
-                photoLargeItemList.add(messageItem.getPhotoItemLarge());
-                if (photoFileId == messageItem.getPhotoItemLarge().getPhotoFileId()) {
+            if (messageItem.getContentType() == MessageItem.ContentType.PHOTO_MESSAGE_TYPE) {
+                MessageContentPhotoItem messageContentPhotoItem = ((MessageContentPhotoItem)messageItem.getMessageContentItem());
+                if (messageContentPhotoItem == null) {
+                    continue;
+                }
+                PhotoItem photoItemLarge = messageContentPhotoItem.getPhotoItemLarge();
+                if (photoItemLarge == null) {
+                    continue;
+                }
+                photoLargeItemList.add(photoItemLarge);
+                if (photoFileId == photoItemLarge.getPhotoFileId()) {
                     clickedPosInPhotoList = currentPosInPhotoList;
                 }
                 currentPosInPhotoList++;
@@ -337,8 +340,8 @@ public class MessagesRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.V
         return new Pair<>(clickedPosInPhotoList, photoLargeItemList);
     }
 
-    private void setSendStateMessage(TdApi.Message message, ImageView imageView) {
-        if (message.id >= TEMP_SEND_STATE_IS_SENDING) {
+    private void setSendStateMessage(MessageItem message, ImageView imageView) {
+        if (message.getId() >= TEMP_SEND_STATE_IS_SENDING) {
             imageView.setImageDrawable(ResourcesCompat.getDrawable(ApplicationSIP.applicationContext.getResources(), R.drawable.ic_clock, ApplicationSIP.applicationContext.getTheme()));
         } else {
             imageView.setImageDrawable(ResourcesCompat.getDrawable(ApplicationSIP.applicationContext.getResources(), R.drawable.ic_not_read, ApplicationSIP.applicationContext.getTheme()));
@@ -347,20 +350,18 @@ public class MessagesRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.V
 
     private void onBindActionHolder(RecyclerView.ViewHolder holder, int position) {
         ActionViewHolder actionHolder = (ActionViewHolder) holder;
-        TdApi.Message message = getItem(position).getMessage();
-        if (message == null) {
+        MessageItem message = getItem(position);
+        MessageContentActionsItem messageContentActionsItem = (MessageContentActionsItem)message.getMessageContentItem();
+        if (messageContentActionsItem == null) {
             return;
         }
-        TdApi.MessageContent messageContent = message.message;
-        if (messageContent == null) {
-            return;
-        }
-        String actionText = getActionText(messageContent, usersMap.get(message.fromId));
+
+        String actionText = getActionText(messageContentActionsItem.getMessageContent(), usersMap.get(message.getFromId()));
         if (actionText != null) {
             actionHolder.messageText.setText(actionText);
         }
-        if (messageContent.getClass() == TdApi.MessageChatChangePhoto.class) {
-            TdApi.Photo photo = ((TdApi.MessageChatChangePhoto)messageContent).photo;
+        if (messageContentActionsItem.getMessageContent().getClass() == TdApi.MessageChatChangePhoto.class) {
+            TdApi.Photo photo = ((TdApi.MessageChatChangePhoto)messageContentActionsItem.getMessageContent()).photo;
             actionHolder.photo.setVisibility(View.VISIBLE);
             // TODO add later
             //setPhoto(actionHolder.photo, photo, GROUP_SMALL_PHOTO, true);
@@ -406,17 +407,12 @@ public class MessagesRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.V
 
     private void onBindUnsupportedHolder(RecyclerView.ViewHolder holder, int position) {
         UnsupportedViewHolder unsupportedHolder = (UnsupportedViewHolder) holder;
-        TdApi.Message message = getItem(position).getMessage();
+        MessageItem message = getItem(position);
         if (message == null) {
             return;
         }
 
-        TdApi.MessageContent messageContent = message.message;
-        if (messageContent == null) {
-            return;
-        }
-
-        UserItem user = usersMap.get(message.fromId);
+        UserItem user = usersMap.get(message.getFromId());
         // set name
         String name = user.getName();
         unsupportedHolder.messageName.setText(name);
@@ -424,15 +420,15 @@ public class MessagesRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.V
         unsupportedHolder.avatar.setCircleRounds(true);
         unsupportedHolder.avatar.setImageLoaderI(user);
 
-        String dataString = TimeUtils.stringForMessageListDate(message.date);
+        String dataString = TimeUtils.stringForMessageListDate(message.getDate());
         unsupportedHolder.messageSendingTime.setText(dataString);
 
         // set unread outbox image
-        if (message.date == TEMP_SEND_STATE_IS_ERROR) {
+        if (message.getDate() == TEMP_SEND_STATE_IS_ERROR) {
             unsupportedHolder.messageUnreadOutbox.setVisibility(View.VISIBLE);
             unsupportedHolder.messageUnreadOutbox.setImageDrawable(ResourcesCompat.getDrawable(ApplicationSIP.applicationContext.getResources(), R.drawable.ic_message_error, ApplicationSIP.applicationContext.getTheme()));
-        } else if (myUserId == message.fromId) {
-            if (lastChatReadOutboxId >= message.id) {
+        } else if (myUserId == message.getFromId()) {
+            if (lastChatReadOutboxId >= message.getId()) {
                 unsupportedHolder.messageUnreadOutbox.setVisibility(View.GONE);
             } else {
                 unsupportedHolder.messageUnreadOutbox.setVisibility(View.VISIBLE);
