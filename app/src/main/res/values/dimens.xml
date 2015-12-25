@@ -12,4 +12,6 @@
     <dimen name="message_sending_time_text_size">@dimen/text_size_small</dimen>
     <dimen name="message_text_text_size">@dimen/text_size_medium</dimen>
     <dimen name="message_padding_top_bottom">@dimen/size_small</dimen>
+    <dimen name="message_chat_changing_padding_left_right">@dimen/size_large</dimen>
+    <dimen name="message_chat_changing_photo_size">@dimen/size_xxxlarge</dimen>
 </resources>

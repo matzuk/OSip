@@ -9,6 +9,7 @@ import com.tg.osip.business.models.messages.contents.ChatJoinByLink;
 import com.tg.osip.business.models.messages.contents.ChatAddParticipantItem;
 import com.tg.osip.business.models.messages.contents.ChatChangePhotoItem;
 import com.tg.osip.business.models.messages.contents.ChatChangeTitleItem;
+import com.tg.osip.business.models.messages.contents.GroupChatCreate;
 import com.tg.osip.business.models.messages.contents.MessageContentItem;
 import com.tg.osip.business.models.messages.contents.MessageContentPhotoItem;
 import com.tg.osip.business.models.messages.contents.MessageContentTextItem;
@@ -32,7 +33,7 @@ public class MessageItem {
         CHAT_DELETE_PARTICIPANT,
         CHAT_DELETE_PHOTO,
         CHAT_JOIN_BY_LINK,
-        ACTION_TYPE,
+        GROUP_CHAT_CREATE,
         UNSUPPORTED_TYPE,
         NULL_TYPE
     }
@@ -96,6 +97,9 @@ public class MessageItem {
         } else if (message.message.getClass() == TdApi.MessageChatJoinByLink.class) {
             contentType = ContentType.CHAT_JOIN_BY_LINK;
             messageContentItem = new ChatJoinByLink((TdApi.MessageChatJoinByLink)message.message);
+        } else if (message.message.getClass() == TdApi.MessageGroupChatCreate.class) {
+            contentType = ContentType.GROUP_CHAT_CREATE;
+            messageContentItem = new GroupChatCreate((TdApi.MessageGroupChatCreate)message.message);
         } else {
             contentType = ContentType.UNSUPPORTED_TYPE;
         }

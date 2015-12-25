@@ -6,6 +6,7 @@ import com.tg.osip.business.models.messages.contents.ChatChangeTitleItem;
 import com.tg.osip.business.models.messages.contents.ChatDeleteParticipantItem;
 import com.tg.osip.business.models.messages.contents.ChatDeletePhoto;
 import com.tg.osip.business.models.messages.contents.ChatJoinByLink;
+import com.tg.osip.business.models.messages.contents.GroupChatCreate;
 import com.tg.osip.business.models.messages.contents.MessageContentPhotoItem;
 import com.tg.osip.business.models.messages.contents.MessageContentTextItem;
 
@@ -136,6 +137,14 @@ public class MessageItemTest {
         message.message = new TdApi.MessageChatJoinByLink();
         MessageItem messageItem = new MessageItem(message);
         assertThat(messageItem.getMessageContentItem().getClass()).isEqualTo(ChatJoinByLink.class);
+    }
+
+    @Test
+    public void constructor_messageContentGroupChatCreate() {
+        TdApi.Message message = new TdApi.Message();
+        message.message = new TdApi.MessageGroupChatCreate();
+        MessageItem messageItem = new MessageItem(message);
+        assertThat(messageItem.getMessageContentItem().getClass()).isEqualTo(GroupChatCreate.class);
     }
 
     @Test

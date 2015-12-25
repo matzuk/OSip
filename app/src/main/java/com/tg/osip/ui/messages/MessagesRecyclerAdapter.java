@@ -1,8 +1,11 @@
 package com.tg.osip.ui.messages;
 
+import android.support.v4.content.ContextCompat;
 import android.support.v4.content.res.ResourcesCompat;
 import android.support.v4.util.Pair;
 import android.support.v7.widget.RecyclerView;
+import android.text.SpannableString;
+import android.text.style.ForegroundColorSpan;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,13 +19,15 @@ import com.tg.osip.business.models.messages.MessageAdapterModel;
 import com.tg.osip.business.models.messages.MessageItem;
 import com.tg.osip.business.models.PhotoItem;
 import com.tg.osip.business.models.UserItem;
-import com.tg.osip.business.models.messages.contents.MessageContentActionsItem;
+import com.tg.osip.business.models.messages.contents.ChatAddParticipantItem;
+import com.tg.osip.business.models.messages.contents.ChatChangePhotoItem;
+import com.tg.osip.business.models.messages.contents.ChatChangeTitleItem;
+import com.tg.osip.business.models.messages.contents.ChatDeleteParticipantItem;
+import com.tg.osip.business.models.messages.contents.GroupChatCreate;
 import com.tg.osip.business.models.messages.contents.MessageContentPhotoItem;
 import com.tg.osip.business.models.messages.contents.MessageContentTextItem;
 import com.tg.osip.ui.general.views.images.PhotoView;
 import com.tg.osip.utils.time.TimeUtils;
-
-import org.drinkless.td.libcore.telegram.TdApi;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
@@ -41,8 +46,15 @@ public class MessagesRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.V
 
     private static final int TEXT_VIEW = 0;
     private static final int PHOTO_VIEW = 1;
-    private static final int ACTION_VIEW = 3;
-    private static final int UNSUPPORTED_VIEW = 4;
+    private static final int CHAT_ADD_PARTICIPANT_VIEW = 2;
+    private static final int CHAT_CHANGE_PHOTO_VIEW = 3;
+    private static final int CHAT_CHANGE_TITLE_VIEW = 4;
+    private static final int CHAT_DELETE_PARTICIPANT_VIEW = 5;
+    private static final int CHAT_DELETE_PHOTO_VIEW = 6;
+    // FIXME how work TdApi.MessageChatJoinByLink
+//    private static final int CHAT_JOIN_BY_LINK_VIEW = 7;
+    private static final int GROUP_CHAT_CREATE_VIEW = 8;
+    private static final int UNSUPPORTED_VIEW = 9;
 
     private int myUserId;
     private int lastChatReadOutboxId;
@@ -91,15 +103,25 @@ public class MessagesRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.V
         }
     }
 
-    static class ActionViewHolder extends RecyclerView.ViewHolder {
+    static class ChatChangesViewHolder extends RecyclerView.ViewHolder {
 
         TextView messageText;
-        ImageView photo;
 
-        public ActionViewHolder(View itemView) {
+        public ChatChangesViewHolder(View itemView) {
             super(itemView);
             messageText = (TextView) itemView.findViewById(R.id.message_text);
-            photo = (ImageView) itemView.findViewById(R.id.photo);
+        }
+    }
+
+    static class ChatChangesPhotoViewHolder extends RecyclerView.ViewHolder {
+
+        TextView messageText;
+        PhotoView photo;
+
+        public ChatChangesPhotoViewHolder(View itemView) {
+            super(itemView);
+            messageText = (TextView) itemView.findViewById(R.id.message_text);
+            photo = (PhotoView) itemView.findViewById(R.id.photo);
         }
     }
 
@@ -169,11 +191,28 @@ public class MessagesRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.V
         } else if (viewType == PHOTO_VIEW) {
             View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_message_list_photo, parent, false);
             return new PhotoViewHolder(v);
-        } else if (viewType == ACTION_VIEW) {
-            View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_message_list_actions, parent, false);
-            return new ActionViewHolder(v);
-        }
-        else if (viewType == UNSUPPORTED_VIEW) {
+        } else if (viewType == CHAT_ADD_PARTICIPANT_VIEW) {
+            View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_message_list_chat_changes, parent, false);
+            return new ChatChangesViewHolder(v);
+        } else if (viewType == CHAT_CHANGE_PHOTO_VIEW) {
+            View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_message_list_chat_changes_photo, parent, false);
+            return new ChatChangesPhotoViewHolder(v);
+        } else if (viewType == CHAT_CHANGE_TITLE_VIEW) {
+            View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_message_list_chat_changes, parent, false);
+            return new ChatChangesViewHolder(v);
+        } else if (viewType == CHAT_DELETE_PARTICIPANT_VIEW) {
+            View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_message_list_chat_changes, parent, false);
+            return new ChatChangesViewHolder(v);
+        } else if (viewType == CHAT_DELETE_PHOTO_VIEW) {
+            View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_message_list_chat_changes, parent, false);
+            return new ChatChangesViewHolder(v);
+//        } else if (viewType == CHAT_JOIN_BY_LINK_VIEW) {
+//            View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_message_list_chat_changes, parent, false);
+//            return new ChatChangesViewHolder(v);
+        } else if (viewType == GROUP_CHAT_CREATE_VIEW) {
+            View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_message_list_chat_changes, parent, false);
+            return new ChatChangesViewHolder(v);
+        } else if (viewType == UNSUPPORTED_VIEW) {
             View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_message_list_unsupport, parent, false);
             return new UnsupportedViewHolder(v);
         }
@@ -187,8 +226,20 @@ public class MessagesRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.V
             return TEXT_VIEW;
         } else if (contentType == MessageItem.ContentType.PHOTO_MESSAGE_TYPE) {
             return PHOTO_VIEW;
-        } else if (contentType == MessageItem.ContentType.ACTION_TYPE) {
-            return ACTION_VIEW;
+        } else if (contentType == MessageItem.ContentType.CHAT_ADD_PARTICIPANT) {
+            return CHAT_ADD_PARTICIPANT_VIEW;
+        } else if (contentType == MessageItem.ContentType.CHAT_CHANGE_PHOTO) {
+            return CHAT_CHANGE_PHOTO_VIEW;
+        } else if (contentType == MessageItem.ContentType.CHAT_CHANGE_TITLE) {
+            return CHAT_CHANGE_TITLE_VIEW;
+        } else if (contentType == MessageItem.ContentType.CHAT_DELETE_PARTICIPANT) {
+            return CHAT_DELETE_PARTICIPANT_VIEW;
+        } else if (contentType == MessageItem.ContentType.CHAT_DELETE_PHOTO) {
+            return CHAT_DELETE_PHOTO_VIEW;
+//        } else if (contentType == MessageItem.ContentType.CHAT_JOIN_BY_LINK) {
+//            return CHAT_JOIN_BY_LINK_VIEW;
+        } else if (contentType == MessageItem.ContentType.GROUP_CHAT_CREATE) {
+            return GROUP_CHAT_CREATE_VIEW;
         }
         return UNSUPPORTED_VIEW;
     }
@@ -202,9 +253,27 @@ public class MessagesRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.V
             case PHOTO_VIEW:
                 onBindPhotoHolder(holder, position);
                 break;
-            case ACTION_VIEW:
-                onBindActionHolder(holder, position);
+            case CHAT_ADD_PARTICIPANT_VIEW:
+                onBindChatAddParticipantHolder(holder, position);
                 break;
+            case CHAT_CHANGE_PHOTO_VIEW:
+                onBindChatChangePhotoHolder(holder, position);
+                break;
+            case CHAT_CHANGE_TITLE_VIEW:
+                onBindChatChangeTitleHolder(holder, position);
+                break;
+            case CHAT_DELETE_PARTICIPANT_VIEW:
+                onBindChatDeleteParticipantHolder(holder, position);
+                break;
+            case CHAT_DELETE_PHOTO_VIEW:
+                onBindChatDeletePhotoHolder(holder, position);
+                break;
+            case GROUP_CHAT_CREATE_VIEW:
+                onBindGroupChatCreateHolder(holder, position);
+                break;
+//            case CHAT_JOIN_BY_LINK_VIEW:
+//                onBindChatJoinByLinkHolder(holder, position);
+//                break;
             case UNSUPPORTED_VIEW:
                 onBindUnsupportedHolder(holder, position);
                 break;
@@ -348,61 +417,101 @@ public class MessagesRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.V
         }
     }
 
-    private void onBindActionHolder(RecyclerView.ViewHolder holder, int position) {
-        ActionViewHolder actionHolder = (ActionViewHolder) holder;
+    private void onBindChatAddParticipantHolder(RecyclerView.ViewHolder holder, int position) {
+        ChatChangesViewHolder actionHolder = (ChatChangesViewHolder) holder;
         MessageItem message = getItem(position);
-        MessageContentActionsItem messageContentActionsItem = (MessageContentActionsItem)message.getMessageContentItem();
-        if (messageContentActionsItem == null) {
+        ChatAddParticipantItem chatAddParticipantItem = (ChatAddParticipantItem)message.getMessageContentItem();
+        if (chatAddParticipantItem == null) {
             return;
         }
+        String fromUserName = getUserName(message.getFromId());
+        SpannableString text = new SpannableString(ApplicationSIP.applicationContext.getResources().getString(R.string.added, fromUserName, chatAddParticipantItem.getName()));
+        text.setSpan(new ForegroundColorSpan(ContextCompat.getColor(ApplicationSIP.applicationContext, R.color.color_primary_dark)), 0, fromUserName.length(), 0);
+        text.setSpan(new ForegroundColorSpan(ContextCompat.getColor(ApplicationSIP.applicationContext, R.color.color_primary_dark)), text.length() - chatAddParticipantItem.getName().length(), text.length(), 0);
 
-        String actionText = getActionText(messageContentActionsItem.getMessageContent(), usersMap.get(message.getFromId()));
-        if (actionText != null) {
-            actionHolder.messageText.setText(actionText);
-        }
-        if (messageContentActionsItem.getMessageContent().getClass() == TdApi.MessageChatChangePhoto.class) {
-            TdApi.Photo photo = ((TdApi.MessageChatChangePhoto)messageContentActionsItem.getMessageContent()).photo;
-            actionHolder.photo.setVisibility(View.VISIBLE);
-            // TODO add later
-            //setPhoto(actionHolder.photo, photo, GROUP_SMALL_PHOTO, true);
-        } else {
-            actionHolder.photo.setImageDrawable(null);
-            actionHolder.photo.setVisibility(View.GONE);
-        }
+        actionHolder.messageText.setText(text);
     }
 
-    // TODO add name selecting
-    private String getActionText(TdApi.MessageContent messageContent, UserItem userItem) {
-        String text;
-        TdApi.User userFrom = userItem.getUser();
-        if (messageContent.getClass() == TdApi.MessageChatAddParticipant.class) {
-            text = userItem.getName();
-            text = text + " " + ApplicationSIP.applicationContext.getString(R.string.invited);
-            text = text + " " +((TdApi.MessageChatAddParticipant)messageContent).user.firstName + " " + ((TdApi.MessageChatAddParticipant)messageContent).user.lastName;
-            return text;
-        } else if (messageContent.getClass() == TdApi.MessageChatChangePhoto.class) {
-            text = userItem.getName();
-            text = text + " " + ApplicationSIP.applicationContext.getString(R.string.changed_group_photo);
-            return text;
-        } else if (messageContent.getClass() == TdApi.MessageChatChangeTitle.class) {
-            text = userItem.getName();
-            text = text + " " + ApplicationSIP.applicationContext.getString(R.string.changed_group_name);
-            text = text + " " +((TdApi.MessageChatChangeTitle)messageContent).title;
-            return text;
-        } else if (messageContent.getClass() == TdApi.MessageChatDeleteParticipant.class) {
-            text = ((TdApi.MessageChatDeleteParticipant)messageContent).user.firstName + " " + ((TdApi.MessageChatDeleteParticipant)messageContent).user.lastName;
-            if (userFrom != null) {
-                text = userItem.getName() + ApplicationSIP.applicationContext.getString(R.string.removed) + " " + text;
-            } else {
-                text = text + " " + ApplicationSIP.applicationContext.getString(R.string.left_group);
-            }
-            return text;
-        } else if (messageContent instanceof TdApi.MessageChatDeletePhoto) {
-            text = userItem.getName();
-            text = text + " " + ApplicationSIP.applicationContext.getString(R.string.removed_group_photo);
-            return text;
+    private String getUserName(int id) {
+        UserItem userItem = usersMap.get(id);
+        String fromUserName = "";
+        if (userItem != null) {
+            fromUserName = userItem.getName();
         }
-        return "";
+        return fromUserName;
+    }
+
+    private void onBindChatChangePhotoHolder(RecyclerView.ViewHolder holder, int position) {
+        ChatChangesPhotoViewHolder actionHolder = (ChatChangesPhotoViewHolder) holder;
+        MessageItem message = getItem(position);
+        ChatChangePhotoItem chatChangePhotoItem = (ChatChangePhotoItem)message.getMessageContentItem();
+        if (chatChangePhotoItem == null) {
+            return;
+        }
+        String fromUserName = getUserName(message.getFromId());
+        SpannableString text = new SpannableString(ApplicationSIP.applicationContext.getResources().getString(R.string.changed_group_photo, fromUserName));
+        text.setSpan(new ForegroundColorSpan(ContextCompat.getColor(ApplicationSIP.applicationContext, R.color.color_primary_dark)), 0, fromUserName.length(), 0);
+
+        if (chatChangePhotoItem.getPhotoItemMedium() != null) {
+            actionHolder.photo.setVisibility(View.VISIBLE);
+            actionHolder.photo.setCircleRounds(true);
+            actionHolder.photo.setImageLoaderI(chatChangePhotoItem.getPhotoItemMedium());
+        } else {
+            actionHolder.photo.setVisibility(View.GONE);
+        }
+        actionHolder.messageText.setText(text);
+    }
+
+    private void onBindChatChangeTitleHolder(RecyclerView.ViewHolder holder, int position) {
+        ChatChangesViewHolder actionHolder = (ChatChangesViewHolder) holder;
+        MessageItem message = getItem(position);
+        ChatChangeTitleItem chatChangeTitleItem = (ChatChangeTitleItem)message.getMessageContentItem();
+        if (chatChangeTitleItem == null) {
+            return;
+        }
+        String fromUserName = getUserName(message.getFromId());
+        SpannableString text = new SpannableString(ApplicationSIP.applicationContext.getResources().getString(R.string.changed_group_title, fromUserName, chatChangeTitleItem.getTitle()));
+        text.setSpan(new ForegroundColorSpan(ContextCompat.getColor(ApplicationSIP.applicationContext, R.color.color_primary_dark)), 0, fromUserName.length(), 0);
+
+        actionHolder.messageText.setText(text);
+    }
+
+    private void onBindChatDeleteParticipantHolder(RecyclerView.ViewHolder holder, int position) {
+        ChatChangesViewHolder actionHolder = (ChatChangesViewHolder) holder;
+        MessageItem message = getItem(position);
+        ChatDeleteParticipantItem chatDeleteParticipantItem = (ChatDeleteParticipantItem)message.getMessageContentItem();
+        if (chatDeleteParticipantItem == null) {
+            return;
+        }
+        String fromUserName = getUserName(message.getFromId());
+        SpannableString text = new SpannableString(ApplicationSIP.applicationContext.getResources().getString(R.string.removed_participant, fromUserName, chatDeleteParticipantItem.getName()));
+        text.setSpan(new ForegroundColorSpan(ContextCompat.getColor(ApplicationSIP.applicationContext, R.color.color_primary_dark)), 0, fromUserName.length(), 0);
+
+        actionHolder.messageText.setText(text);
+    }
+
+    private void onBindChatDeletePhotoHolder(RecyclerView.ViewHolder holder, int position) {
+        ChatChangesViewHolder actionHolder = (ChatChangesViewHolder) holder;
+        MessageItem message = getItem(position);
+        String fromUserName = getUserName(message.getFromId());
+        SpannableString text = new SpannableString(ApplicationSIP.applicationContext.getResources().getString(R.string.removed_photo, fromUserName));
+        text.setSpan(new ForegroundColorSpan(ContextCompat.getColor(ApplicationSIP.applicationContext, R.color.color_primary_dark)), 0, fromUserName.length(), 0);
+
+        actionHolder.messageText.setText(text);
+    }
+
+    private void onBindGroupChatCreateHolder(RecyclerView.ViewHolder holder, int position) {
+        ChatChangesViewHolder actionHolder = (ChatChangesViewHolder) holder;
+        MessageItem message = getItem(position);
+        GroupChatCreate groupChatCreate = (GroupChatCreate)message.getMessageContentItem();
+        if (groupChatCreate == null) {
+            return;
+        }
+        String fromUserName = getUserName(message.getFromId());
+        SpannableString text = new SpannableString(ApplicationSIP.applicationContext.getResources().getString(R.string.created_group, fromUserName, groupChatCreate.getTitle()));
+        text.setSpan(new ForegroundColorSpan(ContextCompat.getColor(ApplicationSIP.applicationContext, R.color.color_primary_dark)), 0, fromUserName.length(), 0);
+
+        actionHolder.messageText.setText(text);
     }
 
     private void onBindUnsupportedHolder(RecyclerView.ViewHolder holder, int position) {

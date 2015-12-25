@@ -108,6 +108,9 @@ public class UserItem implements ImageLoaderI {
     }
 
     public String getName() {
+        if (name == null) {
+            return "";
+        }
         return name;
     }
 

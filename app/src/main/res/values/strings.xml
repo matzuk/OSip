@@ -41,7 +41,7 @@
     <string name="closeDrawer">Close</string>
     <string name="navigation_list_log_out">Log Out</string>
 
-    <!-- ChatList Fragment -->
+    <!-- Chat Fragment -->
     <string name="chat_list_toolbar_title">Messages</string>
     <string name="chat_list_toolbar_title_waiting_network">Waiting for network…</string>
     <string name="chat_list_message_type_audio">Audio</string>
@@ -68,17 +68,21 @@
     <string name="formatterDay12H">h:mm a</string>
     <string name="formatDateAtTime">%1$s at %2$s</string>
 
-    <!-- Chat Fragment -->
+    <!-- Messages Fragment -->
     <string name="chat_header_many">new messages</string>
     <string name="chat_status_online">online</string>
     <string name="chat_status_offline">offline</string>
     <string name="chat_status_offline_first">last seen</string>
     <string name="chat_status_offline_last">ago</string>
     <string name="chat_status_members">members</string>
-    <string name="invited">invited</string>
-    <string name="changed_group_name">changed group name to</string>
-    <string name="changed_group_photo">changed group photo to</string>
-    <string name="removed">removed</string>
+    <!-- Chat changings Fragment -->
+    <string name="added">%1$s added "%2$s"</string>
+    <string name="changed_group_photo">%1$s changed the group photo to</string>
+    <string name="changed_group_title">%1$s changed the group name to \"%2$s\"</string>
+    <string name="removed_participant">%1$s removed %2$s</string>
+    <string name="removed_photo">%1$s removed photo</string>
+    <string name="created_group">%1$s created the group \"%2$s\"</string>
+
     <string name="left_group">left group</string>
     <string name="removed_group_photo">removed group photo</string>
     <string name="unsupported_type">Sorry! Unsupported type</string>

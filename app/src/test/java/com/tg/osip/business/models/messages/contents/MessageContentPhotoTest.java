@@ -117,4 +117,32 @@ public class MessageContentPhotoTest {
         assertThat(messageContentPhoto.getPhotoItemLarge().getHeight()).isEqualTo(500);
     }
 
+    @Test
+    public void init_photoBX() {
+        MessageContentPhoto messageContentPhoto = new MessageContentPhoto() {
+            @Override
+            TdApi.Photo getPhoto(TdApi.MessageContent messageContent) {
+                return null;
+            }
+        };
+
+        TdApi.Photo photo = new TdApi.Photo();
+        TdApi.PhotoSize photoSizeX = new TdApi.PhotoSize();
+        photoSizeX.height = 500;
+        photoSizeX.width = 500;
+        photoSizeX.photo = new TdApi.File();
+        photoSizeX.type = "x";
+        TdApi.PhotoSize photoSizeS = new TdApi.PhotoSize();
+        photoSizeS.height = 100;
+        photoSizeS.width = 100;
+        photoSizeS.photo = new TdApi.File();
+        photoSizeS.type = "b";
+        TdApi.PhotoSize[] photoSizes = new TdApi.PhotoSize[]{photoSizeX, photoSizeS};
+        photo.photos = photoSizes;
+
+        messageContentPhoto.init(photo);
+        assertThat(messageContentPhoto.getPhotoItemMedium().getHeight()).isEqualTo(100);
+        assertThat(messageContentPhoto.getPhotoItemLarge().getHeight()).isEqualTo(500);
+    }
+
 }

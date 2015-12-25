@@ -6,6 +6,7 @@ import com.tg.osip.business.models.messages.MessageAdapterModel;
 import com.tg.osip.business.models.messages.MessageItem;
 import com.tg.osip.business.models.PhotoItem;
 import com.tg.osip.business.models.UserItem;
+import com.tg.osip.business.models.messages.contents.MessageContentPhoto;
 import com.tg.osip.business.models.messages.contents.MessageContentPhotoItem;
 import com.tg.osip.tdclient.update_managers.FileDownloaderManager;
 import com.tg.osip.tdclient.TGProxyI;
@@ -97,10 +98,10 @@ public class MessagesInteract {
 
     private Observable<List<PhotoItem>> getPhotoTypeMediumDownloadingObservable(List<MessageItem> mainListItems) {
         return Observable.from(mainListItems)
-                .filter(messageItem -> messageItem.getContentType() == MessageItem.ContentType.PHOTO_MESSAGE_TYPE)
-                .map(messageItem1 -> (MessageContentPhotoItem) messageItem1.getMessageContentItem())
+                .filter(messageItem -> messageItem.getContentType() == MessageItem.ContentType.PHOTO_MESSAGE_TYPE || messageItem.getContentType() == MessageItem.ContentType.CHAT_CHANGE_PHOTO)
+                .map(messageItem1 -> (MessageContentPhoto) messageItem1.getMessageContentItem())
                 .filter(messageContentPhotoItem -> messageContentPhotoItem != null)
-                .map(MessageContentPhotoItem::getPhotoItemMedium)
+                .map(MessageContentPhoto::getPhotoItemMedium)
                 .filter(photoItem -> photoItem != null)
                 .toList()
                 .doOnNext(fileDownloaderManager::startFileListDownloading);

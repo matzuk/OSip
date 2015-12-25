@@ -19,6 +19,10 @@ public abstract class MessageContentPhoto<T extends TdApi.MessageContent> extend
     private static final String PHOTO_TYPE_X = "x";
     private static final String PHOTO_TYPE_Y = "y";
 
+    private static final String PHOTO_TYPE_A = "a";
+    private static final String PHOTO_TYPE_B = "b";
+    private static final String PHOTO_TYPE_C = "c";
+
     private PhotoItem photoItemMedium;
     private PhotoItem photoItemLarge;
 
@@ -51,6 +55,14 @@ public abstract class MessageContentPhoto<T extends TdApi.MessageContent> extend
         if (photoItemMedium == null) {
             for (TdApi.PhotoSize photoSize : photoSizes) {
                 if (photoSize.type.equals(PHOTO_TYPE_S)) {
+                    photoItemMedium = new PhotoItem(photoSize);
+                }
+            }
+        }
+        // if type there are not TYPE_M and TYPE_S then set TYPE_B
+        if (photoItemMedium == null) {
+            for (TdApi.PhotoSize photoSize : photoSizes) {
+                if (photoSize.type.equals(PHOTO_TYPE_B)) {
                     photoItemMedium = new PhotoItem(photoSize);
                 }
             }
