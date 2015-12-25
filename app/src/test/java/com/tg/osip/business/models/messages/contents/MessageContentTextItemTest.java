@@ -12,14 +12,7 @@ public class MessageContentTextItemTest {
 
     @Test
      public void constructor_nullMessageContent() {
-        TdApi.MessageContent messageContent = null;
-        MessageContentTextItem messageContentTextItem = new MessageContentTextItem(messageContent);
-        assertThat(messageContentTextItem.getText()).isEqualTo("");
-    }
-
-    @Test
-    public void constructor_otherMessageContent() {
-        TdApi.MessageAudio messageContent = new TdApi.MessageAudio();
+        TdApi.MessageText messageContent = null;
         MessageContentTextItem messageContentTextItem = new MessageContentTextItem(messageContent);
         assertThat(messageContentTextItem.getText()).isEqualTo("");
     }

@@ -11,12 +11,11 @@ public class MessageContentTextItem extends MessageContentItem {
 
     private String text;
 
-    public MessageContentTextItem(TdApi.MessageContent messageContent) {
-        if (messageContent == null || messageContent.getClass() != TdApi.MessageText.class) {
+    public MessageContentTextItem(TdApi.MessageText messageContent) {
+        if (messageContent == null) {
             return;
         }
-        TdApi.MessageText messageText = (TdApi.MessageText)messageContent;
-        text = messageText.text;
+        text = messageContent.text;
     }
 
     @NonNull

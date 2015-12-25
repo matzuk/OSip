@@ -3,8 +3,12 @@ package com.tg.osip.business.models.messages;
 import android.support.annotation.Nullable;
 import android.support.annotation.VisibleForTesting;
 
-import com.tg.osip.business.models.PhotoItem;
-import com.tg.osip.business.models.messages.contents.MessageContentActionsItem;
+import com.tg.osip.business.models.messages.contents.ChatDeleteParticipantItem;
+import com.tg.osip.business.models.messages.contents.ChatDeletePhoto;
+import com.tg.osip.business.models.messages.contents.ChatJoinByLink;
+import com.tg.osip.business.models.messages.contents.ChatAddParticipantItem;
+import com.tg.osip.business.models.messages.contents.ChatChangePhotoItem;
+import com.tg.osip.business.models.messages.contents.ChatChangeTitleItem;
 import com.tg.osip.business.models.messages.contents.MessageContentItem;
 import com.tg.osip.business.models.messages.contents.MessageContentPhotoItem;
 import com.tg.osip.business.models.messages.contents.MessageContentTextItem;
@@ -22,6 +26,12 @@ public class MessageItem {
     public enum ContentType {
         PHOTO_MESSAGE_TYPE,
         TEXT_MESSAGE_TYPE,
+        CHAT_ADD_PARTICIPANT,
+        CHAT_CHANGE_PHOTO,
+        CHAT_CHANGE_TITLE,
+        CHAT_DELETE_PARTICIPANT,
+        CHAT_DELETE_PHOTO,
+        CHAT_JOIN_BY_LINK,
         ACTION_TYPE,
         UNSUPPORTED_TYPE,
         NULL_TYPE
@@ -42,7 +52,6 @@ public class MessageItem {
 
     public MessageItem(TdApi.Message message) {
         initMessageFields(message);
-        initMessageType(message);
         initMessageContent(message);
     }
 
@@ -58,46 +67,37 @@ public class MessageItem {
         forwardDate = message.forwardDate;
     }
 
-    void initMessageType(TdApi.Message message) {
+    void initMessageContent(TdApi.Message message) {
         if (message == null) {
             contentType = ContentType.NULL_TYPE;
         } else if (message.message == null) {
             contentType = ContentType.NULL_TYPE;
         } else if (message.message.getClass() == TdApi.MessageText.class) {
             contentType = ContentType.TEXT_MESSAGE_TYPE;
+            messageContentItem = new MessageContentTextItem((TdApi.MessageText)message.message);
         } else if (message.message.getClass() == TdApi.MessagePhoto.class) {
             contentType = ContentType.PHOTO_MESSAGE_TYPE;
-        } else if (message.message.getClass() == TdApi.MessageChatAddParticipant.class ||
-                message.message.getClass() == TdApi.MessageChatChangePhoto.class ||
-                message.message.getClass() == TdApi.MessageChatChangeTitle.class ||
-                message.message.getClass() == TdApi.MessageChatDeleteParticipant.class ||
-                message.message.getClass() == TdApi.MessageChatDeletePhoto.class) {
-            contentType = ContentType.ACTION_TYPE;
+            messageContentItem = new MessageContentPhotoItem((TdApi.MessagePhoto)message.message);
+        } else if (message.message.getClass() == TdApi.MessageChatAddParticipant.class) {
+            contentType = ContentType.CHAT_ADD_PARTICIPANT;
+            messageContentItem = new ChatAddParticipantItem((TdApi.MessageChatAddParticipant)message.message);
+        } else if (message.message.getClass() == TdApi.MessageChatChangePhoto.class) {
+            contentType = ContentType.CHAT_CHANGE_PHOTO;
+            messageContentItem = new ChatChangePhotoItem((TdApi.MessageChatChangePhoto)message.message);
+        } else if (message.message.getClass() == TdApi.MessageChatChangeTitle.class) {
+            contentType = ContentType.CHAT_CHANGE_TITLE;
+            messageContentItem = new ChatChangeTitleItem((TdApi.MessageChatChangeTitle)message.message);
+        } else if (message.message.getClass() == TdApi.MessageChatDeleteParticipant.class) {
+            contentType = ContentType.CHAT_DELETE_PARTICIPANT;
+            messageContentItem = new ChatDeleteParticipantItem((TdApi.MessageChatDeleteParticipant)message.message);
+        } else if (message.message.getClass() == TdApi.MessageChatDeletePhoto.class) {
+            contentType = ContentType.CHAT_DELETE_PHOTO;
+            messageContentItem = new ChatDeletePhoto();
+        } else if (message.message.getClass() == TdApi.MessageChatJoinByLink.class) {
+            contentType = ContentType.CHAT_JOIN_BY_LINK;
+            messageContentItem = new ChatJoinByLink((TdApi.MessageChatJoinByLink)message.message);
         } else {
             contentType = ContentType.UNSUPPORTED_TYPE;
-        }
-    }
-
-    void initMessageContent(TdApi.Message message) {
-        if (message == null || message.message == null) {
-            return;
-        }
-        switch (contentType) {
-            case TEXT_MESSAGE_TYPE:
-                messageContentItem = new MessageContentTextItem(message.message);
-                break;
-            case PHOTO_MESSAGE_TYPE:
-                messageContentItem = new MessageContentPhotoItem(message.message);
-                break;
-            case ACTION_TYPE:
-                messageContentItem = new MessageContentActionsItem(message.message);
-                break;
-            case UNSUPPORTED_TYPE:
-                messageContentItem = null;
-                break;
-            case NULL_TYPE:
-                messageContentItem = null;
-                break;
         }
     }
 
