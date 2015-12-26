@@ -486,6 +486,7 @@ public class MessagesRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.V
         String fromUserName = getUserName(message.getFromId());
         SpannableString text = new SpannableString(ApplicationSIP.applicationContext.getResources().getString(R.string.removed_participant, fromUserName, chatDeleteParticipantItem.getName()));
         text.setSpan(new ForegroundColorSpan(ContextCompat.getColor(ApplicationSIP.applicationContext, R.color.color_primary_dark)), 0, fromUserName.length(), 0);
+        text.setSpan(new ForegroundColorSpan(ContextCompat.getColor(ApplicationSIP.applicationContext, R.color.color_primary_dark)), text.length() - chatDeleteParticipantItem.getName().length(), text.length(), 0);
 
         actionHolder.messageText.setText(text);
     }
