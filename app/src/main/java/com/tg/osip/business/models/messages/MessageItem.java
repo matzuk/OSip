@@ -34,6 +34,7 @@ public class MessageItem {
         CHAT_DELETE_PHOTO,
         CHAT_JOIN_BY_LINK,
         GROUP_CHAT_CREATE,
+        AUDIO,
         UNSUPPORTED_TYPE,
         NULL_TYPE
     }
@@ -100,6 +101,10 @@ public class MessageItem {
         } else if (message.message.getClass() == TdApi.MessageGroupChatCreate.class) {
             contentType = ContentType.GROUP_CHAT_CREATE;
             messageContentItem = new GroupChatCreate((TdApi.MessageGroupChatCreate)message.message);
+        } else if (message.message.getClass() == TdApi.MessageAudio.class) {
+            contentType = ContentType.AUDIO;
+            // temp
+            messageContentItem = null;
         } else {
             contentType = ContentType.UNSUPPORTED_TYPE;
         }

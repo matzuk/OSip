@@ -54,7 +54,8 @@ public class MessagesRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.V
     // FIXME how work TdApi.MessageChatJoinByLink
 //    private static final int CHAT_JOIN_BY_LINK_VIEW = 7;
     private static final int GROUP_CHAT_CREATE_VIEW = 8;
-    private static final int UNSUPPORTED_VIEW = 9;
+    private static final int AUDIO_VIEW = 9;
+    private static final int UNSUPPORTED_VIEW = 10;
 
     private int myUserId;
     private int lastChatReadOutboxId;
@@ -145,6 +146,22 @@ public class MessagesRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.V
         }
     }
 
+    static class AudioViewHolder extends RecyclerView.ViewHolder {
+
+        PhotoView avatar;
+        TextView messageName;
+        TextView messageSendingTime;
+        ImageView messageUnreadOutbox;
+
+        public AudioViewHolder(View itemView) {
+            super(itemView);
+            avatar = (PhotoView) itemView.findViewById(R.id.avatar);
+            messageName = (TextView) itemView.findViewById(R.id.message_name);
+            messageSendingTime = (TextView) itemView.findViewById(R.id.message_sending_time);
+            messageUnreadOutbox = (ImageView) itemView.findViewById(R.id.message_unread_outbox);
+        }
+    }
+
     ///// overrides methods /////
     @Override
     public long getItemId(int position) {
@@ -185,6 +202,9 @@ public class MessagesRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.V
         } else if (viewType == GROUP_CHAT_CREATE_VIEW) {
             View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_message_list_chat_changes, parent, false);
             return new ChatChangesViewHolder(v);
+        } else if (viewType == AUDIO_VIEW) {
+            View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_message_list_audio, parent, false);
+            return new AudioViewHolder(v);
         } else if (viewType == UNSUPPORTED_VIEW) {
             View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_message_list_unsupport, parent, false);
             return new UnsupportedViewHolder(v);
@@ -213,6 +233,8 @@ public class MessagesRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.V
 //            return CHAT_JOIN_BY_LINK_VIEW;
         } else if (contentType == MessageItem.ContentType.GROUP_CHAT_CREATE) {
             return GROUP_CHAT_CREATE_VIEW;
+        } else if (contentType == MessageItem.ContentType.AUDIO) {
+            return AUDIO_VIEW;
         }
         return UNSUPPORTED_VIEW;
     }
@@ -247,6 +269,9 @@ public class MessagesRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.V
 //            case CHAT_JOIN_BY_LINK_VIEW:
 //                onBindChatJoinByLinkHolder(holder, position);
 //                break;
+            case AUDIO_VIEW:
+                onBindAudioHolder(holder, position);
+                break;
             case UNSUPPORTED_VIEW:
                 onBindUnsupportedHolder(holder, position);
                 break;
@@ -282,6 +307,22 @@ public class MessagesRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.V
         this.lastChatReadOutboxId = lastChatReadOutboxId;
     }
 
+    //    private boolean isItemsEqual(int position) {
+//        if (position == getItemCount() - 1) {
+//            return false;
+//        }
+//        int nextPosition = position + 1;
+//        if (getItemViewType(position) != getItemViewType(nextPosition)) {
+//            return false;
+//        }
+//        String dataString = TimeUtils.stringForMessageListDate(getItem(position).getMessage().date);
+//        String dataPreviousString = TimeUtils.stringForMessageListDate(getItem(nextPosition).getMessage().date);
+//        if (!dataPreviousString.equals(dataString)) {
+//            return false;
+//        }
+//        return getItem(position).getMessage().fromId == getItem(nextPosition).getMessage().fromId;
+//    }
+
     ///// onBindViewHolders /////
     private void onBindTextHolder(RecyclerView.ViewHolder holder, int position) {
         TextViewHolder textHolder = (TextViewHolder) holder;
@@ -306,36 +347,8 @@ public class MessagesRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.V
         textHolder.messageSendingTime.setText(dataString);
 
         // set unread outbox image
-        if (message.getDate() == TEMP_SEND_STATE_IS_ERROR) {
-            textHolder.messageUnreadOutbox.setVisibility(View.VISIBLE);
-            textHolder.messageUnreadOutbox.setImageDrawable(ResourcesCompat.getDrawable(ApplicationSIP.applicationContext.getResources(), R.drawable.ic_message_error, ApplicationSIP.applicationContext.getTheme()));
-        } else if (myUserId == message.getFromId()) {
-            if (lastChatReadOutboxId >= message.getId()) {
-                textHolder.messageUnreadOutbox.setVisibility(View.GONE);
-            } else {
-                textHolder.messageUnreadOutbox.setVisibility(View.VISIBLE);
-                setSendStateMessage(message, textHolder.messageUnreadOutbox);
-            }
-        } else {
-            textHolder.messageUnreadOutbox.setVisibility(View.GONE);
-        }
+        setUnreadOutboxImages(message, textHolder.messageUnreadOutbox);
     }
-
-//    private boolean isItemsEqual(int position) {
-//        if (position == getItemCount() - 1) {
-//            return false;
-//        }
-//        int nextPosition = position + 1;
-//        if (getItemViewType(position) != getItemViewType(nextPosition)) {
-//            return false;
-//        }
-//        String dataString = TimeUtils.stringForMessageListDate(getItem(position).getMessage().date);
-//        String dataPreviousString = TimeUtils.stringForMessageListDate(getItem(nextPosition).getMessage().date);
-//        if (!dataPreviousString.equals(dataString)) {
-//            return false;
-//        }
-//        return getItem(position).getMessage().fromId == getItem(nextPosition).getMessage().fromId;
-//    }
 
     private void onBindPhotoHolder(RecyclerView.ViewHolder holder, int position) {
         PhotoViewHolder photoViewHolder = (PhotoViewHolder) holder;
@@ -364,19 +377,7 @@ public class MessagesRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.V
         photoViewHolder.messageSendingTime.setText(dataString);
 
         // set unread outbox image
-        if (message.getDate() == TEMP_SEND_STATE_IS_ERROR) {
-            photoViewHolder.messageUnreadOutbox.setVisibility(View.VISIBLE);
-            photoViewHolder.messageUnreadOutbox.setImageDrawable(ResourcesCompat.getDrawable(ApplicationSIP.applicationContext.getResources(), R.drawable.ic_message_error, ApplicationSIP.applicationContext.getTheme()));
-        } else if (myUserId == message.getFromId()) {
-            if (lastChatReadOutboxId >= message.getId()) {
-                photoViewHolder.messageUnreadOutbox.setVisibility(View.GONE);
-            } else {
-                photoViewHolder.messageUnreadOutbox.setVisibility(View.VISIBLE);
-                setSendStateMessage(message, photoViewHolder.messageUnreadOutbox);
-            }
-        } else {
-            photoViewHolder.messageUnreadOutbox.setVisibility(View.GONE);
-        }
+        setUnreadOutboxImages(message, photoViewHolder.messageUnreadOutbox);
         // set photo OnClickListener
         photoViewHolder.photoLayout.setOnClickListener(v -> {
             if (onMessageClickListenerWeakReference != null && onMessageClickListenerWeakReference.get() != null && messageContentPhotoItem.getPhotoItemLarge() != null) {
@@ -385,39 +386,6 @@ public class MessagesRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.V
                 onMessageClickListener.onPhotoMessageClick(clickedPair.first, clickedPair.second);
             }
         });
-    }
-
-    // temp method for PhotoItems getting
-    private Pair<Integer, List<PhotoItem>> getPhotoLargeItemsWithClickedPos(int photoFileId) {
-        int currentPosInPhotoList = 0;
-        int clickedPosInPhotoList = currentPosInPhotoList;
-        List<PhotoItem> photoLargeItemList = new ArrayList<>();
-        for (MessageItem messageItem : listElements) {
-            if (messageItem.getContentType() == MessageItem.ContentType.PHOTO_MESSAGE_TYPE) {
-                MessageContentPhotoItem messageContentPhotoItem = ((MessageContentPhotoItem)messageItem.getMessageContentItem());
-                if (messageContentPhotoItem == null) {
-                    continue;
-                }
-                PhotoItem photoItemLarge = messageContentPhotoItem.getPhotoItemLarge();
-                if (photoItemLarge == null) {
-                    continue;
-                }
-                photoLargeItemList.add(photoItemLarge);
-                if (photoFileId == photoItemLarge.getPhotoFileId()) {
-                    clickedPosInPhotoList = currentPosInPhotoList;
-                }
-                currentPosInPhotoList++;
-            }
-        }
-        return new Pair<>(clickedPosInPhotoList, photoLargeItemList);
-    }
-
-    private void setSendStateMessage(MessageItem message, ImageView imageView) {
-        if (message.getId() >= TEMP_SEND_STATE_IS_SENDING) {
-            imageView.setImageDrawable(ResourcesCompat.getDrawable(ApplicationSIP.applicationContext.getResources(), R.drawable.ic_clock, ApplicationSIP.applicationContext.getTheme()));
-        } else {
-            imageView.setImageDrawable(ResourcesCompat.getDrawable(ApplicationSIP.applicationContext.getResources(), R.drawable.ic_not_read, ApplicationSIP.applicationContext.getTheme()));
-        }
     }
 
     private void onBindChatAddParticipantHolder(RecyclerView.ViewHolder holder, int position) {
@@ -433,15 +401,6 @@ public class MessagesRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.V
         text.setSpan(new ForegroundColorSpan(ContextCompat.getColor(ApplicationSIP.applicationContext, R.color.color_primary_dark)), text.length() - chatAddParticipantItem.getName().length(), text.length(), 0);
 
         actionHolder.messageText.setText(text);
-    }
-
-    private String getUserName(int id) {
-        UserItem userItem = usersMap.get(id);
-        String fromUserName = "";
-        if (userItem != null) {
-            fromUserName = userItem.getName();
-        }
-        return fromUserName;
     }
 
     private void onBindChatChangePhotoHolder(RecyclerView.ViewHolder holder, int position) {
@@ -518,6 +477,30 @@ public class MessagesRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.V
         actionHolder.messageText.setText(text);
     }
 
+    private void onBindAudioHolder(RecyclerView.ViewHolder holder, int position) {
+        AudioViewHolder audioViewHolder = (AudioViewHolder) holder;
+        MessageItem message = getItem(position);
+//        MessageContentTextItem messageContentTextItem = (MessageContentTextItem)message.getMessageContentItem();
+//        if (messageContentTextItem == null) {
+//            return;
+//        }
+        // get user
+        UserItem user = usersMap.get(message.getFromId());
+        if (user != null) {
+            // set name
+            String name = user.getName();
+            audioViewHolder.messageName.setText(name);
+            // Set avatar
+            audioViewHolder.avatar.setCircleRounds(true);
+            audioViewHolder.avatar.setImageLoaderI(user);
+        }
+        // set data
+        String dataString = TimeUtils.stringForMessageListDate(message.getDate());
+        audioViewHolder.messageSendingTime.setText(dataString);
+        // set unread outbox image
+        setUnreadOutboxImages(message, audioViewHolder.messageUnreadOutbox);
+    }
+
     private void onBindUnsupportedHolder(RecyclerView.ViewHolder holder, int position) {
         UnsupportedViewHolder unsupportedHolder = (UnsupportedViewHolder) holder;
         MessageItem message = getItem(position);
@@ -550,6 +533,66 @@ public class MessagesRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.V
         } else {
             unsupportedHolder.messageUnreadOutbox.setVisibility(View.GONE);
         }
+    }
+
+    ///// Helper methods for onBindViewHolders /////
+    private void setUnreadOutboxImages(MessageItem message, ImageView messageUnreadOutbox) {
+        if (message.getDate() == TEMP_SEND_STATE_IS_ERROR) {
+            messageUnreadOutbox.setVisibility(View.VISIBLE);
+            messageUnreadOutbox.setImageDrawable(ResourcesCompat.getDrawable(ApplicationSIP.applicationContext.getResources(), R.drawable.ic_message_error, ApplicationSIP.applicationContext.getTheme()));
+        } else if (myUserId == message.getFromId()) {
+            if (lastChatReadOutboxId >= message.getId()) {
+                messageUnreadOutbox.setVisibility(View.GONE);
+            } else {
+                messageUnreadOutbox.setVisibility(View.VISIBLE);
+                setSendStateMessage(message, messageUnreadOutbox);
+            }
+        } else {
+            messageUnreadOutbox.setVisibility(View.GONE);
+        }
+    }
+
+    private void setSendStateMessage(MessageItem message, ImageView imageView) {
+        if (message.getId() >= TEMP_SEND_STATE_IS_SENDING) {
+            imageView.setImageDrawable(ResourcesCompat.getDrawable(ApplicationSIP.applicationContext.getResources(), R.drawable.ic_clock, ApplicationSIP.applicationContext.getTheme()));
+        } else {
+            imageView.setImageDrawable(ResourcesCompat.getDrawable(ApplicationSIP.applicationContext.getResources(), R.drawable.ic_not_read, ApplicationSIP.applicationContext.getTheme()));
+        }
+    }
+
+    private String getUserName(int id) {
+        UserItem userItem = usersMap.get(id);
+        String fromUserName = "";
+        if (userItem != null) {
+            fromUserName = userItem.getName();
+        }
+        return fromUserName;
+    }
+
+    ///// ClickListeners helpers for onBindViewHolders /////
+    // temp method for PhotoItems getting
+    private Pair<Integer, List<PhotoItem>> getPhotoLargeItemsWithClickedPos(int photoFileId) {
+        int currentPosInPhotoList = 0;
+        int clickedPosInPhotoList = currentPosInPhotoList;
+        List<PhotoItem> photoLargeItemList = new ArrayList<>();
+        for (MessageItem messageItem : listElements) {
+            if (messageItem.getContentType() == MessageItem.ContentType.PHOTO_MESSAGE_TYPE) {
+                MessageContentPhotoItem messageContentPhotoItem = ((MessageContentPhotoItem)messageItem.getMessageContentItem());
+                if (messageContentPhotoItem == null) {
+                    continue;
+                }
+                PhotoItem photoItemLarge = messageContentPhotoItem.getPhotoItemLarge();
+                if (photoItemLarge == null) {
+                    continue;
+                }
+                photoLargeItemList.add(photoItemLarge);
+                if (photoFileId == photoItemLarge.getPhotoFileId()) {
+                    clickedPosInPhotoList = currentPosInPhotoList;
+                }
+                currentPosInPhotoList++;
+            }
+        }
+        return new Pair<>(clickedPosInPhotoList, photoLargeItemList);
     }
 
 }
