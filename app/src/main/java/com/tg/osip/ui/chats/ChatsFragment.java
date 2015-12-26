@@ -13,6 +13,7 @@ import android.widget.ProgressBar;
 
 import com.tg.osip.ApplicationSIP;
 import com.tg.osip.R;
+import com.tg.osip.business.PersistentInfo;
 import com.tg.osip.business.chats.ChatsInteract;
 import com.tg.osip.tdclient.TGProxyI;
 import com.tg.osip.tdclient.update_managers.FileDownloaderManager;
@@ -117,8 +118,8 @@ public class ChatsFragment extends BaseFragment implements ChatsContract.View {
 
         @Provides
         @NonNull
-        public ChatsPresenter provideChatsPresenter(@NonNull ChatsInteract chatsInteract) {
-            return new ChatsPresenter(chatsInteract);
+        public ChatsPresenter provideChatsPresenter(@NonNull ChatsInteract chatsInteract, @NonNull PersistentInfo persistentInfo) {
+            return new ChatsPresenter(chatsInteract, persistentInfo);
         }
 
         @Provides

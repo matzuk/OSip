@@ -2,6 +2,7 @@ package com.tg.osip;
 
 import com.tg.osip.business.AuthManager;
 import com.tg.osip.tdclient.TGModule;
+import com.tg.osip.ui.activities.LoginActivity;
 import com.tg.osip.ui.activities.MainActivity;
 import com.tg.osip.ui.activities.PhotoMediaActivity;
 import com.tg.osip.ui.chats.ChatsFragment;
@@ -25,6 +26,7 @@ public interface AppComponent {
     MessagesFragment.MessagesComponent plus( MessagesFragment.MessagesModule messagesModule);
 
     void inject(ApplicationSIP applicationSIP);
+    void inject(LoginActivity loginActivity);
     void inject(AuthManager authManager);
     void inject(PhotoMediaActivity photoMediaActivity);
     void inject(PhotoView photoView);

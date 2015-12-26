@@ -27,13 +27,15 @@ public class ChatsPresenter implements ChatsContract.UserActionsListener {
     private static final int LIMIT = 50;
 
     ChatsInteract chatsInteract;
+    PersistentInfo persistentInfo;
 
     private ChatRecyclerAdapter chatRecyclerAdapter;
     private Subscription listPagingSubscription;
     private WeakReference<ChatsContract.View> chatsContractViewWeak;
 
-    public ChatsPresenter(ChatsInteract chatsInteract) {
+    public ChatsPresenter(ChatsInteract chatsInteract, PersistentInfo persistentInfo) {
         this.chatsInteract = chatsInteract;
+        this.persistentInfo = persistentInfo;
     }
 
     @Override
@@ -51,7 +53,7 @@ public class ChatsPresenter implements ChatsContract.UserActionsListener {
             }
             // init Controller
             chatRecyclerAdapter = new ChatRecyclerAdapter();
-            chatRecyclerAdapter.setMyUserId(PersistentInfo.getInstance().getMeUserId());
+            chatRecyclerAdapter.setMyUserId(persistentInfo.getMeUserId());
         }
         recyclerView.setAdapter(chatRecyclerAdapter);
         startListPaging(recyclerView);

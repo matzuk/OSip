@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.support.v4.util.Pair;
 import android.support.v7.widget.RecyclerView;
 
+import com.tg.osip.business.PersistentInfo;
 import com.tg.osip.business.messages.MessagesInteract;
 import com.tg.osip.business.models.messages.MessageAdapterModel;
 import com.tg.osip.business.models.PhotoItem;
@@ -34,15 +35,17 @@ public class MessagesPresenter implements MessagesContract.UserActionsListener {
     private static final int EMPTY_COUNT_LIST = 1;
 
     MessagesInteract messagesInteract;
+    PersistentInfo persistentInfo;
 
     private WeakReference<MessagesContract.View> messagesContractViewWeakReference;
-    private MessagesRecyclerAdapter messagesRecyclerAdapter = new MessagesRecyclerAdapter();
+    private MessagesRecyclerAdapter messagesRecyclerAdapter;
     private OnMessageClickListener onMessageClickListener;
 
     private Subscription loadDataSubscription;
 
-    public MessagesPresenter(MessagesInteract messagesInteract) {
+    public MessagesPresenter(MessagesInteract messagesInteract, PersistentInfo persistentInfo) {
         this.messagesInteract = messagesInteract;
+        messagesRecyclerAdapter = new MessagesRecyclerAdapter(persistentInfo.getMeUserId());
     }
 
     @Override

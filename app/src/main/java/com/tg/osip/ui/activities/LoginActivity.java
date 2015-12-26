@@ -6,6 +6,7 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
+import com.tg.osip.ApplicationSIP;
 import com.tg.osip.R;
 import com.tg.osip.business.AuthManager;
 import com.tg.osip.business.AuthManager.AuthStateEnum;
@@ -22,10 +23,15 @@ import com.tg.osip.ui.general.views.SimpleAlertDialog;
 
 import org.drinkless.td.libcore.telegram.TdApi;
 
+import javax.inject.Inject;
+
 import rx.Subscriber;
 import rx.Subscription;
 
 public class LoginActivity extends AppCompatActivity {
+
+    @Inject
+    PersistentInfo persistentInfo;
 
     private Subscription channelSubscription;
     private Subscription meUserLoadingSubscription;
@@ -33,6 +39,8 @@ public class LoginActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        ApplicationSIP.get().applicationComponent().inject(this);
+
         setContentView(R.layout.ac_login);
         subscribeToChannel();
         startFragment(new SplashFragment(), false);
@@ -100,7 +108,7 @@ public class LoginActivity extends AppCompatActivity {
                 .subscribe(new DefaultSubscriber<TdApi.User>() {
                     @Override
                     public void onNext(TdApi.User user) {
-                        PersistentInfo.getInstance().setMeUserId(user.id);
+                        persistentInfo.setMeUserId(user.id);
                         startActivity(new Intent(LoginActivity.this, MainActivity.class));
                         finish();
                     }

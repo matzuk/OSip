@@ -15,22 +15,10 @@ public class PersistentInfo {
     private static final String PREFS_NAME = "persistentInfo";
     private static final String ME_USER_ID = "meUserId";
     private static final int DEFAULT_USER_ID = 0;
-    private static volatile PersistentInfo instance;
 
     private int meUserId;
 
-    public static PersistentInfo getInstance() {
-        if (instance == null) {
-            synchronized (AuthManager.class) {
-                if (instance == null) {
-                    instance = new PersistentInfo();
-                }
-            }
-        }
-        return instance;
-    }
-
-    private PersistentInfo() {
+    public PersistentInfo() {
         SharedPreferences preferences = getSharedPreferences();
         meUserId = preferences.getInt(ME_USER_ID, DEFAULT_USER_ID);
     }

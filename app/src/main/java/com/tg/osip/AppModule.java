@@ -3,6 +3,9 @@ package com.tg.osip;
 import android.content.Context;
 import android.support.annotation.NonNull;
 
+import com.tg.osip.business.PersistentInfo;
+import com.tg.osip.tdclient.update_managers.UpdateManager;
+
 import javax.inject.Singleton;
 
 import dagger.Module;
@@ -25,6 +28,12 @@ public class AppModule {
     @Singleton
     Context provideContext() {
         return appContext;
+    }
+
+    @Provides
+    @Singleton
+    public PersistentInfo providePersistentInfo() {
+        return new PersistentInfo();
     }
 
 }

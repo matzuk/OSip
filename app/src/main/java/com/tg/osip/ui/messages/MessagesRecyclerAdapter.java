@@ -61,10 +61,12 @@ public class MessagesRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.V
     private List<MessageItem> listElements = new ArrayList<>();
     private Map<Integer, UserItem> usersMap = new HashMap<>();
     private WeakReference<OnMessageClickListener> onMessageClickListenerWeakReference;
-    // after reorientation test this member
-    // or one extra request will be sent after each reorientation
-    private boolean allItemsLoaded;
 
+    public MessagesRecyclerAdapter(int myUserId) {
+        this.myUserId = myUserId;
+    }
+
+    ///// ViewHolders /////
     static class TextViewHolder extends RecyclerView.ViewHolder {
 
         PhotoView avatar;
@@ -143,44 +145,15 @@ public class MessagesRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.V
         }
     }
 
-    public void setOnMessageClickListener(OnMessageClickListener onMessageClickListener) {
-        this.onMessageClickListenerWeakReference = new WeakReference<>(onMessageClickListener);
-    }
-
+    ///// overrides methods /////
     @Override
     public long getItemId(int position) {
         return getItem(position).getId();
     }
 
-    public MessageItem getItem(int position) {
-        return listElements.get(position);
-    }
-
     @Override
     public int getItemCount() {
         return listElements.size();
-    }
-
-    public void addMessageAdapterModel(MessageAdapterModel messageAdapterModel) {
-        if (messageAdapterModel == null) {
-            allItemsLoaded = true;
-            return;
-        }
-        List<MessageItem> messageItemList = messageAdapterModel.getMessageItemList();
-        if (messageItemList == null || messageItemList.size() == EMPTY_LIST) {
-            allItemsLoaded = true;
-            return;
-        }
-        listElements.addAll(messageItemList);
-        Map<Integer, UserItem> integerUserItemMap = messageAdapterModel.getIntegerUserItemMap();
-        if (integerUserItemMap != null) {
-            usersMap.putAll(integerUserItemMap);
-        }
-        notifyItemRangeInserted(getItemCount() - messageItemList.size(), messageItemList.size());
-    }
-
-    public boolean isAllItemsLoaded() {
-        return allItemsLoaded;
     }
 
     @Override
@@ -280,6 +253,36 @@ public class MessagesRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.V
         }
     }
 
+    ///// Other methods /////
+    public void setOnMessageClickListener(OnMessageClickListener onMessageClickListener) {
+        this.onMessageClickListenerWeakReference = new WeakReference<>(onMessageClickListener);
+    }
+
+    public MessageItem getItem(int position) {
+        return listElements.get(position);
+    }
+
+    public void addMessageAdapterModel(MessageAdapterModel messageAdapterModel) {
+        if (messageAdapterModel == null) {
+            return;
+        }
+        List<MessageItem> messageItemList = messageAdapterModel.getMessageItemList();
+        if (messageItemList == null || messageItemList.size() == EMPTY_LIST) {
+            return;
+        }
+        listElements.addAll(messageItemList);
+        Map<Integer, UserItem> integerUserItemMap = messageAdapterModel.getIntegerUserItemMap();
+        if (integerUserItemMap != null) {
+            usersMap.putAll(integerUserItemMap);
+        }
+        notifyItemRangeInserted(getItemCount() - messageItemList.size(), messageItemList.size());
+    }
+
+    public void setLastChatReadOutboxId(int lastChatReadOutboxId) {
+        this.lastChatReadOutboxId = lastChatReadOutboxId;
+    }
+
+    ///// onBindViewHolders /////
     private void onBindTextHolder(RecyclerView.ViewHolder holder, int position) {
         TextViewHolder textHolder = (TextViewHolder) holder;
         MessageItem message = getItem(position);
@@ -547,18 +550,6 @@ public class MessagesRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.V
         } else {
             unsupportedHolder.messageUnreadOutbox.setVisibility(View.GONE);
         }
-    }
-
-    public void setMyUserId(int myUserId) {
-        this.myUserId = myUserId;
-    }
-
-    public void setLastChatReadOutboxId(int lastChatReadOutboxId) {
-        this.lastChatReadOutboxId = lastChatReadOutboxId;
-    }
-
-    public void setChatUsers(Map<Integer, UserItem> users) {
-        usersMap.putAll(users);
     }
 
 }

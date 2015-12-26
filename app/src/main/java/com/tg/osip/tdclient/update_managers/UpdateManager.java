@@ -1,7 +1,5 @@
 package com.tg.osip.tdclient.update_managers;
 
-import android.util.Log;
-
 import org.drinkless.td.libcore.telegram.TdApi;
 
 import rx.subjects.PublishSubject;
