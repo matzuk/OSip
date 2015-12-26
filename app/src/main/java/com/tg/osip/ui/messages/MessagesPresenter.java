@@ -101,8 +101,10 @@ public class MessagesPresenter implements MessagesContract.UserActionsListener {
             messagesContractViewWeakReference.get().updateToolBar(MessageToolbarViewFactory.getUserToolbarView(activity, chatMessageAdapterModelPair.first));
         }
         // adapter
+        // add lastChatReadOutboxId field
         // add message from Chat topMessage only one
         if (messagesRecyclerAdapter.getItemCount() < EMPTY_COUNT_LIST) {
+            messagesRecyclerAdapter.setLastChatReadOutboxId(chatMessageAdapterModelPair.first.lastReadOutboxMessageId);
             MessageAdapterModel messageAdapterModel = chatMessageAdapterModelPair.second;
             messagesRecyclerAdapter.addMessageAdapterModel(messageAdapterModel);
         }
