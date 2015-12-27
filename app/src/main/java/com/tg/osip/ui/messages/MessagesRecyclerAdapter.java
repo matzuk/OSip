@@ -10,6 +10,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -152,6 +153,7 @@ public class MessagesRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.V
         TextView messageName;
         TextView messageSendingTime;
         ImageView messageUnreadOutbox;
+        ProgressBar progressBar;
 
         public AudioViewHolder(View itemView) {
             super(itemView);
@@ -159,6 +161,7 @@ public class MessagesRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.V
             messageName = (TextView) itemView.findViewById(R.id.message_name);
             messageSendingTime = (TextView) itemView.findViewById(R.id.message_sending_time);
             messageUnreadOutbox = (ImageView) itemView.findViewById(R.id.message_unread_outbox);
+            progressBar = (ProgressBar) itemView.findViewById(R.id.progressBar);
         }
     }
 
@@ -499,6 +502,9 @@ public class MessagesRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.V
         audioViewHolder.messageSendingTime.setText(dataString);
         // set unread outbox image
         setUnreadOutboxImages(message, audioViewHolder.messageUnreadOutbox);
+
+        //
+
     }
 
     private void onBindUnsupportedHolder(RecyclerView.ViewHolder holder, int position) {

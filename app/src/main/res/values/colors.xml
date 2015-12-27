@@ -20,4 +20,5 @@
     <color name="color_registration_no">#CE5757</color>
     <color name="color_registration_yes">#58BA80</color>
     <color name="color_message_toolbar_secondary">#d2eafc</color>
+    <color name="color_progress_download_view_inner">#F0F6FA</color>
 </resources>

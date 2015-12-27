@@ -56,17 +56,13 @@
         android:layout_marginTop="@dimen/size_xsmall_half"
         android:src="@drawable/ic_not_read"/>
 
-    <TextView
-        android:id="@+id/message_text"
+    <com.tg.osip.ui.general.views.ProgressDownloadView
+        android:id="@+id/progressDownloadView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/message_name"
         android:paddingTop="@dimen/size_xsmall"
         android:layout_marginLeft="@dimen/size_yylarge"
-        android:layout_marginStart="@dimen/size_yylarge"
-        android:textSize="@dimen/message_text_text_size"
-        android:textColor="@color/color_text_primary"
-        android:text="audio"
-        android:textAppearance="?android:attr/textAppearanceMedium"/>
+        android:layout_marginStart="@dimen/size_yylarge"/>
 
 </RelativeLayout>
