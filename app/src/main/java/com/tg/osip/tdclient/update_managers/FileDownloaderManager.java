@@ -1,7 +1,6 @@
 package com.tg.osip.tdclient.update_managers;
 
 import com.tg.osip.tdclient.TGProxyI;
-import com.tg.osip.ui.general.views.images.ImageLoaderI;
 import com.tg.osip.ui.general.views.images.ImageLoaderUtils;
 import com.tg.osip.utils.common.BackgroundExecutor;
 import com.tg.osip.utils.log.Logger;
@@ -75,23 +74,23 @@ public class FileDownloaderManager {
         return !getFilePath(fileId).equals(FILE_PATH_EMPTY);
     }
 
-    public <T extends ImageLoaderI> void startFileDownloading(T imageLoaderI) {
-        if (ImageLoaderUtils.isPhotoFileIdValid(imageLoaderI.getPhotoFileId()) && !ImageLoaderUtils.isPhotoFilePathValid(imageLoaderI.getPhotoFilePath()) &&
-                !isFileInCache(imageLoaderI.getPhotoFileId())) {
+    public <T extends FileDownloaderI> void startFileDownloading(T fileDownloaderI) {
+        if (ImageLoaderUtils.isPhotoFileIdValid(fileDownloaderI.getPhotoFileId()) && !ImageLoaderUtils.isPhotoFilePathValid(fileDownloaderI.getPhotoFilePath()) &&
+                !isFileInCache(fileDownloaderI.getPhotoFileId())) {
             tgProxy
-                    .sendTD(new TdApi.DownloadFile(imageLoaderI.getPhotoFileId()), TdApi.Ok.class)
+                    .sendTD(new TdApi.DownloadFile(fileDownloaderI.getPhotoFileId()), TdApi.Ok.class)
                     .subscribeOn(Schedulers.from(BackgroundExecutor.getSafeBackgroundExecutor()))
                     .observeOn(Schedulers.from(BackgroundExecutor.getSafeBackgroundExecutor()))
                     .subscribe();
         }
     }
 
-    public <T extends ImageLoaderI> void startFileListDownloading(List<T> imageLoaderIs) {
-        Observable.from(imageLoaderIs)
+    public <T extends FileDownloaderI> void startFileListDownloading(List<T> fileDownloaderIs) {
+        Observable.from(fileDownloaderIs)
                 .subscribeOn(Schedulers.from(BackgroundExecutor.getSafeBackgroundExecutor()))
                 .observeOn(Schedulers.from(BackgroundExecutor.getSafeBackgroundExecutor()))
-                .filter(imageLoaderI -> ImageLoaderUtils.isPhotoFileIdValid(imageLoaderI.getPhotoFileId()) && !ImageLoaderUtils.isPhotoFilePathValid(imageLoaderI.getPhotoFilePath()) &&
-                        !isFileInCache(imageLoaderI.getPhotoFileId()))
+                .filter(fileDownloaderI -> ImageLoaderUtils.isPhotoFileIdValid(fileDownloaderI.getPhotoFileId()) && !ImageLoaderUtils.isPhotoFilePathValid(fileDownloaderI.getPhotoFilePath()) &&
+                        !isFileInCache(fileDownloaderI.getPhotoFileId()))
                 .concatMap(imageLoaderI -> tgProxy.sendTD(new TdApi.DownloadFile(imageLoaderI.getPhotoFileId()), TdApi.Ok.class))
                 .subscribe();
     }

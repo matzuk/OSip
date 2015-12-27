@@ -2,6 +2,7 @@ package com.tg.osip.ui.general.views.images;
 
 import android.graphics.drawable.Drawable;
 
+import com.tg.osip.tdclient.update_managers.FileDownloaderI;
 import com.tg.osip.ui.general.views.images.PhotoView;
 
 /**
@@ -9,10 +10,8 @@ import com.tg.osip.ui.general.views.images.PhotoView;
  *
  * @author e.matsyuk
  */
-public interface ImageLoaderI {
+public interface ImageLoaderI extends FileDownloaderI {
 
     Drawable getPlug();
-    String getPhotoFilePath();
-    int getPhotoFileId();
     ImageLoaderI getPlugFile();
 }
