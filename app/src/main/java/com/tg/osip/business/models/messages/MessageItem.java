@@ -3,6 +3,7 @@ package com.tg.osip.business.models.messages;
 import android.support.annotation.Nullable;
 import android.support.annotation.VisibleForTesting;
 
+import com.tg.osip.business.models.messages.contents.AudioItem;
 import com.tg.osip.business.models.messages.contents.ChatDeleteParticipantItem;
 import com.tg.osip.business.models.messages.contents.ChatDeletePhoto;
 import com.tg.osip.business.models.messages.contents.ChatJoinByLink;
@@ -103,8 +104,7 @@ public class MessageItem {
             messageContentItem = new GroupChatCreate((TdApi.MessageGroupChatCreate)message.message);
         } else if (message.message.getClass() == TdApi.MessageAudio.class) {
             contentType = ContentType.AUDIO;
-            // temp
-            messageContentItem = null;
+            messageContentItem = new AudioItem((TdApi.MessageAudio)message.message);
         } else {
             contentType = ContentType.UNSUPPORTED_TYPE;
         }

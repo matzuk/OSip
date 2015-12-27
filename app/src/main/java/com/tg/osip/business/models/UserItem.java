@@ -88,12 +88,12 @@ public class UserItem implements ImageLoaderI {
     }
 
     @Override
-    public int getPhotoFileId() {
+    public int getFileId() {
         return photoFileId;
     }
 
     @Override
-    public String getPhotoFilePath() {
+    public String getFilePath() {
         return photoFilePath;
     }
 

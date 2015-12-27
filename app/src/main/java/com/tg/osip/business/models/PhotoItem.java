@@ -65,12 +65,12 @@ public class PhotoItem implements ImageLoaderI, Serializable {
     }
 
     @Override
-    public int getPhotoFileId() {
+    public int getFileId() {
         return photoFileId;
     }
 
     @Override
-    public String getPhotoFilePath() {
+    public String getFilePath() {
         return photoFilePath;
     }
 

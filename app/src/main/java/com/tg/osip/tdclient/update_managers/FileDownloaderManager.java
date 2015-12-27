@@ -1,7 +1,8 @@
 package com.tg.osip.tdclient.update_managers;
 
+import android.support.v4.util.Pair;
+
 import com.tg.osip.tdclient.TGProxyI;
-import com.tg.osip.ui.general.views.images.ImageLoaderUtils;
 import com.tg.osip.utils.common.BackgroundExecutor;
 import com.tg.osip.utils.log.Logger;
 
@@ -25,9 +26,12 @@ public class FileDownloaderManager {
 
     private final static String ADD_TO_PATH = "file://";
     public final static String FILE_PATH_EMPTY = "";
+    private final static int EMPTY_FILE_ID = 0;
+    private final static int MINIMAL_FILE_SIZE = 0;
 
     private ConcurrentHashMap<Integer, TdApi.File> fileHashMap = new ConcurrentHashMap<>();
     private PublishSubject<Integer> downloadChannel = PublishSubject.create();
+    private PublishSubject<Pair<Integer, Integer>> downloadProgressChannel = PublishSubject.create();
 
     TGProxyI tgProxy;
 
@@ -40,6 +44,10 @@ public class FileDownloaderManager {
         return downloadChannel;
     }
 
+    public PublishSubject<Pair<Integer, Integer>> getDownloadProgressChannel() {
+        return downloadProgressChannel;
+    }
+
     private void subscribeToUpdateChannel(PublishSubject<TdApi.Update> updateChannel) {
         updateChannel
                 .filter(update -> update.getClass() == TdApi.UpdateFile.class)
@@ -47,7 +55,8 @@ public class FileDownloaderManager {
                 .subscribeOn(Schedulers.from(BackgroundExecutor.getSafeBackgroundExecutor()))
                 .subscribe(new Subscriber<TdApi.UpdateFile>() {
                     @Override
-                    public void onCompleted() { }
+                    public void onCompleted() {
+                    }
 
                     @Override
                     public void onError(Throwable e) {
@@ -58,6 +67,30 @@ public class FileDownloaderManager {
                     public void onNext(TdApi.UpdateFile update) {
                         fileHashMap.put(update.file.id, update.file);
                         downloadChannel.onNext(update.file.id);
+                    }
+                });
+        updateChannel
+                .filter(update -> update.getClass() == TdApi.UpdateFileProgress.class)
+                .map(update -> (TdApi.UpdateFileProgress) update)
+                .filter(update -> update.fileId > EMPTY_FILE_ID && update.size > MINIMAL_FILE_SIZE)
+                .map(update -> {
+                    float progress = (float) update.ready / (float) update.size * 100;
+                    return new Pair<>(update.fileId, (int) progress);
+                })
+                .subscribeOn(Schedulers.from(BackgroundExecutor.getSafeBackgroundExecutor()))
+                .subscribe(new Subscriber<Pair<Integer, Integer>>() {
+                    @Override
+                    public void onCompleted() {
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        Logger.error(e);
+                    }
+
+                    @Override
+                    public void onNext(Pair<Integer, Integer> update) {
+                        downloadProgressChannel.onNext(update);
                     }
                 });
     }
@@ -75,10 +108,10 @@ public class FileDownloaderManager {
     }
 
     public <T extends FileDownloaderI> void startFileDownloading(T fileDownloaderI) {
-        if (ImageLoaderUtils.isPhotoFileIdValid(fileDownloaderI.getPhotoFileId()) && !ImageLoaderUtils.isPhotoFilePathValid(fileDownloaderI.getPhotoFilePath()) &&
-                !isFileInCache(fileDownloaderI.getPhotoFileId())) {
+        if (FileDownloaderUtils.isFileIdValid(fileDownloaderI.getFileId()) && !FileDownloaderUtils.isFilePathValid(fileDownloaderI.getFilePath()) &&
+                !isFileInCache(fileDownloaderI.getFileId())) {
             tgProxy
-                    .sendTD(new TdApi.DownloadFile(fileDownloaderI.getPhotoFileId()), TdApi.Ok.class)
+                    .sendTD(new TdApi.DownloadFile(fileDownloaderI.getFileId()), TdApi.Ok.class)
                     .subscribeOn(Schedulers.from(BackgroundExecutor.getSafeBackgroundExecutor()))
                     .observeOn(Schedulers.from(BackgroundExecutor.getSafeBackgroundExecutor()))
                     .subscribe();
@@ -89,9 +122,9 @@ public class FileDownloaderManager {
         Observable.from(fileDownloaderIs)
                 .subscribeOn(Schedulers.from(BackgroundExecutor.getSafeBackgroundExecutor()))
                 .observeOn(Schedulers.from(BackgroundExecutor.getSafeBackgroundExecutor()))
-                .filter(fileDownloaderI -> ImageLoaderUtils.isPhotoFileIdValid(fileDownloaderI.getPhotoFileId()) && !ImageLoaderUtils.isPhotoFilePathValid(fileDownloaderI.getPhotoFilePath()) &&
-                        !isFileInCache(fileDownloaderI.getPhotoFileId()))
-                .concatMap(imageLoaderI -> tgProxy.sendTD(new TdApi.DownloadFile(imageLoaderI.getPhotoFileId()), TdApi.Ok.class))
+                .filter(fileDownloaderI -> FileDownloaderUtils.isFileIdValid(fileDownloaderI.getFileId()) && !FileDownloaderUtils.isFilePathValid(fileDownloaderI.getFilePath()) &&
+                        !isFileInCache(fileDownloaderI.getFileId()))
+                .concatMap(imageLoaderI -> tgProxy.sendTD(new TdApi.DownloadFile(imageLoaderI.getFileId()), TdApi.Ok.class))
                 .subscribe();
     }
 

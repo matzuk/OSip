@@ -32,7 +32,7 @@
         android:layout_height="48dp"
         android:layout_gravity="center"
         android:max="100"
-        android:progress="40"
+        android:progress="0"
         android:progressDrawable="@drawable/progress_circular_outer" />
 
 </FrameLayout>

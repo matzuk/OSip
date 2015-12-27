@@ -20,6 +20,7 @@ import com.tg.osip.business.models.messages.MessageAdapterModel;
 import com.tg.osip.business.models.messages.MessageItem;
 import com.tg.osip.business.models.PhotoItem;
 import com.tg.osip.business.models.UserItem;
+import com.tg.osip.business.models.messages.contents.AudioItem;
 import com.tg.osip.business.models.messages.contents.ChatAddParticipantItem;
 import com.tg.osip.business.models.messages.contents.ChatChangePhotoItem;
 import com.tg.osip.business.models.messages.contents.ChatChangeTitleItem;
@@ -27,6 +28,7 @@ import com.tg.osip.business.models.messages.contents.ChatDeleteParticipantItem;
 import com.tg.osip.business.models.messages.contents.GroupChatCreate;
 import com.tg.osip.business.models.messages.contents.MessageContentPhotoItem;
 import com.tg.osip.business.models.messages.contents.MessageContentTextItem;
+import com.tg.osip.ui.general.views.ProgressDownloadView;
 import com.tg.osip.ui.general.views.images.PhotoView;
 import com.tg.osip.utils.time.TimeUtils;
 
@@ -153,7 +155,7 @@ public class MessagesRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.V
         TextView messageName;
         TextView messageSendingTime;
         ImageView messageUnreadOutbox;
-        ProgressBar progressBar;
+        ProgressDownloadView progressDownloadView;
 
         public AudioViewHolder(View itemView) {
             super(itemView);
@@ -161,7 +163,7 @@ public class MessagesRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.V
             messageName = (TextView) itemView.findViewById(R.id.message_name);
             messageSendingTime = (TextView) itemView.findViewById(R.id.message_sending_time);
             messageUnreadOutbox = (ImageView) itemView.findViewById(R.id.message_unread_outbox);
-            progressBar = (ProgressBar) itemView.findViewById(R.id.progressBar);
+            progressDownloadView = (ProgressDownloadView) itemView.findViewById(R.id.progressDownloadView);
         }
     }
 
@@ -385,7 +387,7 @@ public class MessagesRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.V
         photoViewHolder.photoLayout.setOnClickListener(v -> {
             if (onMessageClickListenerWeakReference != null && onMessageClickListenerWeakReference.get() != null && messageContentPhotoItem.getPhotoItemLarge() != null) {
                 OnMessageClickListener onMessageClickListener = onMessageClickListenerWeakReference.get();
-                Pair<Integer, List<PhotoItem>> clickedPair = getPhotoLargeItemsWithClickedPos(messageContentPhotoItem.getPhotoItemLarge().getPhotoFileId());
+                Pair<Integer, List<PhotoItem>> clickedPair = getPhotoLargeItemsWithClickedPos(messageContentPhotoItem.getPhotoItemLarge().getFileId());
                 onMessageClickListener.onPhotoMessageClick(clickedPair.first, clickedPair.second);
             }
         });
@@ -483,10 +485,10 @@ public class MessagesRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.V
     private void onBindAudioHolder(RecyclerView.ViewHolder holder, int position) {
         AudioViewHolder audioViewHolder = (AudioViewHolder) holder;
         MessageItem message = getItem(position);
-//        MessageContentTextItem messageContentTextItem = (MessageContentTextItem)message.getMessageContentItem();
-//        if (messageContentTextItem == null) {
-//            return;
-//        }
+        AudioItem audioItem = (AudioItem)message.getMessageContentItem();
+        if (audioItem == null) {
+            return;
+        }
         // get user
         UserItem user = usersMap.get(message.getFromId());
         if (user != null) {
@@ -504,7 +506,7 @@ public class MessagesRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.V
         setUnreadOutboxImages(message, audioViewHolder.messageUnreadOutbox);
 
         //
-
+        audioViewHolder.progressDownloadView.setFileDownloaderI(audioItem);
     }
 
     private void onBindUnsupportedHolder(RecyclerView.ViewHolder holder, int position) {
@@ -592,7 +594,7 @@ public class MessagesRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.V
                     continue;
                 }
                 photoLargeItemList.add(photoItemLarge);
-                if (photoFileId == photoItemLarge.getPhotoFileId()) {
+                if (photoFileId == photoItemLarge.getFileId()) {
                     clickedPosInPhotoList = currentPosInPhotoList;
                 }
                 currentPosInPhotoList++;

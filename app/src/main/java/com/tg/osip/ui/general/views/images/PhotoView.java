@@ -8,6 +8,7 @@ import android.widget.ImageView;
 import com.squareup.picasso.Picasso;
 import com.tg.osip.ApplicationSIP;
 import com.tg.osip.tdclient.update_managers.FileDownloaderManager;
+import com.tg.osip.tdclient.update_managers.FileDownloaderUtils;
 import com.tg.osip.utils.common.BackgroundExecutor;
 import com.tg.osip.utils.log.Logger;
 
@@ -57,28 +58,28 @@ public class PhotoView extends ImageView {
     private void startImageLoading(ImageLoaderI imageLoaderI) {
         unSubscribe();
         // set default drawable
-        if (imageLoaderI.getPlugFile() != null && ImageLoaderUtils.isPhotoFileIdValid(imageLoaderI.getPlugFile().getPhotoFileId())) {
-            if (ImageLoaderUtils.isPhotoFilePathValid(imageLoaderI.getPlugFile().getPhotoFilePath())) {
-                setFileToView(imageLoaderI.getPlugFile().getPhotoFilePath());
-            } else if (fileDownloaderManager.isFileInCache(imageLoaderI.getPlugFile().getPhotoFileId())) {
-                setFileToView(fileDownloaderManager.getFilePath(imageLoaderI.getPlugFile().getPhotoFileId()));
+        if (imageLoaderI.getPlugFile() != null && FileDownloaderUtils.isFileIdValid(imageLoaderI.getPlugFile().getFileId())) {
+            if (FileDownloaderUtils.isFilePathValid(imageLoaderI.getPlugFile().getFilePath())) {
+                setFileToView(imageLoaderI.getPlugFile().getFilePath());
+            } else if (fileDownloaderManager.isFileInCache(imageLoaderI.getPlugFile().getFileId())) {
+                setFileToView(fileDownloaderManager.getFilePath(imageLoaderI.getPlugFile().getFileId()));
             }
         } else {
             setImageDrawable(imageLoaderI.getPlug());
         }
-        if (ImageLoaderUtils.isPhotoFileIdValid(imageLoaderI.getPhotoFileId())) {
-            if (ImageLoaderUtils.isPhotoFilePathValid(imageLoaderI.getPhotoFilePath())) {
-                setFileToView(imageLoaderI.getPhotoFilePath());
+        if (FileDownloaderUtils.isFileIdValid(imageLoaderI.getFileId())) {
+            if (FileDownloaderUtils.isFilePathValid(imageLoaderI.getFilePath())) {
+                setFileToView(imageLoaderI.getFilePath());
                 return;
             }
             // test file downloaded cache
-            if (fileDownloaderManager.isFileInCache(imageLoaderI.getPhotoFileId())) {
-                setFileToView(fileDownloaderManager.getFilePath(imageLoaderI.getPhotoFileId()));
+            if (fileDownloaderManager.isFileInCache(imageLoaderI.getFileId())) {
+                setFileToView(fileDownloaderManager.getFilePath(imageLoaderI.getFileId()));
                 return;
             }
         }
         // start update manager listening
-        fileId = imageLoaderI.getPhotoFileId();
+        fileId = imageLoaderI.getFileId();
         subscribeToDownloadChannel();
     }
 

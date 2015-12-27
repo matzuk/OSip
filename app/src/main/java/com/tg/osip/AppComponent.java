@@ -6,6 +6,7 @@ import com.tg.osip.ui.activities.LoginActivity;
 import com.tg.osip.ui.activities.MainActivity;
 import com.tg.osip.ui.activities.PhotoMediaActivity;
 import com.tg.osip.ui.chats.ChatsFragment;
+import com.tg.osip.ui.general.views.ProgressDownloadView;
 import com.tg.osip.ui.general.views.images.PhotoView;
 import com.tg.osip.ui.messages.MessagesFragment;
 
@@ -30,4 +31,5 @@ public interface AppComponent {
     void inject(AuthManager authManager);
     void inject(PhotoMediaActivity photoMediaActivity);
     void inject(PhotoView photoView);
+    void inject(ProgressDownloadView progressDownloadView);
 }
