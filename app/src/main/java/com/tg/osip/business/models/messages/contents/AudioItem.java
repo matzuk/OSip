@@ -1,6 +1,7 @@
 package com.tg.osip.business.models.messages.contents;
 
 import com.tg.osip.tdclient.update_managers.FileDownloaderI;
+import com.tg.osip.utils.CommonStaticFields;
 
 import org.drinkless.td.libcore.telegram.TdApi;
 
@@ -8,9 +9,6 @@ import org.drinkless.td.libcore.telegram.TdApi;
  * @author e.matsyuk
  */
 public class AudioItem extends MessageContentItem implements FileDownloaderI {
-
-    private final static String ADD_TO_PATH = "file://";
-    private final static String EMPTY_STRING = "";
 
     private String fileName;
     private String mimeType;
@@ -42,15 +40,15 @@ public class AudioItem extends MessageContentItem implements FileDownloaderI {
         }
         audioFileId = messageAudio.audio.audio.id;
         String filePath = messageAudio.audio.audio.path;
-        if (filePath != null && !filePath.equals(EMPTY_STRING)) {
-            audioFilePath = ADD_TO_PATH + filePath;
+        if (filePath != null && !filePath.equals(CommonStaticFields.EMPTY_STRING)) {
+            audioFilePath = CommonStaticFields.ADD_TO_PATH + filePath;
         }
     }
 
     @Override
     public String getFilePath() {
         if (audioFilePath == null) {
-            return EMPTY_STRING;
+            return CommonStaticFields.EMPTY_STRING;
         }
         return audioFilePath;
     }
@@ -63,28 +61,28 @@ public class AudioItem extends MessageContentItem implements FileDownloaderI {
 
     public String getFileName() {
         if (fileName == null) {
-            return EMPTY_STRING;
+            return CommonStaticFields.EMPTY_STRING;
         }
         return fileName;
     }
 
     public String getMimeType() {
         if (mimeType == null) {
-            return EMPTY_STRING;
+            return CommonStaticFields.EMPTY_STRING;
         }
         return mimeType;
     }
 
     public String getPerformer() {
         if (performer == null) {
-            return EMPTY_STRING;
+            return CommonStaticFields.EMPTY_STRING;
         }
         return performer;
     }
 
     public String getTitle() {
         if (title == null) {
-            return EMPTY_STRING;
+            return CommonStaticFields.EMPTY_STRING;
         }
         return title;
     }

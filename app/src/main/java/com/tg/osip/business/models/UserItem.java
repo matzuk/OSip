@@ -7,6 +7,7 @@ import com.amulyakhare.textdrawable.TextDrawable;
 import com.amulyakhare.textdrawable.util.ColorGenerator;
 import com.tg.osip.ui.general.views.images.ImageLoaderI;
 import com.tg.osip.ui.messages.MessagesRecyclerAdapter;
+import com.tg.osip.utils.CommonStaticFields;
 import com.tg.osip.utils.common.AndroidUtils;
 
 import org.drinkless.td.libcore.telegram.TdApi;
@@ -17,10 +18,6 @@ import org.drinkless.td.libcore.telegram.TdApi;
  * @author e.matsyuk
  */
 public class UserItem implements ImageLoaderI {
-
-    private final static String ADD_TO_PATH = "file://";
-    private final static String EMPTY_STRING = "";
-    private final static String SPACE = " ";
 
     private TdApi.User user;
     private int photoFileId;
@@ -49,10 +46,10 @@ public class UserItem implements ImageLoaderI {
     private void initFilePath(TdApi.User user) {
         String filePath = user.profilePhoto.small.path;
         if (!TextUtils.isEmpty(filePath)) {
-            photoFilePath = ADD_TO_PATH + filePath;
+            photoFilePath = CommonStaticFields.ADD_TO_PATH + filePath;
             return;
         }
-        photoFilePath = EMPTY_STRING;
+        photoFilePath = CommonStaticFields.EMPTY_STRING;
     }
 
     private void initPlug() {
@@ -67,7 +64,7 @@ public class UserItem implements ImageLoaderI {
         StringBuilder stringBuilder = new StringBuilder();
         if (user.firstName != null) {
             stringBuilder.append(user.firstName);
-            stringBuilder.append(SPACE);
+            stringBuilder.append(CommonStaticFields.SPACE);
         }
         if (user.lastName != null) {
             stringBuilder.append(user.lastName);
@@ -79,7 +76,7 @@ public class UserItem implements ImageLoaderI {
         if (user.phoneNumber != null) {
             phone = user.phoneNumber;
         } else {
-            phone = EMPTY_STRING;
+            phone = CommonStaticFields.EMPTY_STRING;
         }
     }
 

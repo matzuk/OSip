@@ -12,6 +12,7 @@ import com.tg.osip.ApplicationSIP;
 import com.tg.osip.R;
 import com.tg.osip.ui.chats.ChatRecyclerAdapter;
 import com.tg.osip.ui.general.views.images.ImageLoaderI;
+import com.tg.osip.utils.CommonStaticFields;
 import com.tg.osip.utils.common.AndroidUtils;
 import com.tg.osip.utils.time.TimeUtils;
 
@@ -33,8 +34,6 @@ import rx.functions.Func2;
  */
 public class ChatItem implements ImageLoaderI {
 
-    private final static String ADD_TO_PATH = "file://";
-    private final static String EMPTY_STRING = "";
     private final static String SPACE = " ";
 
     private TdApi.Chat chat;
@@ -120,11 +119,11 @@ public class ChatItem implements ImageLoaderI {
 
     void initChatLastMessage(Context context, TdApi.MessageContent messageContent) {
         if (messageContent == null) {
-            lastMessageText = EMPTY_STRING;
+            lastMessageText = CommonStaticFields.EMPTY_STRING;
             return;
         }
         if (messageContent.getClass() == TdApi.MessageText.class) {
-            lastMessageText = ((TdApi.MessageText)messageContent).text != null ? ((TdApi.MessageText)messageContent).text : EMPTY_STRING;
+            lastMessageText = ((TdApi.MessageText)messageContent).text != null ? ((TdApi.MessageText)messageContent).text : CommonStaticFields.EMPTY_STRING;
         } else if (messageContent.getClass() == TdApi.MessageAudio.class) {
             lastMessageText = context.getResources().getString(R.string.chat_list_message_type_audio);
         } else if (messageContent.getClass() == TdApi.MessageVideo.class) {
@@ -140,7 +139,7 @@ public class ChatItem implements ImageLoaderI {
 
     private void initName(TdApi.ChatInfo chatInfo) {
         if (groupChat) {
-            userName = ((TdApi.GroupChatInfo)chatInfo).groupChat.title != null ? ((TdApi.GroupChatInfo)chatInfo).groupChat.title : EMPTY_STRING;
+            userName = ((TdApi.GroupChatInfo)chatInfo).groupChat.title != null ? ((TdApi.GroupChatInfo)chatInfo).groupChat.title : CommonStaticFields.EMPTY_STRING;
         } else {
             userName = initNameFromPrivateChat(((TdApi.PrivateChatInfo)chatInfo).user);
         }
@@ -178,9 +177,9 @@ public class ChatItem implements ImageLoaderI {
             filePath = ((TdApi.PrivateChatInfo)chatInfo).user.profilePhoto.small.path;
         }
         if (!TextUtils.isEmpty(filePath)) {
-            photoFilePath = ADD_TO_PATH + filePath;
+            photoFilePath = CommonStaticFields.ADD_TO_PATH + filePath;
         } else {
-            photoFilePath = EMPTY_STRING;
+            photoFilePath = CommonStaticFields.EMPTY_STRING;
         }
     }
 
@@ -210,7 +209,7 @@ public class ChatItem implements ImageLoaderI {
             info = getHeaderInfoForPrivateChat((TdApi.PrivateChatInfo)chatInfo);
             return;
         }
-        info = EMPTY_STRING;
+        info = CommonStaticFields.EMPTY_STRING;
     }
 
     private String getHeaderInfoForPrivateChat(TdApi.PrivateChatInfo privateChatInfo) {

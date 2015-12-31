@@ -4,6 +4,7 @@ import android.graphics.drawable.Drawable;
 import android.text.TextUtils;
 
 import com.tg.osip.ui.general.views.images.ImageLoaderI;
+import com.tg.osip.utils.CommonStaticFields;
 
 import org.drinkless.td.libcore.telegram.TdApi;
 
@@ -15,9 +16,6 @@ import java.io.Serializable;
  * @author e.matsyul
  */
 public class PhotoItem implements ImageLoaderI, Serializable {
-
-    private final static String ADD_TO_PATH = "file://";
-    private final static String EMPTY_STRING = "";
 
     private int photoFileId;
     private String photoFilePath;
@@ -41,10 +39,10 @@ public class PhotoItem implements ImageLoaderI, Serializable {
     private void initFilePath(TdApi.PhotoSize photoSize) {
         String filePath = photoSize.photo.path;
         if (!TextUtils.isEmpty(filePath)) {
-            photoFilePath = ADD_TO_PATH + filePath;
+            photoFilePath = CommonStaticFields.ADD_TO_PATH + filePath;
             return;
         }
-        photoFilePath = EMPTY_STRING;
+        photoFilePath = CommonStaticFields.EMPTY_STRING;
     }
 
     private void initPlug() {

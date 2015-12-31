@@ -3,6 +3,8 @@ package com.tg.osip.business.models.messages.contents;
 import android.support.annotation.NonNull;
 import android.support.annotation.VisibleForTesting;
 
+import com.tg.osip.utils.CommonStaticFields;
+
 import org.drinkless.td.libcore.telegram.TdApi;
 
 /**
@@ -11,8 +13,6 @@ import org.drinkless.td.libcore.telegram.TdApi;
  * @author e.matsyuk
  */
 public abstract class ChatParticipantItem<T extends TdApi.MessageContent> extends MessageContentItem {
-
-    private final static String SPACE = " ";
 
     private String name;
 
@@ -36,7 +36,7 @@ public abstract class ChatParticipantItem<T extends TdApi.MessageContent> extend
         }
         if (user.lastName != null) {
             if (user.firstName != null) {
-                userName += SPACE;
+                userName += CommonStaticFields.SPACE;
             }
             userName += user.lastName;
         }

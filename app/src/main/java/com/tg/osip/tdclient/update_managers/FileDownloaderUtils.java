@@ -1,5 +1,7 @@
 package com.tg.osip.tdclient.update_managers;
 
+import com.tg.osip.utils.CommonStaticFields;
+
 /**
  * Utils for ImageLoaderI inheritors
  *
@@ -7,15 +9,12 @@ package com.tg.osip.tdclient.update_managers;
  */
 public class FileDownloaderUtils {
 
-    private final static int EMPTY_FILE_ID = 0;
-    private final static String EMPTY_STRING = "";
-
     public static boolean isFileIdValid(int photoFileId) {
-        return photoFileId != EMPTY_FILE_ID;
+        return photoFileId != CommonStaticFields.EMPTY_FILE_ID;
     }
 
     public static boolean isFilePathValid(String photoFilePath) {
-        return photoFilePath != null && !photoFilePath.equals(EMPTY_STRING);
+        return photoFilePath != null && !photoFilePath.equals(CommonStaticFields.EMPTY_STRING);
     }
 
 }

@@ -24,8 +24,6 @@ import rx.subjects.PublishSubject;
  */
 public class FileDownloaderManager {
 
-    private final static String ADD_TO_PATH = "file://";
-    public final static String FILE_PATH_EMPTY = "";
     private final static int EMPTY_FILE_ID = 0;
     private final static int MINIMAL_FILE_SIZE = 0;
     private final static int EMPTY_PROGRESS = 0;
@@ -104,13 +102,13 @@ public class FileDownloaderManager {
     public String getFilePath(int fileId) {
         TdApi.File file = downloadedFileMap.get(fileId);
         if (file != null) {
-            return ADD_TO_PATH + file.path;
+            return FileDownloaderUtils.ADD_TO_PATH + file.path;
         }
-        return FILE_PATH_EMPTY;
+        return FileDownloaderUtils.FILE_PATH_EMPTY;
     }
 
     public boolean isFileInCache(int fileId) {
-        return !getFilePath(fileId).equals(FILE_PATH_EMPTY);
+        return !getFilePath(fileId).equals(FileDownloaderUtils.FILE_PATH_EMPTY);
     }
 
     public boolean isFileInProgress(int fileId) {
