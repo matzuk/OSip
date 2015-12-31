@@ -57,6 +57,8 @@ public class PhotoView extends ImageView {
 
     private void startImageLoading(ImageLoaderI imageLoaderI) {
         unSubscribe();
+        Logger.debug("FileId: " + imageLoaderI.getFileId());
+        Logger.debug("FilePath: " + imageLoaderI.getFilePath());
         // set default drawable
         if (imageLoaderI.getPlugFile() != null && FileDownloaderUtils.isFileIdValid(imageLoaderI.getPlugFile().getFileId())) {
             if (FileDownloaderUtils.isFilePathValid(imageLoaderI.getPlugFile().getFilePath())) {
@@ -70,11 +72,14 @@ public class PhotoView extends ImageView {
         if (FileDownloaderUtils.isFileIdValid(imageLoaderI.getFileId())) {
             if (FileDownloaderUtils.isFilePathValid(imageLoaderI.getFilePath())) {
                 setFileToView(imageLoaderI.getFilePath());
+                fileId = 0;
                 return;
             }
             // test file downloaded cache
             if (fileDownloaderManager.isFileInCache(imageLoaderI.getFileId())) {
+                Logger.debug("FilePath cache: " + fileDownloaderManager.getFilePath(imageLoaderI.getFileId()));
                 setFileToView(fileDownloaderManager.getFilePath(imageLoaderI.getFileId()));
+                fileId = 0;
                 return;
             }
         }
