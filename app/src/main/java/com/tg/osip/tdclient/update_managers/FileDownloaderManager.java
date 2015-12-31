@@ -28,8 +28,10 @@ public class FileDownloaderManager {
     public final static String FILE_PATH_EMPTY = "";
     private final static int EMPTY_FILE_ID = 0;
     private final static int MINIMAL_FILE_SIZE = 0;
+    private final static int EMPTY_PROGRESS = 0;
 
-    private ConcurrentHashMap<Integer, TdApi.File> fileHashMap = new ConcurrentHashMap<>();
+    private ConcurrentHashMap<Integer, TdApi.File> downloadedFileMap = new ConcurrentHashMap<>();
+    private ConcurrentHashMap<Integer, Integer> progressFileMap = new ConcurrentHashMap<>();
     private PublishSubject<Integer> downloadChannel = PublishSubject.create();
     private PublishSubject<Pair<Integer, Integer>> downloadProgressChannel = PublishSubject.create();
 
@@ -65,7 +67,10 @@ public class FileDownloaderManager {
 
                     @Override
                     public void onNext(TdApi.UpdateFile update) {
-                        fileHashMap.put(update.file.id, update.file);
+                        downloadedFileMap.put(update.file.id, update.file);
+                        if (progressFileMap.containsKey(update.file.id)) {
+                            progressFileMap.remove(update.file.id);
+                        }
                         downloadChannel.onNext(update.file.id);
                     }
                 });
@@ -90,13 +95,14 @@ public class FileDownloaderManager {
 
                     @Override
                     public void onNext(Pair<Integer, Integer> update) {
+                        progressFileMap.put(update.first, update.second);
                         downloadProgressChannel.onNext(update);
                     }
                 });
     }
 
     public String getFilePath(int fileId) {
-        TdApi.File file = fileHashMap.get(fileId);
+        TdApi.File file = downloadedFileMap.get(fileId);
         if (file != null) {
             return ADD_TO_PATH + file.path;
         }
@@ -105,6 +111,18 @@ public class FileDownloaderManager {
 
     public boolean isFileInCache(int fileId) {
         return !getFilePath(fileId).equals(FILE_PATH_EMPTY);
+    }
+
+    public boolean isFileInProgress(int fileId) {
+        return progressFileMap.containsKey(fileId);
+    }
+
+    public int getProgressValue(int fileId) {
+        if (isFileInProgress(fileId)) {
+            return progressFileMap.get(fileId);
+        } else {
+            return EMPTY_PROGRESS;
+        }
     }
 
     public <T extends FileDownloaderI> void startFileDownloading(T fileDownloaderI) {
@@ -129,7 +147,8 @@ public class FileDownloaderManager {
     }
 
     public void clearManager() {
-        fileHashMap.clear();
+        downloadedFileMap.clear();
+        progressFileMap.clear();
     }
 
 }

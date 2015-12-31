@@ -43,8 +43,6 @@ public class ChatsInteractTest {
         TdApi.Chats chats = new TdApi.Chats(chatsMas);
         when(tgProxy.sendTD(any(TdApi.TLFunction.class), any())).thenReturn(Observable.just(chats));
         assertThat(chatsInteract.getNextDataPortionInList(0, 0).toBlocking().single()).isNotNull();
-
-
     }
 
     @Test
