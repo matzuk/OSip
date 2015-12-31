@@ -3,6 +3,7 @@ package com.tg.osip.tdclient.update_managers;
 import android.support.v4.util.Pair;
 
 import com.tg.osip.tdclient.TGProxyI;
+import com.tg.osip.utils.CommonStaticFields;
 import com.tg.osip.utils.common.BackgroundExecutor;
 import com.tg.osip.utils.log.Logger;
 
@@ -24,7 +25,6 @@ import rx.subjects.PublishSubject;
  */
 public class FileDownloaderManager {
 
-    private final static int EMPTY_FILE_ID = 0;
     private final static int MINIMAL_FILE_SIZE = 0;
     private final static int EMPTY_PROGRESS = 0;
 
@@ -75,7 +75,7 @@ public class FileDownloaderManager {
         updateChannel
                 .filter(update -> update.getClass() == TdApi.UpdateFileProgress.class)
                 .map(update -> (TdApi.UpdateFileProgress) update)
-                .filter(update -> update.fileId > EMPTY_FILE_ID && update.size > MINIMAL_FILE_SIZE)
+                .filter(update -> update.fileId > CommonStaticFields.EMPTY_FILE_ID && update.size > MINIMAL_FILE_SIZE)
                 .map(update -> {
                     float progress = (float) update.ready / (float) update.size * 100;
                     return new Pair<>(update.fileId, (int) progress);
@@ -102,13 +102,13 @@ public class FileDownloaderManager {
     public String getFilePath(int fileId) {
         TdApi.File file = downloadedFileMap.get(fileId);
         if (file != null) {
-            return FileDownloaderUtils.ADD_TO_PATH + file.path;
+            return CommonStaticFields.ADD_TO_PATH + file.path;
         }
-        return FileDownloaderUtils.FILE_PATH_EMPTY;
+        return CommonStaticFields.FILE_PATH_EMPTY;
     }
 
     public boolean isFileInCache(int fileId) {
-        return !getFilePath(fileId).equals(FileDownloaderUtils.FILE_PATH_EMPTY);
+        return !getFilePath(fileId).equals(CommonStaticFields.FILE_PATH_EMPTY);
     }
 
     public boolean isFileInProgress(int fileId) {
