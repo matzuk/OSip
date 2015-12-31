@@ -126,6 +126,9 @@ public class FileDownloaderManager {
     public <T extends FileDownloaderI> void startFileDownloading(T fileDownloaderI) {
         if (FileDownloaderUtils.isFileIdValid(fileDownloaderI.getFileId()) && !FileDownloaderUtils.isFilePathValid(fileDownloaderI.getFilePath()) &&
                 !isFileInCache(fileDownloaderI.getFileId())) {
+            // set empty progress for file
+            progressFileMap.put(fileDownloaderI.getFileId(), EMPTY_PROGRESS);
+            // start downloading
             tgProxy
                     .sendTD(new TdApi.DownloadFile(fileDownloaderI.getFileId()), TdApi.Ok.class)
                     .subscribeOn(Schedulers.from(BackgroundExecutor.getSafeBackgroundExecutor()))
@@ -140,6 +143,7 @@ public class FileDownloaderManager {
                 .observeOn(Schedulers.from(BackgroundExecutor.getSafeBackgroundExecutor()))
                 .filter(fileDownloaderI -> FileDownloaderUtils.isFileIdValid(fileDownloaderI.getFileId()) && !FileDownloaderUtils.isFilePathValid(fileDownloaderI.getFilePath()) &&
                         !isFileInCache(fileDownloaderI.getFileId()))
+                .doOnNext(fileDownloaderI -> progressFileMap.put(fileDownloaderI.getFileId(), EMPTY_PROGRESS))
                 .concatMap(imageLoaderI -> tgProxy.sendTD(new TdApi.DownloadFile(imageLoaderI.getFileId()), TdApi.Ok.class))
                 .subscribe();
     }
