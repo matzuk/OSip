@@ -34,8 +34,11 @@ import rx.schedulers.Schedulers;
 public class ProgressDownloadView extends FrameLayout {
 
     private static final int FULL_PROGRESS = 100;
-    private static final int DOWNLOAD_IMAGE_LEVEL = 0;
-    private static final int PAUSE_IMAGE_LEVEL = 1;
+    private static final int IMAGE_DOWNLOAD_LEVEL = 0;
+    private static final int IMAGE_PAUSE_LEVEL = 1;
+    private static final int IMAGE_PLAY_LEVEL = 2;
+    private static final int INNER_DOWNLOAD_LEVEL = 0;
+    private static final int INNER_PLAY_LEVEL = 1;
 
     public enum DownloadingState {
         START, // download icon
@@ -48,10 +51,8 @@ public class ProgressDownloadView extends FrameLayout {
     FileDownloaderManager fileDownloaderManager;
 
     ProgressBar progressBar;
-    ImageView startImage;
-    ImageView downloadedImage;
-    ImageView startInner;
-    ImageView downloadedInner;
+    ImageView downloadImage;
+    ImageView downloadInner;
 
     private DownloadingState downloadingState;
     private FileDownloaderI fileDownloaderI;
@@ -94,10 +95,8 @@ public class ProgressDownloadView extends FrameLayout {
     private void initViews() {
         inflate(getContext(), R.layout.progress_download_view, this);
         progressBar = (ProgressBar)findViewById(R.id.progressBar);
-        startImage = (ImageView)findViewById(R.id.start_image);
-        downloadedImage = (ImageView)findViewById(R.id.downloaded_image);
-        startInner = (ImageView)findViewById(R.id.start_inner);
-        downloadedInner = (ImageView)findViewById(R.id.downloaded_inner);
+        downloadImage = (ImageView)findViewById(R.id.download_image);
+        downloadInner = (ImageView)findViewById(R.id.download_inner);
     }
 
     public void setFileDownloaderI(@NonNull FileDownloaderI fileDownloaderI) {
@@ -133,41 +132,18 @@ public class ProgressDownloadView extends FrameLayout {
         switch(downloadingState) {
             case START:
                 progressBar.setVisibility(View.VISIBLE);
-                progressBar.setAlpha(1f);
-                startImage.setVisibility(View.VISIBLE);
-                startImage.setAlpha(1f);
-                startImage.setImageLevel(DOWNLOAD_IMAGE_LEVEL);
-                startInner.setVisibility(View.VISIBLE);
-                startInner.setAlpha(1f);
-                downloadedImage.setVisibility(View.GONE);
-                downloadedImage.setAlpha(0f);
-                downloadedInner.setVisibility(View.GONE);
-                downloadedInner.setAlpha(0f);
+                downloadImage.setImageLevel(IMAGE_DOWNLOAD_LEVEL);
+                downloadInner.setImageLevel(INNER_DOWNLOAD_LEVEL);
                 break;
             case DOWNLOADING:
                 progressBar.setVisibility(View.VISIBLE);
-                progressBar.setAlpha(1f);
-                startImage.setVisibility(View.VISIBLE);
-                startImage.setImageLevel(PAUSE_IMAGE_LEVEL);
-                startImage.setAlpha(1f);
-                startInner.setVisibility(View.VISIBLE);
-                startInner.setAlpha(1f);
-                downloadedImage.setVisibility(View.GONE);
-                downloadedImage.setAlpha(0f);
-                downloadedInner.setVisibility(View.GONE);
-                downloadedInner.setAlpha(0f);
+                downloadImage.setImageLevel(IMAGE_PAUSE_LEVEL);
+                downloadInner.setImageLevel(INNER_DOWNLOAD_LEVEL);
                 break;
             case READY:
                 progressBar.setVisibility(View.GONE);
-                progressBar.setAlpha(0f);
-                startImage.setVisibility(View.GONE);
-                startImage.setAlpha(0f);
-                startInner.setVisibility(View.GONE);
-                startInner.setAlpha(0f);
-                downloadedImage.setVisibility(View.VISIBLE);
-                downloadedImage.setAlpha(1f);
-                downloadedInner.setVisibility(View.VISIBLE);
-                downloadedInner.setAlpha(1f);
+                downloadImage.setImageLevel(IMAGE_PLAY_LEVEL);
+                downloadInner.setImageLevel(INNER_PLAY_LEVEL);
                 break;
         }
     }
@@ -189,7 +165,7 @@ public class ProgressDownloadView extends FrameLayout {
         setOnClickListener(v -> {
             switch (downloadingState) {
                 case START:
-                    animateStateChanging(startImage, DOWNLOAD_IMAGE_LEVEL, PAUSE_IMAGE_LEVEL);
+                    animateStateChanging(downloadImage, IMAGE_DOWNLOAD_LEVEL, IMAGE_PAUSE_LEVEL).start();
                     downloadingState = DownloadingState.DOWNLOADING;
                     if (onDownloadClickListener != null) {
                         onDownloadClickListener.onClick(downloadingState);
@@ -197,14 +173,14 @@ public class ProgressDownloadView extends FrameLayout {
                     startDownloading();
                     break;
                 case DOWNLOADING:
-                    animateStateChanging(startImage, PAUSE_IMAGE_LEVEL, DOWNLOAD_IMAGE_LEVEL);
+                    animateStateChanging(downloadImage, IMAGE_PAUSE_LEVEL, IMAGE_DOWNLOAD_LEVEL).start();
                     downloadingState = DownloadingState.PAUSE_DOWNLOADING;
                     if (onDownloadClickListener != null) {
                         onDownloadClickListener.onClick(downloadingState);
                     }
                     break;
                 case PAUSE_DOWNLOADING:
-                    animateStateChanging(startImage, DOWNLOAD_IMAGE_LEVEL, PAUSE_IMAGE_LEVEL);
+                    animateStateChanging(downloadImage, IMAGE_DOWNLOAD_LEVEL, IMAGE_PAUSE_LEVEL).start();
                     downloadingState = DownloadingState.DOWNLOADING;
                     if (onDownloadClickListener != null) {
                         onDownloadClickListener.onClick(downloadingState);
@@ -214,7 +190,7 @@ public class ProgressDownloadView extends FrameLayout {
         });
     }
 
-    private void animateStateChanging(final ImageView imageView, int from, int to) {
+    private AnimatorSet animateStateChanging(final ImageView imageView, int from, int to) {
         AnimatorSet animatorSet = new AnimatorSet();
         ObjectAnimator alphaAppear = ObjectAnimator.ofFloat(imageView, "alpha", 0f, 1f);
         alphaAppear.setDuration(100);
@@ -226,7 +202,7 @@ public class ProgressDownloadView extends FrameLayout {
                 .play(alphaDisappear)
                 .with(alphaImageLevelChanging)
                 .before(alphaAppear);
-        animatorSet.start();
+        return animatorSet;
     }
 
     public void setOnDownloadClickListener(OnDownloadClickListener onDownloadClickListener) {
@@ -276,32 +252,14 @@ public class ProgressDownloadView extends FrameLayout {
     private void animateToReadyStatus() {
         AnimatorSet animatorSet = new AnimatorSet();
 
-        ObjectAnimator alphaDisappearStartImage = ObjectAnimator.ofFloat(startImage, "alpha", 1f, 0f);
-        ObjectAnimator alphaDisappearStartInner = ObjectAnimator.ofFloat(startInner, "alpha", 1f, 0f);
         ObjectAnimator alphaDisappearProgress = ObjectAnimator.ofFloat(progressBar, "alpha", 1f, 0f);
-        AnimatorSet animatorSetDisappear = new AnimatorSet();
-        animatorSetDisappear.setDuration(100);
-        animatorSetDisappear
-                .play(alphaDisappearStartImage)
-                .with(alphaDisappearStartInner)
-                .with(alphaDisappearProgress);
-
-        downloadedImage.setAlpha(0f);
-        downloadedInner.setAlpha(0f);
-        downloadedImage.setVisibility(View.VISIBLE);
-        downloadedInner.setVisibility(View.VISIBLE);
-
-        ObjectAnimator alphaAppearStartImage = ObjectAnimator.ofFloat(downloadedImage, "alpha", 0f, 1f);
-        ObjectAnimator alphaAppearStartInner = ObjectAnimator.ofFloat(downloadedInner, "alpha", 0f, 1f);
-        AnimatorSet animatorSetAppear = new AnimatorSet();
-        animatorSetAppear.setDuration(100);
-        animatorSetAppear
-                .play(alphaAppearStartImage)
-                .with(alphaAppearStartInner);
+        AnimatorSet imageAnimatorSet = animateStateChanging(downloadImage, IMAGE_PAUSE_LEVEL, IMAGE_PLAY_LEVEL);
+        AnimatorSet innerAnimatorSet = animateStateChanging(downloadInner, INNER_DOWNLOAD_LEVEL, INNER_PLAY_LEVEL);
 
         animatorSet
-                .play(animatorSetDisappear)
-                .before(animatorSetAppear);
+                .play(alphaDisappearProgress)
+                .with(imageAnimatorSet)
+                .with(innerAnimatorSet);
 
         animatorSet.start();
     }
