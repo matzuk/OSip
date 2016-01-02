@@ -1,40 +1,28 @@
 package com.tg.osip.ui.general.views;
 
-import android.content.Context;
-import android.view.View;
-import android.widget.ImageView;
-import android.widget.ProgressBar;
-
+import com.tg.osip.RobolectricUnitTestRunner;
 import com.tg.osip.tdclient.update_managers.FileDownloaderI;
 import com.tg.osip.tdclient.update_managers.FileDownloaderManager;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Mockito.when;
 
 /**
+ * Unit tests
+ *
  * @author e.matsyuk
  */
 public class ProgressDownloadViewTest {
 
     @Mock
     FileDownloaderManager fileDownloaderManager;
-    @Mock
-    ProgressBar progressBar;
-    @Mock
-    ImageView startImage;
-    @Mock
-    ImageView downloadedImage;
-    @Mock
-    ImageView startInner;
-    @Mock
-    ImageView downloadedInner;
 
     @Before
     public void setup() {
@@ -146,6 +134,11 @@ public class ProgressDownloadViewTest {
         progressDownloadView.setFileDownloaderManager(fileDownloaderManager);
 
         assertThat(progressDownloadView.getDownloadingState(fileDownloaderI)).isEqualTo(ProgressDownloadView.DownloadingState.DOWNLOADING);
+    }
+
+    @Test
+    public void progressUpdatingTest() {
+
     }
 
 }

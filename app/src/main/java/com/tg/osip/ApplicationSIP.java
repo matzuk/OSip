@@ -29,10 +29,7 @@ public class ApplicationSIP extends Application {
         applicationContext = getApplicationContext();
         Logger.registerLogger(this);
 
-        appComponent = DaggerAppComponent.builder()
-                .appModule(new AppModule(getApplicationContext()))
-                .tGModule(new TGModule())
-                .build();
+        appComponent = prepareApplicationComponent().build();
         appComponent.inject(this);
 
         if (isDebugMode()) {
@@ -44,6 +41,13 @@ public class ApplicationSIP extends Application {
                 }
             });
         }
+    }
+
+    @NonNull
+    protected DaggerAppComponent.Builder prepareApplicationComponent() {
+        return DaggerAppComponent.builder()
+                .appModule(new AppModule(getApplicationContext()))
+                .tGModule(new TGModule());
     }
 
     public boolean isDebugMode() {

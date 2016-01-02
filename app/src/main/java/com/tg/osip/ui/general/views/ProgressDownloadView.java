@@ -16,6 +16,7 @@ import com.tg.osip.R;
 import com.tg.osip.tdclient.update_managers.FileDownloaderI;
 import com.tg.osip.tdclient.update_managers.FileDownloaderManager;
 import com.tg.osip.tdclient.update_managers.FileDownloaderUtils;
+import com.tg.osip.utils.CommonStaticFields;
 import com.tg.osip.utils.common.BackgroundExecutor;
 import com.tg.osip.utils.log.Logger;
 
@@ -54,7 +55,7 @@ public class ProgressDownloadView extends FrameLayout {
     ImageView downloadImage;
     ImageView downloadInner;
 
-    private DownloadingState downloadingState;
+    DownloadingState downloadingState;
     private FileDownloaderI fileDownloaderI;
     private Subscription downloadProgressChannelSubscription;
 
@@ -151,8 +152,11 @@ public class ProgressDownloadView extends FrameLayout {
     private void setProgress() {
         if (downloadingState == DownloadingState.DOWNLOADING) {
             progressBar.setProgress(fileDownloaderManager.getProgressValue(fileDownloaderI.getFileId()));
+            subscribeToDownloadChannel();
+        } else {
+            progressBar.setProgress(CommonStaticFields.EMPTY_PROGRESS);
         }
-        subscribeToDownloadChannel();
+
     }
 
     private void setOnClickListeners() {
@@ -216,7 +220,7 @@ public class ProgressDownloadView extends FrameLayout {
         subscribeToDownloadChannel();
     }
 
-    private void subscribeToDownloadChannel() {
+    void subscribeToDownloadChannel() {
         downloadProgressChannelSubscription = fileDownloaderManager.getDownloadProgressChannel()
                 .filter(progressPair -> progressPair.first == fileDownloaderI.getFileId())
                 .map(progressPair -> progressPair.second)
@@ -245,7 +249,6 @@ public class ProgressDownloadView extends FrameLayout {
 
     private void setReadyStatus() {
         downloadingState = DownloadingState.READY;
-        setOnClickListeners();
         animateToReadyStatus();
     }
 

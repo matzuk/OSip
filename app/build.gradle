@@ -88,4 +88,5 @@ dependencies {
         exclude module: 'hamcrest-core'
         exclude module: 'objenesis'
     }
+    testCompile "org.robolectric:robolectric:3.0"
 }
