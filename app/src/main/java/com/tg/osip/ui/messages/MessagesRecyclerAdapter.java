@@ -156,6 +156,8 @@ public class MessagesRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.V
         TextView messageSendingTime;
         ImageView messageUnreadOutbox;
         ProgressDownloadView progressDownloadView;
+        TextView messageAudioTitle;
+        TextView messageAudioPerformer;
 
         public AudioViewHolder(View itemView) {
             super(itemView);
@@ -164,6 +166,8 @@ public class MessagesRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.V
             messageSendingTime = (TextView) itemView.findViewById(R.id.message_sending_time);
             messageUnreadOutbox = (ImageView) itemView.findViewById(R.id.message_unread_outbox);
             progressDownloadView = (ProgressDownloadView) itemView.findViewById(R.id.progressDownloadView);
+            messageAudioTitle = (TextView) itemView.findViewById(R.id.message_audio_title);
+            messageAudioPerformer = (TextView) itemView.findViewById(R.id.message_audio_performer);
         }
     }
 
@@ -504,7 +508,9 @@ public class MessagesRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.V
         audioViewHolder.messageSendingTime.setText(dataString);
         // set unread outbox image
         setUnreadOutboxImages(message, audioViewHolder.messageUnreadOutbox);
-
+        // set audio title and performer
+        audioViewHolder.messageAudioTitle.setText(audioItem.getTitle());
+        audioViewHolder.messageAudioPerformer.setText(audioItem.getPerformer());
         //
         audioViewHolder.progressDownloadView.setFileDownloaderI(audioItem);
     }
