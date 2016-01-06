@@ -15,6 +15,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import rx.Observable;
 import rx.Subscriber;
+import rx.functions.Action1;
 import rx.schedulers.Schedulers;
 import rx.subjects.PublishSubject;
 
@@ -142,6 +143,20 @@ public class FileDownloaderManager {
                         !isFileInCache(fileDownloaderI.getFileId()))
                 .doOnNext(fileDownloaderI -> progressFileMap.put(fileDownloaderI.getFileId(), CommonStaticFields.EMPTY_PROGRESS))
                 .concatMap(imageLoaderI -> tgProxy.sendTD(new TdApi.DownloadFile(imageLoaderI.getFileId()), TdApi.Ok.class))
+                .subscribe();
+    }
+
+    public <T extends FileDownloaderI> void stopFileDownloading(T fileDownloaderI) {
+        if (!FileDownloaderUtils.isFileIdValid(fileDownloaderI.getFileId())) {
+            return;
+        }
+        tgProxy
+                .sendTD(new TdApi.CancelDownloadFile(fileDownloaderI.getFileId()), TdApi.Ok.class)
+                .doOnNext(ok -> {
+                    if (progressFileMap.containsKey(fileDownloaderI.getFileId())) {
+                        progressFileMap.remove(fileDownloaderI.getFileId());
+                    }
+                })
                 .subscribe();
     }
 

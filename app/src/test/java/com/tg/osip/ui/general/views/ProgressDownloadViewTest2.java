@@ -32,6 +32,8 @@ public class ProgressDownloadViewTest2 {
     FileDownloaderManager fileDownloaderManager;
 
     ProgressDownloadView progressDownloadView;
+    PublishSubject<Pair<Integer, Integer>> downloadProgressChannel;
+    Activity activity;
 
     @Before
     public void setup() {
@@ -39,9 +41,23 @@ public class ProgressDownloadViewTest2 {
         // inject the mocks in the test the initMocks method needs to be called.
         MockitoAnnotations.initMocks(this);
         // Robolectic
-        Activity activity = Robolectric.setupActivity(Activity.class);
+        activity = Robolectric.setupActivity(Activity.class);
 
         progressDownloadView = new ProgressDownloadView(activity);
+        downloadProgressChannel = PublishSubject.create();
+
+        when(fileDownloaderManager.isFileInCache(anyInt())).thenReturn(false);
+        when(fileDownloaderManager.isFileInProgress(10)).thenReturn(true);
+        when(fileDownloaderManager.isFileInProgress(20)).thenReturn(false);
+        when(fileDownloaderManager.isFileInProgress(30)).thenReturn(false);
+        when(fileDownloaderManager.isFileInProgress(40)).thenReturn(false);
+        when(fileDownloaderManager.isFileInProgress(50)).thenReturn(false);
+
+        when(fileDownloaderManager.getProgressValue(10)).thenReturn(20);
+
+        when(fileDownloaderManager.getDownloadProgressChannel()).thenReturn(downloadProgressChannel);
+
+        progressDownloadView.setFileDownloaderManager(fileDownloaderManager);
     }
 
     @Test
@@ -57,15 +73,10 @@ public class ProgressDownloadViewTest2 {
                 return 10;
             }
         };
-        when(fileDownloaderManager.isFileInCache(anyInt())).thenReturn(false);
-        when(fileDownloaderManager.isFileInProgress(10)).thenReturn(true);
-        when(fileDownloaderManager.getProgressValue(10)).thenReturn(20);
 
-        PublishSubject<Pair<Integer, Integer>> downloadProgressChannel = PublishSubject.create();
-        when(fileDownloaderManager.getDownloadProgressChannel()).thenReturn(downloadProgressChannel);
-
-        progressDownloadView.setFileDownloaderManager(fileDownloaderManager);
+        assertThat(progressDownloadView.downloadProgressChannelSubscription).isNull();
         progressDownloadView.setFileDownloaderI(fileDownloaderI);
+        assertThat(progressDownloadView.downloadProgressChannelSubscription.isUnsubscribed()).isEqualTo(false);
 
         assertThat(progressDownloadView.progressBar.getProgress()).isEqualTo(20);
 
@@ -80,6 +91,7 @@ public class ProgressDownloadViewTest2 {
 
         downloadProgressChannel.onNext(new Pair<>(10, 100));
         assertThat(progressDownloadView.progressBar.getProgress()).isEqualTo(100);
+        assertThat(progressDownloadView.downloadProgressChannelSubscription.isUnsubscribed()).isEqualTo(true);
         assertThat(progressDownloadView.downloadingState).isEqualTo(ProgressDownloadView.DownloadingState.READY);
     }
 
@@ -93,32 +105,29 @@ public class ProgressDownloadViewTest2 {
 
             @Override
             public int getFileId() {
-                return 10;
+                return 20;
             }
         };
-        when(fileDownloaderManager.isFileInCache(anyInt())).thenReturn(false);
-        when(fileDownloaderManager.isFileInProgress(10)).thenReturn(false);
 
-        PublishSubject<Pair<Integer, Integer>> downloadProgressChannel = PublishSubject.create();
-        when(fileDownloaderManager.getDownloadProgressChannel()).thenReturn(downloadProgressChannel);
-
-        progressDownloadView.setFileDownloaderManager(fileDownloaderManager);
         progressDownloadView.setFileDownloaderI(fileDownloaderI);
+        assertThat(progressDownloadView.downloadProgressChannelSubscription).isNull();
         progressDownloadView.callOnClick();
+        assertThat(progressDownloadView.downloadProgressChannelSubscription.isUnsubscribed()).isEqualTo(false);
 
         assertThat(progressDownloadView.progressBar.getProgress()).isEqualTo(0);
 
-        downloadProgressChannel.onNext(new Pair<>(10, 40));
+        downloadProgressChannel.onNext(new Pair<>(20, 40));
         assertThat(progressDownloadView.progressBar.getProgress()).isEqualTo(40);
 
-        downloadProgressChannel.onNext(new Pair<>(20, 60));
+        downloadProgressChannel.onNext(new Pair<>(21, 60));
         assertThat(progressDownloadView.progressBar.getProgress()).isEqualTo(40);
 
-        downloadProgressChannel.onNext(new Pair<>(10, 85));
+        downloadProgressChannel.onNext(new Pair<>(20, 85));
         assertThat(progressDownloadView.progressBar.getProgress()).isEqualTo(85);
 
-        downloadProgressChannel.onNext(new Pair<>(10, 100));
+        downloadProgressChannel.onNext(new Pair<>(20, 100));
         assertThat(progressDownloadView.progressBar.getProgress()).isEqualTo(100);
+        assertThat(progressDownloadView.downloadProgressChannelSubscription.isUnsubscribed()).isEqualTo(true);
         assertThat(progressDownloadView.downloadingState).isEqualTo(ProgressDownloadView.DownloadingState.READY);
     }
 
@@ -135,16 +144,10 @@ public class ProgressDownloadViewTest2 {
                 return 10;
             }
         };
-        when(fileDownloaderManager.isFileInCache(anyInt())).thenReturn(false);
-        when(fileDownloaderManager.isFileInProgress(10)).thenReturn(true);
-        when(fileDownloaderManager.getProgressValue(10)).thenReturn(20);
 
-        PublishSubject<Pair<Integer, Integer>> downloadProgressChannel = PublishSubject.create();
-        when(fileDownloaderManager.getDownloadProgressChannel()).thenReturn(downloadProgressChannel);
-
-        progressDownloadView.setFileDownloaderManager(fileDownloaderManager);
+        assertThat(progressDownloadView.downloadProgressChannelSubscription).isNull();
         progressDownloadView.setFileDownloaderI(fileDownloaderI);
-        progressDownloadView.callOnClick();
+        assertThat(progressDownloadView.downloadProgressChannelSubscription.isUnsubscribed()).isEqualTo(false);
 
         assertThat(progressDownloadView.progressBar.getProgress()).isEqualTo(20);
 
@@ -159,16 +162,61 @@ public class ProgressDownloadViewTest2 {
 
             @Override
             public int getFileId() {
-                return 20;
+                return 40;
             }
         };
         progressDownloadView.setFileDownloaderI(fileDownloaderI2);
+        assertThat(progressDownloadView.downloadProgressChannelSubscription.isUnsubscribed()).isEqualTo(true);
         progressDownloadView.callOnClick();
+        assertThat(progressDownloadView.downloadProgressChannelSubscription.isUnsubscribed()).isEqualTo(false);
 
         assertThat(progressDownloadView.progressBar.getProgress()).isEqualTo(0);
 
-        downloadProgressChannel.onNext(new Pair<>(20, 100));
+        downloadProgressChannel.onNext(new Pair<>(40, 100));
         assertThat(progressDownloadView.progressBar.getProgress()).isEqualTo(100);
+        assertThat(progressDownloadView.downloadProgressChannelSubscription.isUnsubscribed()).isEqualTo(true);
+        assertThat(progressDownloadView.downloadingState).isEqualTo(ProgressDownloadView.DownloadingState.READY);
+    }
+
+    @Test
+    public void progressUpdatingTest_pauseState() {
+
+        FileDownloaderI fileDownloaderI = new FileDownloaderI() {
+            @Override
+            public String getFilePath() {
+                return "";
+            }
+
+            @Override
+            public int getFileId() {
+                return 50;
+            }
+        };
+
+        assertThat(progressDownloadView.downloadProgressChannelSubscription).isNull();
+        progressDownloadView.setFileDownloaderI(fileDownloaderI);
+        progressDownloadView.callOnClick();
+        assertThat(progressDownloadView.downloadProgressChannelSubscription.isUnsubscribed()).isEqualTo(false);
+
+        assertThat(progressDownloadView.progressBar.getProgress()).isEqualTo(0);
+
+        downloadProgressChannel.onNext(new Pair<>(50, 40));
+        assertThat(progressDownloadView.progressBar.getProgress()).isEqualTo(40);
+
+        progressDownloadView.callOnClick();
+        assertThat(progressDownloadView.downloadProgressChannelSubscription.isUnsubscribed()).isEqualTo(true);
+        assertThat(progressDownloadView.progressBar.getProgress()).isEqualTo(0);
+        assertThat(progressDownloadView.downloadingState).isEqualTo(ProgressDownloadView.DownloadingState.START);
+
+        progressDownloadView.callOnClick();
+        assertThat(progressDownloadView.downloadProgressChannelSubscription.isUnsubscribed()).isEqualTo(false);
+        assertThat(progressDownloadView.downloadingState).isEqualTo(ProgressDownloadView.DownloadingState.DOWNLOADING);
+        assertThat(progressDownloadView.progressBar.getProgress()).isEqualTo(0);
+        downloadProgressChannel.onNext(new Pair<>(50, 50));
+        assertThat(progressDownloadView.progressBar.getProgress()).isEqualTo(50);
+
+        downloadProgressChannel.onNext(new Pair<>(50, 100));
+        assertThat(progressDownloadView.downloadProgressChannelSubscription.isUnsubscribed()).isEqualTo(true);
         assertThat(progressDownloadView.downloadingState).isEqualTo(ProgressDownloadView.DownloadingState.READY);
     }
 

@@ -1,5 +1,6 @@
 package com.tg.osip.ui.general.views;
 
+import android.animation.Animator;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.content.Context;
@@ -34,7 +35,11 @@ import rx.schedulers.Schedulers;
  */
 public class ProgressDownloadView extends FrameLayout {
 
-    private static final int FULL_PROGRESS = 100;
+    private static final float VISIBLE_ALPHA = 1f;
+    private static final float INVISIBLE_ALPHA = 0f;
+    private static final int ANIM_DURATION = 100;
+    private static final int ANIM_SET_DURATION = 200;
+
     private static final int IMAGE_DOWNLOAD_LEVEL = 0;
     private static final int IMAGE_PAUSE_LEVEL = 1;
     private static final int IMAGE_PLAY_LEVEL = 2;
@@ -44,7 +49,6 @@ public class ProgressDownloadView extends FrameLayout {
     public enum DownloadingState {
         START, // download icon
         DOWNLOADING, // pause icon
-        PAUSE_DOWNLOADING, // download icon
         READY // downloading was done
     }
 
@@ -52,12 +56,12 @@ public class ProgressDownloadView extends FrameLayout {
     FileDownloaderManager fileDownloaderManager;
 
     ProgressBar progressBar;
-    ImageView downloadImage;
-    ImageView downloadInner;
+    private ImageView downloadImage;
+    private ImageView downloadInner;
 
     DownloadingState downloadingState;
     private FileDownloaderI fileDownloaderI;
-    private Subscription downloadProgressChannelSubscription;
+    Subscription downloadProgressChannelSubscription;
 
     private OnDownloadClickListener onDownloadClickListener;
 
@@ -101,6 +105,9 @@ public class ProgressDownloadView extends FrameLayout {
     }
 
     public void setFileDownloaderI(@NonNull FileDownloaderI fileDownloaderI) {
+        if (downloadProgressChannelSubscription != null && !downloadProgressChannelSubscription.isUnsubscribed()) {
+            downloadProgressChannelSubscription.unsubscribe();
+        }
         this.fileDownloaderI = fileDownloaderI;
         downloadingState = getDownloadingState(fileDownloaderI);
         setViews();
@@ -132,11 +139,13 @@ public class ProgressDownloadView extends FrameLayout {
     private void setViews() {
         switch(downloadingState) {
             case START:
+                progressBar.setAlpha(VISIBLE_ALPHA);
                 progressBar.setVisibility(View.VISIBLE);
                 downloadImage.setImageLevel(IMAGE_DOWNLOAD_LEVEL);
                 downloadInner.setImageLevel(INNER_DOWNLOAD_LEVEL);
                 break;
             case DOWNLOADING:
+                progressBar.setAlpha(VISIBLE_ALPHA);
                 progressBar.setVisibility(View.VISIBLE);
                 downloadImage.setImageLevel(IMAGE_PAUSE_LEVEL);
                 downloadInner.setImageLevel(INNER_DOWNLOAD_LEVEL);
@@ -169,7 +178,7 @@ public class ProgressDownloadView extends FrameLayout {
         setOnClickListener(v -> {
             switch (downloadingState) {
                 case START:
-                    animateStateChanging(downloadImage, IMAGE_DOWNLOAD_LEVEL, IMAGE_PAUSE_LEVEL).start();
+                    animateStartToDownloadingStateChanging();
                     downloadingState = DownloadingState.DOWNLOADING;
                     if (onDownloadClickListener != null) {
                         onDownloadClickListener.onClick(downloadingState);
@@ -177,31 +186,47 @@ public class ProgressDownloadView extends FrameLayout {
                     startDownloading();
                     break;
                 case DOWNLOADING:
-                    animateStateChanging(downloadImage, IMAGE_PAUSE_LEVEL, IMAGE_DOWNLOAD_LEVEL).start();
-                    downloadingState = DownloadingState.PAUSE_DOWNLOADING;
+                    animateDownloadingToStartStateChanging();
+                    downloadingState = DownloadingState.START;
                     if (onDownloadClickListener != null) {
                         onDownloadClickListener.onClick(downloadingState);
                     }
-                    break;
-                case PAUSE_DOWNLOADING:
-                    animateStateChanging(downloadImage, IMAGE_DOWNLOAD_LEVEL, IMAGE_PAUSE_LEVEL).start();
-                    downloadingState = DownloadingState.DOWNLOADING;
-                    if (onDownloadClickListener != null) {
-                        onDownloadClickListener.onClick(downloadingState);
-                    }
+                    stopDownloading();
                     break;
             }
         });
     }
 
-    private AnimatorSet animateStateChanging(final ImageView imageView, int from, int to) {
+    private void animateStartToDownloadingStateChanging() {
         AnimatorSet animatorSet = new AnimatorSet();
-        ObjectAnimator alphaAppear = ObjectAnimator.ofFloat(imageView, "alpha", 0f, 1f);
-        alphaAppear.setDuration(100);
-        ObjectAnimator alphaDisappear = ObjectAnimator.ofFloat(imageView, "alpha", 1f, 0f);
-        alphaDisappear.setDuration(100);
+        ObjectAnimator alphaAppearProgressBar = ObjectAnimator.ofFloat(progressBar, "alpha", INVISIBLE_ALPHA, VISIBLE_ALPHA);
+        alphaAppearProgressBar.setDuration(ANIM_SET_DURATION);
+        AnimatorSet imageLevelChangingAnim = getAnimateImageLevelChanging(downloadImage, IMAGE_DOWNLOAD_LEVEL, IMAGE_PAUSE_LEVEL);
+        animatorSet
+                .play(alphaAppearProgressBar)
+                .with(imageLevelChangingAnim);
+        animatorSet.start();
+    }
+
+    private void animateDownloadingToStartStateChanging() {
+        AnimatorSet animatorSet = new AnimatorSet();
+        ObjectAnimator alphaDisappearProgressBar = ObjectAnimator.ofFloat(progressBar, "alpha", VISIBLE_ALPHA, INVISIBLE_ALPHA);
+        alphaDisappearProgressBar.setDuration(ANIM_SET_DURATION);
+        AnimatorSet imageLevelChangingAnim = getAnimateImageLevelChanging(downloadImage, IMAGE_PAUSE_LEVEL, IMAGE_DOWNLOAD_LEVEL);
+        animatorSet
+                .play(alphaDisappearProgressBar)
+                .with(imageLevelChangingAnim);
+        animatorSet.start();
+    }
+
+    private AnimatorSet getAnimateImageLevelChanging(final ImageView imageView, int from, int to) {
+        AnimatorSet animatorSet = new AnimatorSet();
+        ObjectAnimator alphaAppear = ObjectAnimator.ofFloat(imageView, "alpha", INVISIBLE_ALPHA, VISIBLE_ALPHA);
+        alphaAppear.setDuration(ANIM_DURATION);
+        ObjectAnimator alphaDisappear = ObjectAnimator.ofFloat(imageView, "alpha", VISIBLE_ALPHA, INVISIBLE_ALPHA);
+        alphaDisappear.setDuration(ANIM_DURATION);
         ObjectAnimator alphaImageLevelChanging = ObjectAnimator.ofInt(imageView, "ImageLevel", from, to);
-        alphaImageLevelChanging.setDuration(100);
+        alphaImageLevelChanging.setDuration(ANIM_DURATION);
         animatorSet
                 .play(alphaDisappear)
                 .with(alphaImageLevelChanging)
@@ -220,7 +245,7 @@ public class ProgressDownloadView extends FrameLayout {
         subscribeToDownloadChannel();
     }
 
-    void subscribeToDownloadChannel() {
+    private void subscribeToDownloadChannel() {
         downloadProgressChannelSubscription = fileDownloaderManager.getDownloadProgressChannel()
                 .filter(progressPair -> progressPair.first == fileDownloaderI.getFileId())
                 .map(progressPair -> progressPair.second)
@@ -228,7 +253,8 @@ public class ProgressDownloadView extends FrameLayout {
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Subscriber<Integer>() {
                     @Override
-                    public void onCompleted() { }
+                    public void onCompleted() {
+                    }
 
                     @Override
                     public void onError(Throwable e) {
@@ -238,7 +264,7 @@ public class ProgressDownloadView extends FrameLayout {
                     @Override
                     public void onNext(Integer progress) {
                         progressBar.setProgress(progress);
-                        if (progress == FULL_PROGRESS) {
+                        if (progress == CommonStaticFields.FULL_PROGRESS) {
                             unsubscribe();
                             setReadyStatus();
                         }
@@ -252,12 +278,42 @@ public class ProgressDownloadView extends FrameLayout {
         animateToReadyStatus();
     }
 
+    private void stopDownloading() {
+        if (downloadProgressChannelSubscription != null && !downloadProgressChannelSubscription.isUnsubscribed()) {
+            downloadProgressChannelSubscription.unsubscribe();
+        }
+        fileDownloaderManager.stopFileDownloading(fileDownloaderI);
+        progressBar.setProgress(CommonStaticFields.EMPTY_PROGRESS);
+    }
+
     private void animateToReadyStatus() {
         AnimatorSet animatorSet = new AnimatorSet();
 
-        ObjectAnimator alphaDisappearProgress = ObjectAnimator.ofFloat(progressBar, "alpha", 1f, 0f);
-        AnimatorSet imageAnimatorSet = animateStateChanging(downloadImage, IMAGE_PAUSE_LEVEL, IMAGE_PLAY_LEVEL);
-        AnimatorSet innerAnimatorSet = animateStateChanging(downloadInner, INNER_DOWNLOAD_LEVEL, INNER_PLAY_LEVEL);
+        ObjectAnimator alphaDisappearProgress = ObjectAnimator.ofFloat(progressBar, "alpha", VISIBLE_ALPHA, INVISIBLE_ALPHA);
+        alphaDisappearProgress.setDuration(ANIM_DURATION);
+        alphaDisappearProgress.addListener(new Animator.AnimatorListener() {
+            @Override
+            public void onAnimationStart(Animator animation) {
+
+            }
+
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                progressBar.setVisibility(View.GONE);
+            }
+
+            @Override
+            public void onAnimationCancel(Animator animation) {
+
+            }
+
+            @Override
+            public void onAnimationRepeat(Animator animation) {
+
+            }
+        });
+        AnimatorSet imageAnimatorSet = getAnimateImageLevelChanging(downloadImage, IMAGE_PAUSE_LEVEL, IMAGE_PLAY_LEVEL);
+        AnimatorSet innerAnimatorSet = getAnimateImageLevelChanging(downloadInner, INNER_DOWNLOAD_LEVEL, INNER_PLAY_LEVEL);
 
         animatorSet
                 .play(alphaDisappearProgress)
