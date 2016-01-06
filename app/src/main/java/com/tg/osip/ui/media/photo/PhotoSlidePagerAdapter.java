@@ -1,4 +1,4 @@
-package com.tg.osip.ui.media;
+package com.tg.osip.ui.media.photo;
 
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;

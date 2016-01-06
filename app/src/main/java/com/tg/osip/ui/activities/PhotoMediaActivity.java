@@ -10,8 +10,8 @@ import com.tg.osip.ApplicationSIP;
 import com.tg.osip.R;
 import com.tg.osip.business.models.PhotoItem;
 import com.tg.osip.tdclient.update_managers.FileDownloaderManager;
-import com.tg.osip.ui.media.DepthPageTransformer;
-import com.tg.osip.ui.media.PhotoSlidePagerAdapter;
+import com.tg.osip.ui.media.photo.DepthPageTransformer;
+import com.tg.osip.ui.media.photo.PhotoSlidePagerAdapter;
 
 import java.util.List;
 
