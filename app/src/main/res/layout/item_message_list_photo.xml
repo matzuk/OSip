@@ -62,7 +62,7 @@
         android:layout_width="@dimen/size_message_photo_width"
         android:layout_height="@dimen/size_message_photo_height"
         android:layout_below="@+id/message_name"
-        android:layout_marginTop="@dimen/size_xsmall"
+        android:layout_marginTop="@dimen/message_media_content_top_padding"
         android:layout_marginLeft="@dimen/size_yylarge"
         android:layout_marginStart="@dimen/size_yylarge"
         android:scaleType="centerCrop"/>
