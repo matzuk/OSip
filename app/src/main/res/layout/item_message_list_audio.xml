@@ -59,10 +59,10 @@
 
     <com.tg.osip.ui.general.views.ProgressDownloadView
         android:id="@+id/progressDownloadView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="@dimen/progress_download_view_size"
+        android:layout_height="@dimen/progress_download_view_size"
         android:layout_below="@+id/message_name"
-        android:paddingTop="@dimen/message_media_content_top_padding"
+        android:layout_marginTop="@dimen/message_media_content_top_padding"
         android:layout_marginLeft="@dimen/size_yylarge"
         android:layout_marginStart="@dimen/size_yylarge"/>
 
