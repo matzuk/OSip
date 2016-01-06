@@ -5,8 +5,8 @@
 
     <ImageView
         android:id="@+id/download_inner"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
+        android:layout_width="@dimen/progress_download_view_size"
+        android:layout_height="@dimen/progress_download_view_size"
         android:layout_gravity="center"
         android:src="@drawable/progress_download_inner"/>
 
@@ -20,8 +20,8 @@
     <ProgressBar
         android:id="@+id/progressBar"
         style="?android:attr/progressBarStyleHorizontal"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
+        android:layout_width="@dimen/progress_download_view_size"
+        android:layout_height="@dimen/progress_download_view_size"
         android:layout_gravity="center"
         android:max="100"
         android:progress="0"

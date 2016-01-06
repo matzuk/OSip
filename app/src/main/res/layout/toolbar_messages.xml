@@ -12,8 +12,8 @@
 
     <com.tg.osip.ui.general.views.images.PhotoView
         android:id="@+id/avatar"
-        android:layout_width="@dimen/size_xxlarge"
-        android:layout_height="@dimen/size_xxlarge"
+        android:layout_width="@dimen/message_avatar_size"
+        android:layout_height="@dimen/message_avatar_size"
         android:scaleType="centerCrop"/>
 
     <LinearLayout
