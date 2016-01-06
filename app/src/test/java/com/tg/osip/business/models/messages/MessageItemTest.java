@@ -147,12 +147,4 @@ public class MessageItemTest {
         assertThat(messageItem.getMessageContentItem().getClass()).isEqualTo(GroupChatCreate.class);
     }
 
-    @Test
-    public void constructor_messageContentUnsupported() {
-        TdApi.Message message = new TdApi.Message();
-        message.message = new TdApi.MessageAudio();
-        MessageItem messageItem = new MessageItem(message);
-        assertThat(messageItem.getMessageContentItem()).isNull();
-    }
-
 }
