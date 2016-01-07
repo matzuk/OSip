@@ -92,7 +92,7 @@ public class ProgressDownloadViewTest2 {
         downloadProgressChannel.onNext(new Pair<>(10, 100));
         assertThat(progressDownloadView.progressBar.getProgress()).isEqualTo(100);
         assertThat(progressDownloadView.downloadProgressChannelSubscription.isUnsubscribed()).isEqualTo(true);
-        assertThat(progressDownloadView.downloadingState).isEqualTo(ProgressDownloadView.DownloadingState.READY);
+        assertThat(progressDownloadView.downloadingState).isEqualTo(ProgressDownloadView.DownloadingState.PLAY);
     }
 
     @Test
@@ -128,7 +128,7 @@ public class ProgressDownloadViewTest2 {
         downloadProgressChannel.onNext(new Pair<>(20, 100));
         assertThat(progressDownloadView.progressBar.getProgress()).isEqualTo(100);
         assertThat(progressDownloadView.downloadProgressChannelSubscription.isUnsubscribed()).isEqualTo(true);
-        assertThat(progressDownloadView.downloadingState).isEqualTo(ProgressDownloadView.DownloadingState.READY);
+        assertThat(progressDownloadView.downloadingState).isEqualTo(ProgressDownloadView.DownloadingState.PLAY);
     }
 
     @Test
@@ -175,7 +175,7 @@ public class ProgressDownloadViewTest2 {
         downloadProgressChannel.onNext(new Pair<>(40, 100));
         assertThat(progressDownloadView.progressBar.getProgress()).isEqualTo(100);
         assertThat(progressDownloadView.downloadProgressChannelSubscription.isUnsubscribed()).isEqualTo(true);
-        assertThat(progressDownloadView.downloadingState).isEqualTo(ProgressDownloadView.DownloadingState.READY);
+        assertThat(progressDownloadView.downloadingState).isEqualTo(ProgressDownloadView.DownloadingState.PLAY);
     }
 
     @Test
@@ -217,7 +217,7 @@ public class ProgressDownloadViewTest2 {
 
         downloadProgressChannel.onNext(new Pair<>(50, 100));
         assertThat(progressDownloadView.downloadProgressChannelSubscription.isUnsubscribed()).isEqualTo(true);
-        assertThat(progressDownloadView.downloadingState).isEqualTo(ProgressDownloadView.DownloadingState.READY);
+        assertThat(progressDownloadView.downloadingState).isEqualTo(ProgressDownloadView.DownloadingState.PLAY);
     }
 
 }

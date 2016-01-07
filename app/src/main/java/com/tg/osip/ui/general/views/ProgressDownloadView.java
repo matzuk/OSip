@@ -66,7 +66,8 @@ public class ProgressDownloadView extends FrameLayout {
     enum DownloadingState {
         START, // download icon
         DOWNLOADING, // pause icon
-        READY // downloading was done
+        PLAY, // downloading was done and playing is ready
+        PAUSE_PLAY // playing was stopped
     }
 
     @Inject
@@ -95,10 +96,7 @@ public class ProgressDownloadView extends FrameLayout {
     }
 
     public ProgressDownloadView(Context context, AttributeSet attrs) {
-        super(context, attrs);
-        provideDependency();
-        initType(context, attrs, 0);
-        initViews();
+        super(context, attrs, 0);
     }
 
     public ProgressDownloadView(Context context, AttributeSet attrs, int defStyleAttr) {
@@ -147,7 +145,7 @@ public class ProgressDownloadView extends FrameLayout {
 
     DownloadingState getDownloadingState(FileDownloaderI fileDownloaderI) {
         if (isFileDownloaded(fileDownloaderI)) {
-            return DownloadingState.READY;
+            return DownloadingState.PLAY;
         } else if (isFileInProgress(fileDownloaderI)) {
             return DownloadingState.DOWNLOADING;
         } else {
@@ -180,7 +178,7 @@ public class ProgressDownloadView extends FrameLayout {
                 downloadImage.setImageLevel(IMAGE_PAUSE_LEVEL);
                 downloadInner.setImageLevel(INNER_DOWNLOAD_LEVEL);
                 break;
-            case READY:
+            case PLAY:
                 progressBar.setVisibility(View.GONE);
                 downloadImage.setImageLevel(IMAGE_PLAY_LEVEL);
                 downloadInner.setImageLevel(INNER_PLAY_LEVEL);
@@ -294,7 +292,7 @@ public class ProgressDownloadView extends FrameLayout {
     }
 
     private void setReadyStatus() {
-        downloadingState = DownloadingState.READY;
+        downloadingState = DownloadingState.PLAY;
         animateToReadyStatus();
     }
 

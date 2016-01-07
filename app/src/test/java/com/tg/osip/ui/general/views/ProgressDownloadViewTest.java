@@ -1,12 +1,10 @@
 package com.tg.osip.ui.general.views;
 
-import com.tg.osip.RobolectricUnitTestRunner;
 import com.tg.osip.tdclient.update_managers.FileDownloaderI;
 import com.tg.osip.tdclient.update_managers.FileDownloaderManager;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
@@ -91,7 +89,7 @@ public class ProgressDownloadViewTest {
         ProgressDownloadView progressDownloadView = new ProgressDownloadView();
         progressDownloadView.setFileDownloaderManager(fileDownloaderManager);
 
-        assertThat(progressDownloadView.getDownloadingState(fileDownloaderI)).isEqualTo(ProgressDownloadView.DownloadingState.READY);
+        assertThat(progressDownloadView.getDownloadingState(fileDownloaderI)).isEqualTo(ProgressDownloadView.DownloadingState.PLAY);
     }
 
     @Test
@@ -112,7 +110,7 @@ public class ProgressDownloadViewTest {
         ProgressDownloadView progressDownloadView = new ProgressDownloadView();
         progressDownloadView.setFileDownloaderManager(fileDownloaderManager);
 
-        assertThat(progressDownloadView.getDownloadingState(fileDownloaderI)).isEqualTo(ProgressDownloadView.DownloadingState.READY);
+        assertThat(progressDownloadView.getDownloadingState(fileDownloaderI)).isEqualTo(ProgressDownloadView.DownloadingState.PLAY);
     }
 
     @Test
