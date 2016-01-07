@@ -19,6 +19,7 @@ public class PhotoItem implements ImageLoaderI, Serializable {
 
     private int photoFileId;
     private String photoFilePath;
+    private String photoTGFilePath;
     private int width;
     private int height;
     private PhotoItem plugFile;
@@ -39,10 +40,12 @@ public class PhotoItem implements ImageLoaderI, Serializable {
     private void initFilePath(TdApi.PhotoSize photoSize) {
         String filePath = photoSize.photo.path;
         if (!TextUtils.isEmpty(filePath)) {
-            photoFilePath = CommonStaticFields.ADD_TO_PATH + filePath;
+            photoFilePath = filePath;
+            photoTGFilePath = CommonStaticFields.ADD_TO_PATH + filePath;
             return;
         }
         photoFilePath = CommonStaticFields.EMPTY_STRING;
+        photoTGFilePath = CommonStaticFields.EMPTY_STRING;
     }
 
     private void initPlug() {
@@ -65,6 +68,11 @@ public class PhotoItem implements ImageLoaderI, Serializable {
     @Override
     public int getFileId() {
         return photoFileId;
+    }
+
+    @Override
+    public String getTGFilePath() {
+        return photoTGFilePath;
     }
 
     @Override

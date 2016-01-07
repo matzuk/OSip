@@ -167,7 +167,7 @@ public class ProgressDownloadView extends FrameLayout {
 
     boolean isFileDownloaded(FileDownloaderI fileDownloaderI) {
         boolean isFileIdValid = FileDownloaderUtils.isFileIdValid(fileDownloaderI.getFileId());
-        boolean isFilePathValid = FileDownloaderUtils.isFilePathValid(fileDownloaderI.getFilePath());
+        boolean isFilePathValid = FileDownloaderUtils.isFilePathValid(fileDownloaderI.getTGFilePath());
         boolean isFileInCache = fileDownloaderManager.isFileInCache(fileDownloaderI.getFileId());
         return isFileIdValid && (isFilePathValid || isFileInCache);
     }

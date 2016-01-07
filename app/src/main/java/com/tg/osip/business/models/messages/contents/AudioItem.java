@@ -17,6 +17,7 @@ public class AudioItem extends MessageContentItem implements FileDownloaderI {
     private int duration;
     private int audioFileId;
     private String audioFilePath;
+    private String audioTGFilePath;
 
     public AudioItem(TdApi.MessageAudio messageAudio) {
         if (messageAudio == null || messageAudio.audio == null) {
@@ -41,8 +42,17 @@ public class AudioItem extends MessageContentItem implements FileDownloaderI {
         audioFileId = messageAudio.audio.audio.id;
         String filePath = messageAudio.audio.audio.path;
         if (filePath != null && !filePath.equals(CommonStaticFields.EMPTY_STRING)) {
-            audioFilePath = CommonStaticFields.ADD_TO_PATH + filePath;
+            audioTGFilePath = CommonStaticFields.ADD_TO_PATH + filePath;
+            audioFilePath = filePath;
         }
+    }
+
+    @Override
+    public String getTGFilePath() {
+        if (audioTGFilePath == null) {
+            return CommonStaticFields.EMPTY_STRING;
+        }
+        return audioTGFilePath;
     }
 
     @Override

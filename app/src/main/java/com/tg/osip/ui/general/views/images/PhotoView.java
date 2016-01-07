@@ -60,8 +60,8 @@ public class PhotoView extends ImageView {
         unSubscribe();
         // set default drawable
         if (imageLoaderI.getPlugFile() != null && FileDownloaderUtils.isFileIdValid(imageLoaderI.getPlugFile().getFileId())) {
-            if (FileDownloaderUtils.isFilePathValid(imageLoaderI.getPlugFile().getFilePath())) {
-                setFileToView(imageLoaderI.getPlugFile().getFilePath());
+            if (FileDownloaderUtils.isFilePathValid(imageLoaderI.getPlugFile().getTGFilePath())) {
+                setFileToView(imageLoaderI.getPlugFile().getTGFilePath());
             } else if (fileDownloaderManager.isFileInCache(imageLoaderI.getPlugFile().getFileId())) {
                 setFileToView(fileDownloaderManager.getFilePath(imageLoaderI.getPlugFile().getFileId()));
             }
@@ -69,8 +69,8 @@ public class PhotoView extends ImageView {
             setImageDrawable(imageLoaderI.getPlug());
         }
         if (FileDownloaderUtils.isFileIdValid(imageLoaderI.getFileId())) {
-            if (FileDownloaderUtils.isFilePathValid(imageLoaderI.getFilePath())) {
-                setFileToView(imageLoaderI.getFilePath());
+            if (FileDownloaderUtils.isFilePathValid(imageLoaderI.getTGFilePath())) {
+                setFileToView(imageLoaderI.getTGFilePath());
                 fileId = CommonStaticFields.EMPTY_FILE_ID;
                 return;
             }

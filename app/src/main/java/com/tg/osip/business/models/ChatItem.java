@@ -3,7 +3,6 @@ package com.tg.osip.business.models;
 import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.support.annotation.VisibleForTesting;
-import android.support.v4.util.Pair;
 import android.text.TextUtils;
 
 import com.amulyakhare.textdrawable.TextDrawable;
@@ -17,15 +16,6 @@ import com.tg.osip.utils.common.AndroidUtils;
 import com.tg.osip.utils.time.TimeUtils;
 
 import org.drinkless.td.libcore.telegram.TdApi;
-
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.concurrent.TimeUnit;
-
-import rx.Observable;
-import rx.Subscriber;
-import rx.functions.Func1;
-import rx.functions.Func2;
 
 /**
  * Comfortable model for {@link ChatRecyclerAdapter ChatRecyclerAdapter}
@@ -42,6 +32,7 @@ public class ChatItem implements ImageLoaderI {
     private String userName;
     private boolean groupChat;
     private int photoFileId;
+    private String photoTGFilePath;
     private String photoFilePath;
     private Drawable plug;
     private String info;
@@ -62,7 +53,7 @@ public class ChatItem implements ImageLoaderI {
         initChatLastMessage(chat.topMessage);
         initName(chat.type);
         initFileId(chat.type);
-        initFilePath(chat.type);
+        initFilePaths(chat.type);
         initPlug();
         initInfo();
     }
@@ -90,6 +81,11 @@ public class ChatItem implements ImageLoaderI {
     @Override
     public int getFileId() {
         return photoFileId;
+    }
+
+    @Override
+    public String getTGFilePath() {
+        return photoTGFilePath;
     }
 
     @Override
@@ -169,7 +165,7 @@ public class ChatItem implements ImageLoaderI {
         }
     }
 
-    private void initFilePath(TdApi.ChatInfo chatInfo) {
+    private void initFilePaths(TdApi.ChatInfo chatInfo) {
         String filePath;
         if (groupChat) {
             filePath = ((TdApi.GroupChatInfo)chatInfo).groupChat.photo.small.path;
@@ -177,9 +173,11 @@ public class ChatItem implements ImageLoaderI {
             filePath = ((TdApi.PrivateChatInfo)chatInfo).user.profilePhoto.small.path;
         }
         if (!TextUtils.isEmpty(filePath)) {
-            photoFilePath = CommonStaticFields.ADD_TO_PATH + filePath;
+            photoFilePath = filePath;
+            photoTGFilePath = CommonStaticFields.ADD_TO_PATH + filePath;
         } else {
             photoFilePath = CommonStaticFields.EMPTY_STRING;
+            photoTGFilePath = CommonStaticFields.EMPTY_STRING;
         }
     }
 

@@ -17,7 +17,7 @@ public class AudioItemTest {
         assertThat(audioItem.getMimeType()).isNotNull();
         assertThat(audioItem.getPerformer()).isNotNull();
         assertThat(audioItem.getTitle()).isNotNull();
-        assertThat(audioItem.getFilePath()).isNotNull();
+        assertThat(audioItem.getTGFilePath()).isNotNull();
     }
 
     @Test
@@ -28,7 +28,7 @@ public class AudioItemTest {
         assertThat(audioItem.getMimeType()).isNotNull();
         assertThat(audioItem.getPerformer()).isNotNull();
         assertThat(audioItem.getTitle()).isNotNull();
-        assertThat(audioItem.getFilePath()).isNotNull();
+        assertThat(audioItem.getTGFilePath()).isNotNull();
     }
 
     @Test
@@ -58,7 +58,7 @@ public class AudioItemTest {
         TdApi.MessageAudio messageAudio = new TdApi.MessageAudio();
         messageAudio.audio = audio;
         AudioItem audioItem = new AudioItem(messageAudio);
-        assertThat(audioItem.getFilePath()).isEqualTo("");
+        assertThat(audioItem.getTGFilePath()).isEqualTo("");
     }
 
     @Test
@@ -72,7 +72,7 @@ public class AudioItemTest {
         TdApi.MessageAudio messageAudio = new TdApi.MessageAudio();
         messageAudio.audio = audio;
         AudioItem audioItem = new AudioItem(messageAudio);
-        assertThat(audioItem.getFilePath()).isEqualTo("");
+        assertThat(audioItem.getTGFilePath()).isEqualTo("");
     }
 
     @Test
@@ -86,7 +86,7 @@ public class AudioItemTest {
         TdApi.MessageAudio messageAudio = new TdApi.MessageAudio();
         messageAudio.audio = audio;
         AudioItem audioItem = new AudioItem(messageAudio);
-        assertThat(audioItem.getFilePath()).isEqualTo("file://qqq");
+        assertThat(audioItem.getTGFilePath()).isEqualTo("file://qqq");
     }
 
 }

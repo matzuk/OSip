@@ -22,6 +22,7 @@ public class UserItem implements ImageLoaderI {
     private TdApi.User user;
     private int photoFileId;
     private String photoFilePath;
+    private String photoTGFilePath;
     private Drawable plug;
     private String name;
     private String phone;
@@ -46,10 +47,12 @@ public class UserItem implements ImageLoaderI {
     private void initFilePath(TdApi.User user) {
         String filePath = user.profilePhoto.small.path;
         if (!TextUtils.isEmpty(filePath)) {
-            photoFilePath = CommonStaticFields.ADD_TO_PATH + filePath;
+            photoFilePath = filePath;
+            photoTGFilePath = CommonStaticFields.ADD_TO_PATH + filePath;
             return;
         }
         photoFilePath = CommonStaticFields.EMPTY_STRING;
+        photoTGFilePath = CommonStaticFields.EMPTY_STRING;
     }
 
     private void initPlug() {
@@ -87,6 +90,11 @@ public class UserItem implements ImageLoaderI {
     @Override
     public int getFileId() {
         return photoFileId;
+    }
+
+    @Override
+    public String getTGFilePath() {
+        return photoTGFilePath;
     }
 
     @Override

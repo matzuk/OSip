@@ -15,7 +15,6 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import rx.Observable;
 import rx.Subscriber;
-import rx.functions.Action1;
 import rx.schedulers.Schedulers;
 import rx.subjects.PublishSubject;
 
@@ -122,7 +121,7 @@ public class FileDownloaderManager {
     }
 
     public <T extends FileDownloaderI> void startFileDownloading(T fileDownloaderI) {
-        if (FileDownloaderUtils.isFileIdValid(fileDownloaderI.getFileId()) && !FileDownloaderUtils.isFilePathValid(fileDownloaderI.getFilePath()) &&
+        if (FileDownloaderUtils.isFileIdValid(fileDownloaderI.getFileId()) && !FileDownloaderUtils.isFilePathValid(fileDownloaderI.getTGFilePath()) &&
                 !isFileInCache(fileDownloaderI.getFileId())) {
             // set empty progress for file
             progressFileMap.put(fileDownloaderI.getFileId(), CommonStaticFields.EMPTY_PROGRESS);
@@ -139,7 +138,7 @@ public class FileDownloaderManager {
         Observable.from(fileDownloaderIs)
                 .subscribeOn(Schedulers.from(BackgroundExecutor.getSafeBackgroundExecutor()))
                 .observeOn(Schedulers.from(BackgroundExecutor.getSafeBackgroundExecutor()))
-                .filter(fileDownloaderI -> FileDownloaderUtils.isFileIdValid(fileDownloaderI.getFileId()) && !FileDownloaderUtils.isFilePathValid(fileDownloaderI.getFilePath()) &&
+                .filter(fileDownloaderI -> FileDownloaderUtils.isFileIdValid(fileDownloaderI.getFileId()) && !FileDownloaderUtils.isFilePathValid(fileDownloaderI.getTGFilePath()) &&
                         !isFileInCache(fileDownloaderI.getFileId()))
                 .doOnNext(fileDownloaderI -> progressFileMap.put(fileDownloaderI.getFileId(), CommonStaticFields.EMPTY_PROGRESS))
                 .concatMap(imageLoaderI -> tgProxy.sendTD(new TdApi.DownloadFile(imageLoaderI.getFileId()), TdApi.Ok.class))
