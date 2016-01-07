@@ -59,7 +59,7 @@
         android:layout_marginTop="@dimen/size_xsmall_half"
         android:src="@drawable/ic_not_read"/>
 
-    <com.tg.osip.ui.general.views.ProgressDownloadView
+    <com.tg.osip.ui.general.views.progress_download.ProgressDownloadView
         android:id="@+id/progressDownloadView"
         android:layout_width="@dimen/progress_download_view_size"
         android:layout_height="@dimen/progress_download_view_size"

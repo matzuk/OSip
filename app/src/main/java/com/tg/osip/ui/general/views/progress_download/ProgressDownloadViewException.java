@@ -1,4 +1,4 @@
-package com.tg.osip.ui.general.views;
+package com.tg.osip.ui.general.views.progress_download;
 
 /**
  * @author e.matsyuk

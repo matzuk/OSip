@@ -1,4 +1,4 @@
-package com.tg.osip.ui.general.views;
+package com.tg.osip.ui.general.views.progress_download;
 
 import android.animation.Animator;
 import android.animation.AnimatorSet;
@@ -80,8 +80,9 @@ public class ProgressDownloadView extends FrameLayout {
     private ImageView downloadInner;
 
     DownloadingState downloadingState;
-    private FileDownloaderI fileDownloaderI;
+    private FileDownloaderI fileDownloader;
     Subscription downloadProgressChannelSubscription;
+    private PlayActionI playAction;
 
     @VisibleForTesting
     public ProgressDownloadView() {
@@ -96,7 +97,10 @@ public class ProgressDownloadView extends FrameLayout {
     }
 
     public ProgressDownloadView(Context context, AttributeSet attrs) {
-        super(context, attrs, 0);
+        super(context, attrs);
+        provideDependency();
+        initType(context, attrs, 0);
+        initViews();
     }
 
     public ProgressDownloadView(Context context, AttributeSet attrs, int defStyleAttr) {
@@ -120,6 +124,13 @@ public class ProgressDownloadView extends FrameLayout {
         typedArray.recycle();
     }
 
+    private void initPlayAction() {
+        playAction = PlayActionsFactory.getPlayAction(type, fileDownloader);
+        if (playAction == null) {
+            throw new ProgressDownloadViewException("null playAction");
+        }
+    }
+
     private void initViews() {
         inflate(getContext(), R.layout.progress_download_view, this);
         progressBar = (ProgressBar)findViewById(R.id.progressBar);
@@ -132,13 +143,14 @@ public class ProgressDownloadView extends FrameLayout {
         this.fileDownloaderManager = fileDownloaderManager;
     }
 
-    public void setFileDownloaderI(@NonNull FileDownloaderI fileDownloaderI) {
+    public void setFileDownloader(@NonNull FileDownloaderI fileDownloader) {
         if (downloadProgressChannelSubscription != null && !downloadProgressChannelSubscription.isUnsubscribed()) {
             downloadProgressChannelSubscription.unsubscribe();
         }
-        this.fileDownloaderI = fileDownloaderI;
-        downloadingState = getDownloadingState(fileDownloaderI);
+        this.fileDownloader = fileDownloader;
+        downloadingState = getDownloadingState(fileDownloader);
         setViews();
+        initPlayAction();
         setProgress();
         setOnClickListeners();
     }
@@ -188,7 +200,7 @@ public class ProgressDownloadView extends FrameLayout {
 
     private void setProgress() {
         if (downloadingState == DownloadingState.DOWNLOADING) {
-            progressBar.setProgress(fileDownloaderManager.getProgressValue(fileDownloaderI.getFileId()));
+            progressBar.setProgress(fileDownloaderManager.getProgressValue(fileDownloader.getFileId()));
             subscribeToDownloadChannel();
         } else {
             progressBar.setProgress(CommonStaticFields.EMPTY_PROGRESS);
@@ -197,9 +209,9 @@ public class ProgressDownloadView extends FrameLayout {
     }
 
     private void setOnClickListeners() {
-        if (downloadingState == DownloadingState.START || downloadingState == DownloadingState.DOWNLOADING) {
+//        if (downloadingState == DownloadingState.START || downloadingState == DownloadingState.DOWNLOADING) {
             setOnClickListenerForDownloadingState();
-        }
+//        }
     }
 
     private void setOnClickListenerForDownloadingState() {
@@ -214,6 +226,9 @@ public class ProgressDownloadView extends FrameLayout {
                     animateDownloadingToStartStateChanging();
                     downloadingState = DownloadingState.START;
                     stopDownloading();
+                    break;
+                case PLAY:
+                    playAction.play();
                     break;
             }
         });
@@ -258,14 +273,14 @@ public class ProgressDownloadView extends FrameLayout {
 
     private void startDownloading() {
         // start downloading
-        fileDownloaderManager.startFileDownloading(fileDownloaderI);
+        fileDownloaderManager.startFileDownloading(fileDownloader);
         // start update manager listening
         subscribeToDownloadChannel();
     }
 
     private void subscribeToDownloadChannel() {
         downloadProgressChannelSubscription = fileDownloaderManager.getDownloadProgressChannel()
-                .filter(progressPair -> progressPair.first == fileDownloaderI.getFileId())
+                .filter(progressPair -> progressPair.first == fileDownloader.getFileId())
                 .map(progressPair -> progressPair.second)
                 .subscribeOn(Schedulers.from(BackgroundExecutor.getSafeBackgroundExecutor()))
                 .observeOn(AndroidSchedulers.mainThread())
@@ -300,7 +315,7 @@ public class ProgressDownloadView extends FrameLayout {
         if (downloadProgressChannelSubscription != null && !downloadProgressChannelSubscription.isUnsubscribed()) {
             downloadProgressChannelSubscription.unsubscribe();
         }
-        fileDownloaderManager.stopFileDownloading(fileDownloaderI);
+        fileDownloaderManager.stopFileDownloading(fileDownloader);
         progressBar.setProgress(CommonStaticFields.EMPTY_PROGRESS);
     }
 

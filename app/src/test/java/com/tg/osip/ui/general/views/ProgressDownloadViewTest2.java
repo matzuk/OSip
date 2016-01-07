@@ -6,6 +6,7 @@ import android.support.v4.util.Pair;
 import com.tg.osip.RobolectricUnitTestRunner;
 import com.tg.osip.tdclient.update_managers.FileDownloaderI;
 import com.tg.osip.tdclient.update_managers.FileDownloaderManager;
+import com.tg.osip.ui.general.views.progress_download.ProgressDownloadView;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -75,7 +76,7 @@ public class ProgressDownloadViewTest2 {
         };
 
         assertThat(progressDownloadView.downloadProgressChannelSubscription).isNull();
-        progressDownloadView.setFileDownloaderI(fileDownloaderI);
+        progressDownloadView.setFileDownloader(fileDownloaderI);
         assertThat(progressDownloadView.downloadProgressChannelSubscription.isUnsubscribed()).isEqualTo(false);
 
         assertThat(progressDownloadView.progressBar.getProgress()).isEqualTo(20);
@@ -109,7 +110,7 @@ public class ProgressDownloadViewTest2 {
             }
         };
 
-        progressDownloadView.setFileDownloaderI(fileDownloaderI);
+        progressDownloadView.setFileDownloader(fileDownloaderI);
         assertThat(progressDownloadView.downloadProgressChannelSubscription).isNull();
         progressDownloadView.callOnClick();
         assertThat(progressDownloadView.downloadProgressChannelSubscription.isUnsubscribed()).isEqualTo(false);
@@ -146,7 +147,7 @@ public class ProgressDownloadViewTest2 {
         };
 
         assertThat(progressDownloadView.downloadProgressChannelSubscription).isNull();
-        progressDownloadView.setFileDownloaderI(fileDownloaderI);
+        progressDownloadView.setFileDownloader(fileDownloaderI);
         assertThat(progressDownloadView.downloadProgressChannelSubscription.isUnsubscribed()).isEqualTo(false);
 
         assertThat(progressDownloadView.progressBar.getProgress()).isEqualTo(20);
@@ -165,7 +166,7 @@ public class ProgressDownloadViewTest2 {
                 return 40;
             }
         };
-        progressDownloadView.setFileDownloaderI(fileDownloaderI2);
+        progressDownloadView.setFileDownloader(fileDownloaderI2);
         assertThat(progressDownloadView.downloadProgressChannelSubscription.isUnsubscribed()).isEqualTo(true);
         progressDownloadView.callOnClick();
         assertThat(progressDownloadView.downloadProgressChannelSubscription.isUnsubscribed()).isEqualTo(false);
@@ -194,7 +195,7 @@ public class ProgressDownloadViewTest2 {
         };
 
         assertThat(progressDownloadView.downloadProgressChannelSubscription).isNull();
-        progressDownloadView.setFileDownloaderI(fileDownloaderI);
+        progressDownloadView.setFileDownloader(fileDownloaderI);
         progressDownloadView.callOnClick();
         assertThat(progressDownloadView.downloadProgressChannelSubscription.isUnsubscribed()).isEqualTo(false);
 

@@ -2,6 +2,7 @@ package com.tg.osip.ui.general.views;
 
 import com.tg.osip.tdclient.update_managers.FileDownloaderI;
 import com.tg.osip.tdclient.update_managers.FileDownloaderManager;
+import com.tg.osip.ui.general.views.progress_download.ProgressDownloadView;
 
 import org.junit.Before;
 import org.junit.Test;

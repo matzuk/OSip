@@ -10,7 +10,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -28,7 +27,7 @@ import com.tg.osip.business.models.messages.contents.ChatDeleteParticipantItem;
 import com.tg.osip.business.models.messages.contents.GroupChatCreate;
 import com.tg.osip.business.models.messages.contents.MessageContentPhotoItem;
 import com.tg.osip.business.models.messages.contents.MessageContentTextItem;
-import com.tg.osip.ui.general.views.ProgressDownloadView;
+import com.tg.osip.ui.general.views.progress_download.ProgressDownloadView;
 import com.tg.osip.ui.general.views.images.PhotoView;
 import com.tg.osip.utils.time.TimeUtils;
 
@@ -512,7 +511,7 @@ public class MessagesRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.V
         audioViewHolder.messageAudioTitle.setText(audioItem.getTitle());
         audioViewHolder.messageAudioPerformer.setText(audioItem.getPerformer());
         //
-        audioViewHolder.progressDownloadView.setFileDownloaderI(audioItem);
+        audioViewHolder.progressDownloadView.setFileDownloader(audioItem);
     }
 
     private void onBindUnsupportedHolder(RecyclerView.ViewHolder holder, int position) {
