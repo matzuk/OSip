@@ -88,9 +88,11 @@ public class ProgressDownloadView extends FrameLayout {
 
     ViewState viewState;
     private FileDownloaderI fileDownloader;
+    PlayActionI playAction;
+
     Subscription downloadProgressChannelSubscription;
     Subscription downloadChannelSubscription;
-    PlayActionI playAction;
+    Subscription playChannelSubscription;
 
     @VisibleForTesting
     public ProgressDownloadView(Context context, Type type) {
@@ -129,10 +131,13 @@ public class ProgressDownloadView extends FrameLayout {
     }
 
     private void initPlayAction(int fileId, String filePath) {
+        Logger.debug("initPlayAction");
+        Logger.debug("fileId: " + fileId + ", filePath: " + filePath);
         playAction = PlayActionsFactory.getPlayAction(type, filePath, fileId);
         if (playAction == null) {
             throw new ProgressDownloadViewException("null playAction");
         }
+        subscribeToPlayChannel();
     }
 
     private void initViews() {
@@ -164,6 +169,9 @@ public class ProgressDownloadView extends FrameLayout {
         }
         if (downloadChannelSubscription != null && !downloadChannelSubscription.isUnsubscribed()) {
             downloadChannelSubscription.unsubscribe();
+        }
+        if (playChannelSubscription != null && !playChannelSubscription.isUnsubscribed()) {
+            playChannelSubscription.unsubscribe();
         }
         this.fileDownloader = fileDownloader;
         setDownloadingState(fileDownloader);
@@ -377,13 +385,32 @@ public class ProgressDownloadView extends FrameLayout {
                 });
     }
 
+    private void subscribeToPlayChannel() {
+        playChannelSubscription = playAction.getPlayChannel()
+                .filter(fileId -> fileId != fileDownloader.getFileId() && viewState == ViewState.PLAY)
+                .subscribeOn(Schedulers.from(BackgroundExecutor.getSafeBackgroundExecutor()))
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Subscriber<Integer>() {
+                    @Override
+                    public void onCompleted() {
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        Logger.error(e);
+                    }
+
+                    @Override
+                    public void onNext(Integer fileId) {
+                        getAnimateImageLevelChanging(downloadImage, IMAGE_PLAY_PAUSE_LEVEL, IMAGE_PLAY_LEVEL).start();
+                        viewState = ViewState.PAUSE_PLAY;
+                    }
+                });
+    }
+
     private void setReadyStatus() {
         viewState = ViewState.READY;
-        if (fileDownloaderManager.isFileInCache(fileDownloader.getFileId())) {
-            initPlayAction(fileDownloader.getFileId(), fileDownloaderManager.getFilePath(fileDownloader.getFileId()));
-        } else {
-            Logger.debug("fileId " + fileDownloader.getFileId() + " is not exist in cache!");
-        }
+        initPlayAction(fileDownloader.getFileId(), fileDownloaderManager.getFilePath(fileDownloader.getFileId()));
         animateToReadyStatus();
     }
 
@@ -447,6 +474,9 @@ public class ProgressDownloadView extends FrameLayout {
         }
         if (downloadChannelSubscription != null && !downloadChannelSubscription.isUnsubscribed()) {
             downloadChannelSubscription.unsubscribe();
+        }
+        if (playChannelSubscription != null && !playChannelSubscription.isUnsubscribed()) {
+            playChannelSubscription.unsubscribe();
         }
     }
 

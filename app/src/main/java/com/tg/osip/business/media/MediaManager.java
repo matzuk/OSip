@@ -7,40 +7,49 @@ import com.tg.osip.utils.log.Logger;
 
 import java.io.IOException;
 
+import rx.subjects.PublishSubject;
+
 /**
  * @author e.matsyuk
  */
 public class MediaManager {
 
     private MediaPlayer mediaPlayer;
-    private int currentIdFile;
+    private int currentIdFile = CommonStaticFields.EMPTY_FILE_ID;
     private boolean paused;
+
+    PublishSubject<Integer> playChannel = PublishSubject.create();
 
     public MediaManager(MediaPlayer mediaPlayer) {
         this.mediaPlayer = mediaPlayer;
     }
 
     public void play(String path, int id) {
+        Logger.debug("play");
+        Logger.debug("currentIdFile: " + currentIdFile);
+        Logger.debug("path: " + path + ", id: " + id);
         if (id == currentIdFile) {
             mediaPlayer.start();
             paused = false;
             return;
         }
+        mediaPlayer.reset();
         try {
-            mediaPlayer.reset();
             mediaPlayer.setDataSource(path);
             mediaPlayer.prepare();
-        } catch (Exception e) {
+        } catch (IOException e) {
             Logger.debug(e);
             paused = false;
             return;
         }
         currentIdFile = id;
+        playChannel.onNext(currentIdFile);
         mediaPlayer.start();
         paused = false;
     }
 
     public void pause() {
+        Logger.debug("pause");
         if (mediaPlayer.isPlaying()) {
             mediaPlayer.pause();
             paused = true;
@@ -53,6 +62,7 @@ public class MediaManager {
         }
         paused = false;
         currentIdFile = CommonStaticFields.EMPTY_FILE_ID;
+        playChannel.onNext(currentIdFile);
     }
 
     public int getCurrentIdFile() {
@@ -63,4 +73,7 @@ public class MediaManager {
         return paused;
     }
 
+    public PublishSubject<Integer> getPlayChannel() {
+        return playChannel;
+    }
 }

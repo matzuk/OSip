@@ -36,7 +36,6 @@ public class ProgressDownloadViewTest_AudioType {
     @Mock
     MediaManager mediaManager;
 
-    ProgressDownloadView progressDownloadView_ProgressUpdate;
     PublishSubject<Pair<Integer, Integer>> downloadProgressChannel;
     PublishSubject<Integer> downloadChannel;
     Activity activity;
@@ -49,16 +48,17 @@ public class ProgressDownloadViewTest_AudioType {
         // Robolectic
         activity = Robolectric.setupActivity(Activity.class);
 
-        progressDownloadView_ProgressUpdate = new ProgressDownloadView(activity, ProgressDownloadView.Type.AUDIO);
         downloadProgressChannel = PublishSubject.create();
         downloadChannel = PublishSubject.create();
         when(fileDownloaderManager.getDownloadProgressChannel()).thenReturn(downloadProgressChannel);
         when(fileDownloaderManager.getDownloadChannel()).thenReturn(downloadChannel);
-        progressDownloadView_ProgressUpdate.setFileDownloaderManager(fileDownloaderManager);
     }
 
     @Test
     public void setDownloadingState_emptyFileDownloaderI() {
+        ProgressDownloadView progressDownloadView = new ProgressDownloadView(activity, ProgressDownloadView.Type.AUDIO);
+        progressDownloadView.setFileDownloaderManager(fileDownloaderManager);
+
         FileDownloaderI fileDownloaderI = new FileDownloaderI() {
             @Override
             public String getTGFilePath() {
@@ -75,8 +75,8 @@ public class ProgressDownloadViewTest_AudioType {
                 return 0;
             }
         };
-        progressDownloadView_ProgressUpdate.setFileDownloader(fileDownloaderI);
-        assertThat(progressDownloadView_ProgressUpdate.viewState).isEqualTo(ProgressDownloadView.ViewState.START);
+        progressDownloadView.setFileDownloader(fileDownloaderI);
+        assertThat(progressDownloadView.viewState).isEqualTo(ProgressDownloadView.ViewState.START);
     }
 
     @Test
@@ -104,10 +104,11 @@ public class ProgressDownloadViewTest_AudioType {
                 return 100;
             }
         };
-
+        assertThat(progressDownloadView.playChannelSubscription).isNull();
         progressDownloadView.setFileDownloader(fileDownloaderI);
         assertThat(progressDownloadView.playAction.getId()).isEqualTo(100);
         assertThat(progressDownloadView.viewState).isEqualTo(ProgressDownloadView.ViewState.PLAY);
+        assertThat(progressDownloadView.playChannelSubscription.isUnsubscribed()).isEqualTo(false);
     }
 
     @Test
@@ -135,14 +136,19 @@ public class ProgressDownloadViewTest_AudioType {
                 return 100;
             }
         };
-
+        assertThat(progressDownloadView.playChannelSubscription).isNull();
         progressDownloadView.setFileDownloader(fileDownloaderI);
         assertThat(progressDownloadView.playAction.getId()).isEqualTo(100);
         assertThat(progressDownloadView.viewState).isEqualTo(ProgressDownloadView.ViewState.PAUSE_PLAY);
+        assertThat(progressDownloadView.playChannelSubscription.isUnsubscribed()).isEqualTo(false);
     }
 
     @Test
     public void progressUpdatingTest_downloadingState() {
+        ProgressDownloadView progressDownloadView = new ProgressDownloadView(activity, ProgressDownloadView.Type.AUDIO);
+        progressDownloadView.setFileDownloaderManager(fileDownloaderManager);
+
+        // file is loading in fileDownloaderManager
         when(fileDownloaderManager.isFileInProgress(10)).thenReturn(true);
         when(fileDownloaderManager.getProgressValue(10)).thenReturn(20);
         when(fileDownloaderManager.isFileInCache(anyInt())).thenReturn(false);
@@ -164,33 +170,39 @@ public class ProgressDownloadViewTest_AudioType {
             }
         };
 
-        assertThat(progressDownloadView_ProgressUpdate.downloadProgressChannelSubscription).isNull();
-        assertThat(progressDownloadView_ProgressUpdate.downloadChannelSubscription).isNull();
-        progressDownloadView_ProgressUpdate.setFileDownloader(fileDownloaderI);
-        assertThat(progressDownloadView_ProgressUpdate.downloadProgressChannelSubscription.isUnsubscribed()).isEqualTo(false);
-        assertThat(progressDownloadView_ProgressUpdate.downloadChannelSubscription.isUnsubscribed()).isEqualTo(false);
-
-        assertThat(progressDownloadView_ProgressUpdate.progressBar.getProgress()).isEqualTo(20);
-
+        // before setFileDownloader all channels are null
+        assertThat(progressDownloadView.downloadProgressChannelSubscription).isNull();
+        assertThat(progressDownloadView.downloadChannelSubscription).isNull();
+        assertThat(progressDownloadView.playChannelSubscription).isNull();
+        // setFileDownloader
+        progressDownloadView.setFileDownloader(fileDownloaderI);
+        // download channels subscribed immediately
+        assertThat(progressDownloadView.downloadProgressChannelSubscription.isUnsubscribed()).isEqualTo(false);;
+        assertThat(progressDownloadView.downloadChannelSubscription.isUnsubscribed()).isEqualTo(false);
+        assertThat(progressDownloadView.playChannelSubscription).isNull();
+        // progress
+        assertThat(progressDownloadView.progressBar.getProgress()).isEqualTo(20);
         downloadProgressChannel.onNext(new Pair<>(10, 40));
-        assertThat(progressDownloadView_ProgressUpdate.progressBar.getProgress()).isEqualTo(40);
-
+        assertThat(progressDownloadView.progressBar.getProgress()).isEqualTo(40);
         downloadProgressChannel.onNext(new Pair<>(20, 60));
-        assertThat(progressDownloadView_ProgressUpdate.progressBar.getProgress()).isEqualTo(40);
-
+        assertThat(progressDownloadView.progressBar.getProgress()).isEqualTo(40);
         downloadProgressChannel.onNext(new Pair<>(10, 85));
-        assertThat(progressDownloadView_ProgressUpdate.progressBar.getProgress()).isEqualTo(85);
-
+        assertThat(progressDownloadView.progressBar.getProgress()).isEqualTo(85);
+        // finish loading
         downloadProgressChannel.onNext(new Pair<>(10, 100));
         downloadChannel.onNext(10);
-        assertThat(progressDownloadView_ProgressUpdate.progressBar.getProgress()).isEqualTo(100);
-        assertThat(progressDownloadView_ProgressUpdate.downloadProgressChannelSubscription.isUnsubscribed()).isEqualTo(true);
-        assertThat(progressDownloadView_ProgressUpdate.downloadChannelSubscription.isUnsubscribed()).isEqualTo(true);
-        assertThat(progressDownloadView_ProgressUpdate.viewState).isEqualTo(ProgressDownloadView.ViewState.READY);
+        assertThat(progressDownloadView.progressBar.getProgress()).isEqualTo(100);
+        assertThat(progressDownloadView.downloadProgressChannelSubscription.isUnsubscribed()).isEqualTo(true);
+        assertThat(progressDownloadView.downloadChannelSubscription.isUnsubscribed()).isEqualTo(true);
+        assertThat(progressDownloadView.playChannelSubscription.isUnsubscribed()).isEqualTo(false);
+        assertThat(progressDownloadView.viewState).isEqualTo(ProgressDownloadView.ViewState.READY);
     }
 
     @Test
     public void progressUpdatingTest_startState() {
+        ProgressDownloadView progressDownloadView = new ProgressDownloadView(activity, ProgressDownloadView.Type.AUDIO);
+        progressDownloadView.setFileDownloaderManager(fileDownloaderManager);
+
         when(fileDownloaderManager.isFileInCache(anyInt())).thenReturn(false);
         when(fileDownloaderManager.isFileInProgress(20)).thenReturn(false);
 
@@ -211,36 +223,45 @@ public class ProgressDownloadViewTest_AudioType {
             }
         };
 
-        progressDownloadView_ProgressUpdate.setFileDownloader(fileDownloaderI);
-        assertThat(progressDownloadView_ProgressUpdate.downloadProgressChannelSubscription).isNull();
-        assertThat(progressDownloadView_ProgressUpdate.downloadChannelSubscription).isNull();
-        progressDownloadView_ProgressUpdate.callOnClick();
-        assertThat(progressDownloadView_ProgressUpdate.downloadProgressChannelSubscription.isUnsubscribed()).isEqualTo(false);
-        assertThat(progressDownloadView_ProgressUpdate.downloadChannelSubscription.isUnsubscribed()).isEqualTo(false);
-
-        assertThat(progressDownloadView_ProgressUpdate.progressBar.getProgress()).isEqualTo(0);
-
+        // setFileDownloader
+        progressDownloadView.setFileDownloader(fileDownloaderI);
+        // all channels are null
+        assertThat(progressDownloadView.downloadProgressChannelSubscription).isNull();
+        assertThat(progressDownloadView.playChannelSubscription).isNull();
+        assertThat(progressDownloadView.downloadChannelSubscription).isNull();
+        // click download button
+        progressDownloadView.callOnClick();
+        // download channels subscribed
+        assertThat(progressDownloadView.playChannelSubscription).isNull();
+        assertThat(progressDownloadView.downloadProgressChannelSubscription.isUnsubscribed()).isEqualTo(false);
+        assertThat(progressDownloadView.downloadChannelSubscription.isUnsubscribed()).isEqualTo(false);
+        // progress
+        assertThat(progressDownloadView.progressBar.getProgress()).isEqualTo(0);
         downloadProgressChannel.onNext(new Pair<>(20, 40));
-        assertThat(progressDownloadView_ProgressUpdate.progressBar.getProgress()).isEqualTo(40);
-
+        assertThat(progressDownloadView.progressBar.getProgress()).isEqualTo(40);
         downloadProgressChannel.onNext(new Pair<>(21, 60));
-        assertThat(progressDownloadView_ProgressUpdate.progressBar.getProgress()).isEqualTo(40);
-
+        assertThat(progressDownloadView.progressBar.getProgress()).isEqualTo(40);
         downloadProgressChannel.onNext(new Pair<>(20, 85));
-        assertThat(progressDownloadView_ProgressUpdate.progressBar.getProgress()).isEqualTo(85);
-
+        assertThat(progressDownloadView.progressBar.getProgress()).isEqualTo(85);
+        // finish loading
         downloadProgressChannel.onNext(new Pair<>(20, 100));
         downloadChannel.onNext(20);
-        assertThat(progressDownloadView_ProgressUpdate.progressBar.getProgress()).isEqualTo(100);
-        assertThat(progressDownloadView_ProgressUpdate.downloadProgressChannelSubscription.isUnsubscribed()).isEqualTo(true);
-        assertThat(progressDownloadView_ProgressUpdate.downloadChannelSubscription.isUnsubscribed()).isEqualTo(true);
-        assertThat(progressDownloadView_ProgressUpdate.viewState).isEqualTo(ProgressDownloadView.ViewState.READY);
+        assertThat(progressDownloadView.progressBar.getProgress()).isEqualTo(100);
+        assertThat(progressDownloadView.downloadProgressChannelSubscription.isUnsubscribed()).isEqualTo(true);
+        assertThat(progressDownloadView.downloadChannelSubscription.isUnsubscribed()).isEqualTo(true);
+        assertThat(progressDownloadView.playChannelSubscription.isUnsubscribed()).isEqualTo(false);
+        assertThat(progressDownloadView.viewState).isEqualTo(ProgressDownloadView.ViewState.READY);
     }
 
     @Test
     public void progressUpdatingTest_someFileDownloaders() {
+        ProgressDownloadView progressDownloadView = new ProgressDownloadView(activity, ProgressDownloadView.Type.AUDIO);
+        progressDownloadView.setFileDownloaderManager(fileDownloaderManager);
+
+        // file 40 is not exist yet
         when(fileDownloaderManager.isFileInCache(anyInt())).thenReturn(false);
         when(fileDownloaderManager.isFileInProgress(40)).thenReturn(false);
+        // file 10 is loading in fileDownloaderManager
         when(fileDownloaderManager.isFileInProgress(10)).thenReturn(true);
         when(fileDownloaderManager.getProgressValue(10)).thenReturn(20);
 
@@ -261,16 +282,20 @@ public class ProgressDownloadViewTest_AudioType {
             }
         };
 
-        assertThat(progressDownloadView_ProgressUpdate.downloadProgressChannelSubscription).isNull();
-        assertThat(progressDownloadView_ProgressUpdate.downloadChannelSubscription).isNull();
-        progressDownloadView_ProgressUpdate.setFileDownloader(fileDownloaderI);
-        assertThat(progressDownloadView_ProgressUpdate.downloadProgressChannelSubscription.isUnsubscribed()).isEqualTo(false);
-        assertThat(progressDownloadView_ProgressUpdate.downloadChannelSubscription.isUnsubscribed()).isEqualTo(false);
-
-        assertThat(progressDownloadView_ProgressUpdate.progressBar.getProgress()).isEqualTo(20);
-
+        // before setFileDownloader all channels are null
+        assertThat(progressDownloadView.playChannelSubscription).isNull();
+        assertThat(progressDownloadView.downloadProgressChannelSubscription).isNull();
+        assertThat(progressDownloadView.downloadChannelSubscription).isNull();
+        // setFileDownloader 10
+        progressDownloadView.setFileDownloader(fileDownloaderI);
+        // download channels subscribed immediately
+        assertThat(progressDownloadView.playChannelSubscription).isNull();
+        assertThat(progressDownloadView.downloadProgressChannelSubscription.isUnsubscribed()).isEqualTo(false);
+        assertThat(progressDownloadView.downloadChannelSubscription.isUnsubscribed()).isEqualTo(false);
+        // progress
+        assertThat(progressDownloadView.progressBar.getProgress()).isEqualTo(20);
         downloadProgressChannel.onNext(new Pair<>(10, 40));
-        assertThat(progressDownloadView_ProgressUpdate.progressBar.getProgress()).isEqualTo(40);
+        assertThat(progressDownloadView.progressBar.getProgress()).isEqualTo(40);
 
         FileDownloaderI fileDownloaderI2 = new FileDownloaderI() {
             @Override
@@ -288,25 +313,36 @@ public class ProgressDownloadViewTest_AudioType {
                 return 40;
             }
         };
-        progressDownloadView_ProgressUpdate.setFileDownloader(fileDownloaderI2);
-        assertThat(progressDownloadView_ProgressUpdate.downloadProgressChannelSubscription.isUnsubscribed()).isEqualTo(true);
-        assertThat(progressDownloadView_ProgressUpdate.downloadChannelSubscription.isUnsubscribed()).isEqualTo(true);
-        progressDownloadView_ProgressUpdate.callOnClick();
-        assertThat(progressDownloadView_ProgressUpdate.downloadProgressChannelSubscription.isUnsubscribed()).isEqualTo(false);
-        assertThat(progressDownloadView_ProgressUpdate.downloadChannelSubscription.isUnsubscribed()).isEqualTo(false);
+        // setFileDownloader 40
+        progressDownloadView.setFileDownloader(fileDownloaderI2);
+        // unsubscribe channels
+        assertThat(progressDownloadView.playChannelSubscription).isNull();
+        assertThat(progressDownloadView.downloadProgressChannelSubscription.isUnsubscribed()).isEqualTo(true);
+        assertThat(progressDownloadView.downloadChannelSubscription.isUnsubscribed()).isEqualTo(true);
+        // start new downloading
+        progressDownloadView.callOnClick();
+        // download channels subscribe
+        assertThat(progressDownloadView.playChannelSubscription).isNull();
+        assertThat(progressDownloadView.downloadProgressChannelSubscription.isUnsubscribed()).isEqualTo(false);
+        assertThat(progressDownloadView.downloadChannelSubscription.isUnsubscribed()).isEqualTo(false);
 
-        assertThat(progressDownloadView_ProgressUpdate.progressBar.getProgress()).isEqualTo(0);
-
+        // progress
+        assertThat(progressDownloadView.progressBar.getProgress()).isEqualTo(0);
         downloadProgressChannel.onNext(new Pair<>(40, 100));
         downloadChannel.onNext(40);
-        assertThat(progressDownloadView_ProgressUpdate.progressBar.getProgress()).isEqualTo(100);
-        assertThat(progressDownloadView_ProgressUpdate.downloadProgressChannelSubscription.isUnsubscribed()).isEqualTo(true);
-        assertThat(progressDownloadView_ProgressUpdate.downloadChannelSubscription.isUnsubscribed()).isEqualTo(true);
-        assertThat(progressDownloadView_ProgressUpdate.viewState).isEqualTo(ProgressDownloadView.ViewState.READY);
+        // finish loading
+        assertThat(progressDownloadView.progressBar.getProgress()).isEqualTo(100);
+        assertThat(progressDownloadView.playChannelSubscription.isUnsubscribed()).isEqualTo(false);
+        assertThat(progressDownloadView.downloadProgressChannelSubscription.isUnsubscribed()).isEqualTo(true);
+        assertThat(progressDownloadView.downloadChannelSubscription.isUnsubscribed()).isEqualTo(true);
+        assertThat(progressDownloadView.viewState).isEqualTo(ProgressDownloadView.ViewState.READY);
     }
 
     @Test
     public void progressUpdatingTest_pauseState() {
+        ProgressDownloadView progressDownloadView = new ProgressDownloadView(activity, ProgressDownloadView.Type.AUDIO);
+        progressDownloadView.setFileDownloaderManager(fileDownloaderManager);
+
         when(fileDownloaderManager.isFileInCache(anyInt())).thenReturn(false);
         when(fileDownloaderManager.isFileInProgress(50)).thenReturn(false);
 
@@ -327,42 +363,56 @@ public class ProgressDownloadViewTest_AudioType {
             }
         };
 
-        assertThat(progressDownloadView_ProgressUpdate.downloadProgressChannelSubscription).isNull();
-        assertThat(progressDownloadView_ProgressUpdate.downloadChannelSubscription).isNull();
-        progressDownloadView_ProgressUpdate.setFileDownloader(fileDownloaderI);
-        assertThat(progressDownloadView_ProgressUpdate.viewState).isEqualTo(ProgressDownloadView.ViewState.START);
-        progressDownloadView_ProgressUpdate.callOnClick();
-        assertThat(progressDownloadView_ProgressUpdate.downloadProgressChannelSubscription.isUnsubscribed()).isEqualTo(false);
-        assertThat(progressDownloadView_ProgressUpdate.downloadChannelSubscription.isUnsubscribed()).isEqualTo(false);
-
-        assertThat(progressDownloadView_ProgressUpdate.progressBar.getProgress()).isEqualTo(0);
-
+        // before setFileDownloader all channels are null
+        assertThat(progressDownloadView.playChannelSubscription).isNull();
+        assertThat(progressDownloadView.downloadProgressChannelSubscription).isNull();
+        assertThat(progressDownloadView.downloadChannelSubscription).isNull();
+        // setFileDownloader 50
+        progressDownloadView.setFileDownloader(fileDownloaderI);
+        assertThat(progressDownloadView.viewState).isEqualTo(ProgressDownloadView.ViewState.START);
+        // start downloading
+        progressDownloadView.callOnClick();
+        // download channels subscribe
+        assertThat(progressDownloadView.playChannelSubscription).isNull();
+        assertThat(progressDownloadView.downloadProgressChannelSubscription.isUnsubscribed()).isEqualTo(false);
+        assertThat(progressDownloadView.downloadChannelSubscription.isUnsubscribed()).isEqualTo(false);
+        // progress
+        assertThat(progressDownloadView.progressBar.getProgress()).isEqualTo(0);
         downloadProgressChannel.onNext(new Pair<>(50, 40));
-        assertThat(progressDownloadView_ProgressUpdate.progressBar.getProgress()).isEqualTo(40);
-
-        progressDownloadView_ProgressUpdate.callOnClick();
-        assertThat(progressDownloadView_ProgressUpdate.downloadProgressChannelSubscription.isUnsubscribed()).isEqualTo(true);
-        assertThat(progressDownloadView_ProgressUpdate.downloadChannelSubscription.isUnsubscribed()).isEqualTo(true);
-        assertThat(progressDownloadView_ProgressUpdate.progressBar.getProgress()).isEqualTo(0);
-        assertThat(progressDownloadView_ProgressUpdate.viewState).isEqualTo(ProgressDownloadView.ViewState.START);
-
-        progressDownloadView_ProgressUpdate.callOnClick();
-        assertThat(progressDownloadView_ProgressUpdate.downloadProgressChannelSubscription.isUnsubscribed()).isEqualTo(false);
-        assertThat(progressDownloadView_ProgressUpdate.downloadChannelSubscription.isUnsubscribed()).isEqualTo(false);
-        assertThat(progressDownloadView_ProgressUpdate.viewState).isEqualTo(ProgressDownloadView.ViewState.DOWNLOADING);
-        assertThat(progressDownloadView_ProgressUpdate.progressBar.getProgress()).isEqualTo(0);
+        assertThat(progressDownloadView.progressBar.getProgress()).isEqualTo(40);
+        // click pause
+        progressDownloadView.callOnClick();
+        // download channels unsubscribe
+        assertThat(progressDownloadView.playChannelSubscription).isNull();
+        assertThat(progressDownloadView.downloadProgressChannelSubscription.isUnsubscribed()).isEqualTo(true);
+        assertThat(progressDownloadView.downloadChannelSubscription.isUnsubscribed()).isEqualTo(true);
+        assertThat(progressDownloadView.progressBar.getProgress()).isEqualTo(0);
+        assertThat(progressDownloadView.viewState).isEqualTo(ProgressDownloadView.ViewState.START);
+        // start downloading again
+        progressDownloadView.callOnClick();
+        // download channels subscribe
+        assertThat(progressDownloadView.playChannelSubscription).isNull();
+        assertThat(progressDownloadView.downloadProgressChannelSubscription.isUnsubscribed()).isEqualTo(false);
+        assertThat(progressDownloadView.downloadChannelSubscription.isUnsubscribed()).isEqualTo(false);
+        assertThat(progressDownloadView.viewState).isEqualTo(ProgressDownloadView.ViewState.DOWNLOADING);
+        // progress
+        assertThat(progressDownloadView.progressBar.getProgress()).isEqualTo(0);
         downloadProgressChannel.onNext(new Pair<>(50, 50));
-        assertThat(progressDownloadView_ProgressUpdate.progressBar.getProgress()).isEqualTo(50);
-
+        assertThat(progressDownloadView.progressBar.getProgress()).isEqualTo(50);
+        // finish loading
         downloadProgressChannel.onNext(new Pair<>(50, 100));
         downloadChannel.onNext(50);
-        assertThat(progressDownloadView_ProgressUpdate.downloadProgressChannelSubscription.isUnsubscribed()).isEqualTo(true);
-        assertThat(progressDownloadView_ProgressUpdate.downloadChannelSubscription.isUnsubscribed()).isEqualTo(true);
-        assertThat(progressDownloadView_ProgressUpdate.viewState).isEqualTo(ProgressDownloadView.ViewState.READY);
+        assertThat(progressDownloadView.playChannelSubscription.isUnsubscribed()).isEqualTo(false);
+        assertThat(progressDownloadView.downloadProgressChannelSubscription.isUnsubscribed()).isEqualTo(true);
+        assertThat(progressDownloadView.downloadChannelSubscription.isUnsubscribed()).isEqualTo(true);
+        assertThat(progressDownloadView.viewState).isEqualTo(ProgressDownloadView.ViewState.READY);
     }
 
     @Test
     public void initPlayActionAfterDownloading() {
+        ProgressDownloadView progressDownloadView = new ProgressDownloadView(activity, ProgressDownloadView.Type.AUDIO);
+        progressDownloadView.setFileDownloaderManager(fileDownloaderManager);
+
         when(fileDownloaderManager.isFileInCache(anyInt())).thenReturn(false);
         when(fileDownloaderManager.isFileInProgress(50)).thenReturn(false);
 
@@ -383,22 +433,21 @@ public class ProgressDownloadViewTest_AudioType {
             }
         };
 
-        progressDownloadView_ProgressUpdate.setFileDownloader(fileDownloaderI);
-        assertThat(progressDownloadView_ProgressUpdate.viewState).isEqualTo(ProgressDownloadView.ViewState.START);
+        progressDownloadView.setFileDownloader(fileDownloaderI);
+        assertThat(progressDownloadView.viewState).isEqualTo(ProgressDownloadView.ViewState.START);
         // downloading
-        progressDownloadView_ProgressUpdate.callOnClick();
+        progressDownloadView.callOnClick();
         downloadProgressChannel.onNext(new Pair<>(50, 50));
-        assertThat(progressDownloadView_ProgressUpdate.progressBar.getProgress()).isEqualTo(50);
-
+        assertThat(progressDownloadView.progressBar.getProgress()).isEqualTo(50);
         // ready
         when(fileDownloaderManager.isFileInCache(anyInt())).thenReturn(true);
         when(fileDownloaderManager.getTGFilePath(50)).thenReturn("123");
         when(fileDownloaderManager.getFilePath(50)).thenReturn("123");
         downloadProgressChannel.onNext(new Pair<>(50, 100));
         downloadChannel.onNext(50);
-        assertThat(progressDownloadView_ProgressUpdate.viewState).isEqualTo(ProgressDownloadView.ViewState.READY);
-        assertThat(progressDownloadView_ProgressUpdate.playAction.getId()).isEqualTo(50);
-        assertThat(progressDownloadView_ProgressUpdate.playAction.getPath()).isEqualTo("123");
+        assertThat(progressDownloadView.viewState).isEqualTo(ProgressDownloadView.ViewState.READY);
+        assertThat(progressDownloadView.playAction.getId()).isEqualTo(50);
+        assertThat(progressDownloadView.playAction.getPath()).isEqualTo("123");
     }
 
     @Test
@@ -437,6 +486,46 @@ public class ProgressDownloadViewTest_AudioType {
         assertThat(progressDownloadView.viewState).isEqualTo(ProgressDownloadView.ViewState.PLAY);
         assertThat(progressDownloadView.mediaManager.getCurrentIdFile()).isEqualTo(50);
         assertThat(progressDownloadView.mediaManager.isPaused()).isEqualTo(false);
+    }
+
+    @Test
+    public void playChannel_test() {
+        ProgressDownloadView progressDownloadView = new ProgressDownloadView(activity, ProgressDownloadView.Type.AUDIO);
+        FileDownloaderI fileDownloaderI = new FileDownloaderI() {
+            @Override
+            public String getTGFilePath() {
+                return "123";
+            }
+
+            @Override
+            public String getFilePath() {
+                return "123";
+            }
+
+            @Override
+            public int getFileId() {
+                return 50;
+            }
+        };
+        // null channel
+        assertThat(progressDownloadView.playChannelSubscription).isNull();
+        // setFileDownloader
+        progressDownloadView.setFileDownloader(fileDownloaderI);
+        assertThat(progressDownloadView.viewState).isEqualTo(ProgressDownloadView.ViewState.READY);
+        // Play click
+        progressDownloadView.callOnClick();
+        assertThat(progressDownloadView.viewState).isEqualTo(ProgressDownloadView.ViewState.PLAY);
+        assertThat(progressDownloadView.playChannelSubscription.isUnsubscribed()).isEqualTo(false);
+        // media player play other file
+        progressDownloadView.mediaManager.play("456", 60);
+        assertThat(progressDownloadView.viewState).isEqualTo(ProgressDownloadView.ViewState.PAUSE_PLAY);
+        assertThat(progressDownloadView.playChannelSubscription.isUnsubscribed()).isEqualTo(false);
+        assertThat(progressDownloadView.mediaManager.getCurrentIdFile()).isEqualTo(60);
+        // Play click again
+        progressDownloadView.callOnClick();
+        assertThat(progressDownloadView.viewState).isEqualTo(ProgressDownloadView.ViewState.PLAY);
+        assertThat(progressDownloadView.playChannelSubscription.isUnsubscribed()).isEqualTo(false);
+        assertThat(progressDownloadView.mediaManager.getCurrentIdFile()).isEqualTo(50);
     }
 
 }

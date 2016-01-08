@@ -5,6 +5,8 @@ import com.tg.osip.business.media.MediaManager;
 
 import javax.inject.Inject;
 
+import rx.subjects.PublishSubject;
+
 /**
  * @author e.matsyuk
  */
@@ -40,5 +42,10 @@ public class PlayActionAudio implements PlayActionI {
     @Override
     public int getId() {
         return id;
+    }
+
+    @Override
+    public PublishSubject<Integer> getPlayChannel() {
+        return mediaManager.getPlayChannel();
     }
 }
