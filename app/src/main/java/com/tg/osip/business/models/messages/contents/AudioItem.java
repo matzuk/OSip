@@ -1,7 +1,11 @@
 package com.tg.osip.business.models.messages.contents;
 
+import android.text.format.Formatter;
+
+import com.tg.osip.ApplicationSIP;
 import com.tg.osip.tdclient.update_managers.FileDownloaderI;
 import com.tg.osip.utils.CommonStaticFields;
+import com.tg.osip.utils.log.Logger;
 
 import org.drinkless.td.libcore.telegram.TdApi;
 
@@ -18,6 +22,8 @@ public class AudioItem extends MessageContentItem implements FileDownloaderI {
     private int audioFileId;
     private String audioFilePath;
     private String audioTGFilePath;
+    private int audioFileSize;
+    private String audioFileSizeString;
 
     public AudioItem(TdApi.MessageAudio messageAudio) {
         if (messageAudio == null || messageAudio.audio == null) {
@@ -45,6 +51,8 @@ public class AudioItem extends MessageContentItem implements FileDownloaderI {
             audioTGFilePath = CommonStaticFields.ADD_TO_PATH + filePath;
             audioFilePath = filePath;
         }
+        audioFileSize = messageAudio.audio.audio.size;
+        audioFileSizeString = Formatter.formatFileSize(ApplicationSIP.applicationContext, messageAudio.audio.audio.size);
     }
 
     @Override
@@ -99,5 +107,19 @@ public class AudioItem extends MessageContentItem implements FileDownloaderI {
 
     public int getDuration() {
         return duration;
+    }
+
+    /**
+     * May return 0. Be careful with the division
+     */
+    public int getAudioFileSize() {
+        return audioFileSize;
+    }
+
+    public String getAudioFileSizeString() {
+        if (audioFileSizeString == null) {
+            return CommonStaticFields.EMPTY_STRING;
+        }
+        return audioFileSizeString;
     }
 }
