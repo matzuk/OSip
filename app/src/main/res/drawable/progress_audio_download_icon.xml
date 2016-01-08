@@ -9,4 +9,7 @@
     <item
         android:drawable="@drawable/ic_play"
         android:maxLevel="2" />
+    <item
+        android:drawable="@drawable/ic_pause"
+        android:maxLevel="3" />
 </level-list>

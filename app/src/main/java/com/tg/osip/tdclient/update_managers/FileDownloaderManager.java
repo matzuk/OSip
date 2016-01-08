@@ -96,7 +96,7 @@ public class FileDownloaderManager {
                 });
     }
 
-    public String getFilePath(int fileId) {
+    public String getTGFilePath(int fileId) {
         TdApi.File file = downloadedFileMap.get(fileId);
         if (file != null) {
             return CommonStaticFields.ADD_TO_PATH + file.path;
@@ -104,8 +104,16 @@ public class FileDownloaderManager {
         return CommonStaticFields.FILE_PATH_EMPTY;
     }
 
+    public String getFilePath(int fileId) {
+        TdApi.File file = downloadedFileMap.get(fileId);
+        if (file != null) {
+            return file.path;
+        }
+        return CommonStaticFields.FILE_PATH_EMPTY;
+    }
+
     public boolean isFileInCache(int fileId) {
-        return !getFilePath(fileId).equals(CommonStaticFields.FILE_PATH_EMPTY);
+        return !getTGFilePath(fileId).equals(CommonStaticFields.FILE_PATH_EMPTY);
     }
 
     public boolean isFileInProgress(int fileId) {

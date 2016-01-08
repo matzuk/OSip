@@ -6,4 +6,6 @@ package com.tg.osip.ui.general.views.progress_download;
 public interface PlayActionI {
     void play();
     void pause();
+    String getPath();
+    int getId();
 }

@@ -1,7 +1,7 @@
 package com.tg.osip.ui.general.views.progress_download;
 
 import com.tg.osip.ApplicationSIP;
-import com.tg.osip.business.MediaManager;
+import com.tg.osip.business.media.MediaManager;
 
 import javax.inject.Inject;
 
@@ -14,15 +14,17 @@ public class PlayActionAudio implements PlayActionI {
     MediaManager mediaManager;
 
     private String path;
+    private int id;
 
-    public PlayActionAudio(String path) {
+    public PlayActionAudio(String path, int id) {
         ApplicationSIP.get().applicationComponent().inject(this);
         this.path = path;
+        this.id = id;
     }
 
     @Override
     public void play() {
-        mediaManager.play(path);
+        mediaManager.play(path, id);
     }
 
     @Override
@@ -30,4 +32,13 @@ public class PlayActionAudio implements PlayActionI {
         mediaManager.pause();
     }
 
+    @Override
+    public String getPath() {
+        return path;
+    }
+
+    @Override
+    public int getId() {
+        return id;
+    }
 }

@@ -15,6 +15,7 @@ import android.view.ViewGroup;
 import com.tg.osip.ApplicationSIP;
 import com.tg.osip.R;
 import com.tg.osip.business.PersistentInfo;
+import com.tg.osip.business.media.MediaManager;
 import com.tg.osip.business.messages.MessagesInteract;
 import com.tg.osip.tdclient.TGProxyI;
 import com.tg.osip.tdclient.update_managers.FileDownloaderManager;
@@ -129,8 +130,8 @@ public class MessagesFragment extends Fragment implements MessagesContract.View 
 
         @Provides
         @NonNull
-        public MessagesPresenter provideMessagesPresenter(@NonNull MessagesInteract messagesInteract, @NonNull PersistentInfo persistentInfo) {
-            return new MessagesPresenter(messagesInteract, persistentInfo);
+        public MessagesPresenter provideMessagesPresenter(@NonNull MessagesInteract messagesInteract, @NonNull PersistentInfo persistentInfo, @NonNull MediaManager mediaManager) {
+            return new MessagesPresenter(messagesInteract, persistentInfo, mediaManager);
         }
 
         @Provides

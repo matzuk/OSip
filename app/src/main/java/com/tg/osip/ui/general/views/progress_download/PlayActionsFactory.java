@@ -9,10 +9,10 @@ import com.tg.osip.tdclient.update_managers.FileDownloaderI;
  */
 public class PlayActionsFactory {
 
-    public static PlayActionI getPlayAction(ProgressDownloadView.Type type, FileDownloaderI fileDownloaderI) {
+    public static PlayActionI getPlayAction(ProgressDownloadView.Type type, String filePath, int fileId) {
         switch (type) {
             case AUDIO:
-                return new PlayActionAudio(fileDownloaderI.getFilePath());
+                return new PlayActionAudio(filePath, fileId);
             default:
                 return null;
         }

@@ -7,6 +7,7 @@ import android.support.v4.util.Pair;
 import android.support.v7.widget.RecyclerView;
 
 import com.tg.osip.business.PersistentInfo;
+import com.tg.osip.business.media.MediaManager;
 import com.tg.osip.business.messages.MessagesInteract;
 import com.tg.osip.business.models.messages.MessageAdapterModel;
 import com.tg.osip.business.models.PhotoItem;
@@ -36,6 +37,7 @@ public class MessagesPresenter implements MessagesContract.UserActionsListener {
 
     MessagesInteract messagesInteract;
     PersistentInfo persistentInfo;
+    MediaManager mediaManager;
 
     private WeakReference<MessagesContract.View> messagesContractViewWeakReference;
     private MessagesRecyclerAdapter messagesRecyclerAdapter;
@@ -43,8 +45,9 @@ public class MessagesPresenter implements MessagesContract.UserActionsListener {
 
     private Subscription loadDataSubscription;
 
-    public MessagesPresenter(MessagesInteract messagesInteract, PersistentInfo persistentInfo) {
+    public MessagesPresenter(MessagesInteract messagesInteract, PersistentInfo persistentInfo, MediaManager mediaManager) {
         this.messagesInteract = messagesInteract;
+        this.mediaManager = mediaManager;
         messagesRecyclerAdapter = new MessagesRecyclerAdapter(persistentInfo.getMeUserId());
     }
 
@@ -117,6 +120,7 @@ public class MessagesPresenter implements MessagesContract.UserActionsListener {
 
     @Override
     public void onDestroy() {
+        mediaManager.reset();
         if (loadDataSubscription != null && !loadDataSubscription.isUnsubscribed()) {
             loadDataSubscription.unsubscribe();
         }

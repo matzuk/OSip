@@ -1,6 +1,7 @@
 package com.tg.osip;
 
 import com.tg.osip.business.AuthManager;
+import com.tg.osip.business.media.MediaModule;
 import com.tg.osip.tdclient.TGModule;
 import com.tg.osip.ui.activities.LoginActivity;
 import com.tg.osip.ui.activities.MainActivity;
@@ -19,7 +20,7 @@ import dagger.Component;
  * Component for all application
  * @author e.matsyuk
  */
-@Component(modules = {AppModule.class, TGModule.class})
+@Component(modules = {AppModule.class, TGModule.class, MediaModule.class})
 @Singleton
 public interface AppComponent {
 

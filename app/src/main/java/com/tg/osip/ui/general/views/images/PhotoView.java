@@ -63,7 +63,7 @@ public class PhotoView extends ImageView {
             if (FileDownloaderUtils.isFilePathValid(imageLoaderI.getPlugFile().getTGFilePath())) {
                 setFileToView(imageLoaderI.getPlugFile().getTGFilePath());
             } else if (fileDownloaderManager.isFileInCache(imageLoaderI.getPlugFile().getFileId())) {
-                setFileToView(fileDownloaderManager.getFilePath(imageLoaderI.getPlugFile().getFileId()));
+                setFileToView(fileDownloaderManager.getTGFilePath(imageLoaderI.getPlugFile().getFileId()));
             }
         } else {
             setImageDrawable(imageLoaderI.getPlug());
@@ -76,7 +76,7 @@ public class PhotoView extends ImageView {
             }
             // test file downloaded cache
             if (fileDownloaderManager.isFileInCache(imageLoaderI.getFileId())) {
-                setFileToView(fileDownloaderManager.getFilePath(imageLoaderI.getFileId()));
+                setFileToView(fileDownloaderManager.getTGFilePath(imageLoaderI.getFileId()));
                 fileId = CommonStaticFields.EMPTY_FILE_ID;
                 return;
             }
@@ -131,7 +131,7 @@ public class PhotoView extends ImageView {
                     public void onNext(Integer downloadedFileId) {
                         unsubscribe();
                         if (fileDownloaderManager.isFileInCache(downloadedFileId)) {
-                            setFileToView(fileDownloaderManager.getFilePath(downloadedFileId));
+                            setFileToView(fileDownloaderManager.getTGFilePath(downloadedFileId));
                         }
                     }
                 });
