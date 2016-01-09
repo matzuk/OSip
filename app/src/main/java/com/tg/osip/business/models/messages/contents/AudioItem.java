@@ -23,7 +23,6 @@ public class AudioItem extends MessageContentItem implements FileDownloaderI {
     private String audioFilePath;
     private String audioTGFilePath;
     private int audioFileSize;
-    private String audioFileSizeString;
 
     public AudioItem(TdApi.MessageAudio messageAudio) {
         if (messageAudio == null || messageAudio.audio == null) {
@@ -52,7 +51,6 @@ public class AudioItem extends MessageContentItem implements FileDownloaderI {
             audioFilePath = filePath;
         }
         audioFileSize = messageAudio.audio.audio.size;
-        audioFileSizeString = Formatter.formatFileSize(ApplicationSIP.applicationContext, messageAudio.audio.audio.size);
     }
 
     @Override
@@ -114,12 +112,5 @@ public class AudioItem extends MessageContentItem implements FileDownloaderI {
      */
     public int getAudioFileSize() {
         return audioFileSize;
-    }
-
-    public String getAudioFileSizeString() {
-        if (audioFileSizeString == null) {
-            return CommonStaticFields.EMPTY_STRING;
-        }
-        return audioFileSizeString;
     }
 }

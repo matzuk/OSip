@@ -27,6 +27,7 @@ import com.tg.osip.business.models.messages.contents.ChatDeleteParticipantItem;
 import com.tg.osip.business.models.messages.contents.GroupChatCreate;
 import com.tg.osip.business.models.messages.contents.MessageContentPhotoItem;
 import com.tg.osip.business.models.messages.contents.MessageContentTextItem;
+import com.tg.osip.ui.general.views.ProgressTextView;
 import com.tg.osip.ui.general.views.progress_download.ProgressDownloadView;
 import com.tg.osip.ui.general.views.images.PhotoView;
 import com.tg.osip.utils.time.TimeUtils;
@@ -156,7 +157,7 @@ public class MessagesRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.V
         ImageView messageUnreadOutbox;
         ProgressDownloadView progressDownloadView;
         TextView messageAudioTitle;
-        TextView messageAudioPerformer;
+        ProgressTextView messageAudioPerformer;
 
         public AudioViewHolder(View itemView) {
             super(itemView);
@@ -166,7 +167,7 @@ public class MessagesRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.V
             messageUnreadOutbox = (ImageView) itemView.findViewById(R.id.message_unread_outbox);
             progressDownloadView = (ProgressDownloadView) itemView.findViewById(R.id.progressDownloadView);
             messageAudioTitle = (TextView) itemView.findViewById(R.id.message_audio_title);
-            messageAudioPerformer = (TextView) itemView.findViewById(R.id.message_audio_performer);
+            messageAudioPerformer = (ProgressTextView) itemView.findViewById(R.id.message_audio_performer);
         }
     }
 
@@ -509,7 +510,7 @@ public class MessagesRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.V
         setUnreadOutboxImages(message, audioViewHolder.messageUnreadOutbox);
         // set audio title and performer
         audioViewHolder.messageAudioTitle.setText(audioItem.getTitle());
-        audioViewHolder.messageAudioPerformer.setText(audioItem.getPerformer());
+        audioViewHolder.messageAudioPerformer.setDownloadingInfo(audioItem, audioItem.getPerformer(), audioItem.getAudioFileSize());
         //
         audioViewHolder.progressDownloadView.setFileDownloader(audioItem);
     }

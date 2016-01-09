@@ -28,6 +28,7 @@ public class FileDownloaderManager {
     private ConcurrentHashMap<Integer, TdApi.File> downloadedFileMap = new ConcurrentHashMap<>();
     private ConcurrentHashMap<Integer, Integer> progressFileMap = new ConcurrentHashMap<>();
     private PublishSubject<Integer> downloadChannel = PublishSubject.create();
+    private PublishSubject<Integer> downloadCancelChannel = PublishSubject.create();
     private PublishSubject<Pair<Integer, Integer>> downloadProgressChannel = PublishSubject.create();
 
     TGProxyI tgProxy;
@@ -39,6 +40,10 @@ public class FileDownloaderManager {
 
     public PublishSubject<Integer> getDownloadChannel() {
         return downloadChannel;
+    }
+
+    public PublishSubject<Integer> getDownloadCancelChannel() {
+        return downloadCancelChannel;
     }
 
     public PublishSubject<Pair<Integer, Integer>> getDownloadProgressChannel() {
@@ -163,6 +168,7 @@ public class FileDownloaderManager {
                     if (progressFileMap.containsKey(fileDownloaderI.getFileId())) {
                         progressFileMap.remove(fileDownloaderI.getFileId());
                     }
+                    downloadCancelChannel.onNext(fileDownloaderI.getFileId());
                 })
                 .subscribe();
     }

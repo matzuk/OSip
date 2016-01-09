@@ -38,7 +38,6 @@ public class AudioItemTest {
         assertThat(audioItem.getTitle()).isNotNull();
         assertThat(audioItem.getTGFilePath()).isNotNull();
         assertThat(audioItem.getAudioFileSize()).isNotNull();
-        assertThat(audioItem.getAudioFileSizeString()).isNotNull();
     }
 
     @Test
@@ -51,7 +50,6 @@ public class AudioItemTest {
         assertThat(audioItem.getTitle()).isNotNull();
         assertThat(audioItem.getTGFilePath()).isNotNull();
         assertThat(audioItem.getAudioFileSize()).isNotNull();
-        assertThat(audioItem.getAudioFileSizeString()).isNotNull();
     }
 
     @Test

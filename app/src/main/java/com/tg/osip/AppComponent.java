@@ -7,10 +7,12 @@ import com.tg.osip.ui.activities.LoginActivity;
 import com.tg.osip.ui.activities.MainActivity;
 import com.tg.osip.ui.activities.PhotoMediaActivity;
 import com.tg.osip.ui.chats.ChatsFragment;
+import com.tg.osip.ui.general.views.ProgressTextView;
 import com.tg.osip.ui.general.views.progress_download.PlayActionAudio;
 import com.tg.osip.ui.general.views.progress_download.ProgressDownloadView;
 import com.tg.osip.ui.general.views.images.PhotoView;
 import com.tg.osip.ui.messages.MessagesFragment;
+import com.tg.osip.utils.dagger2_static.StaticModule;
 
 import javax.inject.Singleton;
 
@@ -20,7 +22,7 @@ import dagger.Component;
  * Component for all application
  * @author e.matsyuk
  */
-@Component(modules = {AppModule.class, TGModule.class, MediaModule.class})
+@Component(modules = {AppModule.class, TGModule.class, MediaModule.class, StaticModule.class})
 @Singleton
 public interface AppComponent {
 
@@ -35,4 +37,5 @@ public interface AppComponent {
     void inject(PhotoView photoView);
     void inject(ProgressDownloadView progressDownloadView);
     void inject(PlayActionAudio progressActionAudio);
+    void inject(ProgressTextView progressTextView);
 }

@@ -9,6 +9,9 @@ import com.tg.osip.tdclient.TGProxyI;
 import com.tg.osip.tdclient.TGProxyImpl;
 import com.tg.osip.tdclient.update_managers.FileDownloaderManager;
 import com.tg.osip.tdclient.update_managers.UpdateManager;
+import com.tg.osip.utils.dagger2_static.BytesFormatter;
+import com.tg.osip.utils.dagger2_static.BytesFormatterTest;
+import com.tg.osip.utils.dagger2_static.StaticModule;
 
 import javax.inject.Singleton;
 
@@ -50,6 +53,13 @@ public class ApplicationSIPTest extends ApplicationSIP {
                         MediaPlayer mediaPlayer = mock(MediaPlayer.class);
                         when(mediaPlayer.isPlaying()).thenReturn(true);
                         return mediaPlayer;
+                    }
+                })
+                .staticModule(new StaticModule() {
+                    @NonNull
+                    @Override
+                    public BytesFormatter provideBytesFormatter() {
+                        return new BytesFormatterTest();
                     }
                 });
     }

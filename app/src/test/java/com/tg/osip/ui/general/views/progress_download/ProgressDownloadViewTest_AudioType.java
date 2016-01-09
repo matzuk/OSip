@@ -42,8 +42,7 @@ public class ProgressDownloadViewTest_AudioType {
 
     @Before
     public void setup() {
-        // Mockito has a very convenient way to inject mocks by using the @Mock annotation. To
-        // inject the mocks in the test the initMocks method needs to be called.
+        // Mockito
         MockitoAnnotations.initMocks(this);
         // Robolectic
         activity = Robolectric.setupActivity(Activity.class);

@@ -75,6 +75,7 @@
     <string name="chat_status_offline_first">last seen</string>
     <string name="chat_status_offline_last">ago</string>
     <string name="chat_status_members">members</string>
+    <string name="progress_textview_downloading">Downloaded %1$s of %2$s</string>
     <!-- Chat changings Fragment -->
     <string name="added">%1$s added "%2$s"</string>
     <string name="changed_group_photo">%1$s changed the group photo to</string>

@@ -87,7 +87,7 @@
         android:textAppearance="?android:attr/textAppearanceMedium"
         android:ellipsize="end" />
 
-    <TextView
+    <com.tg.osip.ui.general.views.ProgressTextView
         android:id="@+id/message_audio_performer"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -96,7 +96,7 @@
         android:layout_toEndOf="@+id/progressDownloadView"
         android:paddingLeft="@dimen/size_small"
         android:paddingStart="@dimen/size_small"
-        android:textSize="@dimen/message_text_text_size"
+        android:textSize="@dimen/text_size_small"
         android:textColor="@color/color_text_secondary"
         android:text="Audio performer"
         android:singleLine="true"
