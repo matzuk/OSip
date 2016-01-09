@@ -191,7 +191,11 @@ public class ProgressDownloadView extends FrameLayout {
         }
         // if file was downloaded file may be play or pause
         if (viewState == ViewState.READY) {
-            initPlayAction(fileDownloader.getFileId(), fileDownloader.getFilePath());
+            if (isFileInCache(fileDownloaderI)) {
+                initPlayAction(fileDownloader.getFileId(), fileDownloaderManager.getFilePath(fileDownloader.getFileId()));
+            } else {
+                initPlayAction(fileDownloader.getFileId(), fileDownloader.getFilePath());
+            }
             viewState = playAction.getId() == mediaManager.getCurrentIdFile()? mediaManager.isPaused()? ViewState.PAUSE_PLAY : ViewState.PLAY : ViewState.READY;
         }
         this.viewState = viewState;
@@ -200,8 +204,12 @@ public class ProgressDownloadView extends FrameLayout {
     private boolean isFileDownloaded(FileDownloaderI fileDownloaderI) {
         boolean isFileIdValid = FileDownloaderUtils.isFileIdValid(fileDownloaderI.getFileId());
         boolean isFilePathValid = FileDownloaderUtils.isFilePathValid(fileDownloaderI.getTGFilePath());
-        boolean isFileInCache = fileDownloaderManager.isFileInCache(fileDownloaderI.getFileId());
+        boolean isFileInCache = isFileInCache(fileDownloaderI);
         return isFileIdValid && (isFilePathValid || isFileInCache);
+    }
+
+    private boolean isFileInCache(FileDownloaderI fileDownloaderI) {
+        return fileDownloaderManager.isFileInCache(fileDownloaderI.getFileId());
     }
 
     private boolean isFileInProgress(FileDownloaderI fileDownloaderI) {

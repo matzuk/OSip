@@ -408,6 +408,38 @@ public class ProgressDownloadViewTest_AudioType {
     }
 
     @Test
+    public void initPlayActionFromFileDownloaderCache() {
+        ProgressDownloadView progressDownloadView = new ProgressDownloadView(activity, ProgressDownloadView.Type.AUDIO);
+        progressDownloadView.setFileDownloaderManager(fileDownloaderManager);
+
+        when(fileDownloaderManager.isFileInCache(60)).thenReturn(true);
+        when(fileDownloaderManager.getFilePath(60)).thenReturn("123");
+        when(fileDownloaderManager.isFileInProgress(60)).thenReturn(false);
+
+        FileDownloaderI fileDownloaderI = new FileDownloaderI() {
+            @Override
+            public String getTGFilePath() {
+                return "";
+            }
+
+            @Override
+            public String getFilePath() {
+                return "";
+            }
+
+            @Override
+            public int getFileId() {
+                return 60;
+            }
+        };
+
+        progressDownloadView.setFileDownloader(fileDownloaderI);
+        assertThat(progressDownloadView.viewState).isEqualTo(ProgressDownloadView.ViewState.READY);
+        assertThat(progressDownloadView.playAction.getId()).isEqualTo(60);
+        assertThat(progressDownloadView.playAction.getPath()).isEqualTo("123");
+    }
+
+    @Test
     public void initPlayActionAfterDownloading() {
         ProgressDownloadView progressDownloadView = new ProgressDownloadView(activity, ProgressDownloadView.Type.AUDIO);
         progressDownloadView.setFileDownloaderManager(fileDownloaderManager);
