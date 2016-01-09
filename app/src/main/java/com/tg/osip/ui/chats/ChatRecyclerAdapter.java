@@ -135,7 +135,6 @@ public class ChatRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
                 textYou = ApplicationSIP.applicationContext.getResources().getString(R.string.chat_list_message_text_you) + " ";
             }
 
-            // very heavy operation for list
             String dataString = getItem(position).getLastMessageDate();
             mainHolder.chatMessageSendingTime.setText(dataString);
             // get message content and set last message

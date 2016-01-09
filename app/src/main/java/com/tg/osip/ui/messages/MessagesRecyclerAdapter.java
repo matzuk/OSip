@@ -27,6 +27,7 @@ import com.tg.osip.business.models.messages.contents.ChatDeleteParticipantItem;
 import com.tg.osip.business.models.messages.contents.GroupChatCreate;
 import com.tg.osip.business.models.messages.contents.MessageContentPhotoItem;
 import com.tg.osip.business.models.messages.contents.MessageContentTextItem;
+import com.tg.osip.business.models.messages.contents.VideoItem;
 import com.tg.osip.ui.general.views.ProgressTextView;
 import com.tg.osip.ui.general.views.progress_download.ProgressDownloadView;
 import com.tg.osip.ui.general.views.images.PhotoView;
@@ -58,7 +59,8 @@ public class MessagesRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.V
 //    private static final int CHAT_JOIN_BY_LINK_VIEW = 7;
     private static final int GROUP_CHAT_CREATE_VIEW = 8;
     private static final int AUDIO_VIEW = 9;
-    private static final int UNSUPPORTED_VIEW = 10;
+    private static final int VIDEO_VIEW = 10;
+    private static final int UNSUPPORTED_VIEW = 11;
 
     private int myUserId;
     private int lastChatReadOutboxId;
@@ -171,6 +173,26 @@ public class MessagesRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.V
         }
     }
 
+    static class VideoViewHolder extends RecyclerView.ViewHolder {
+
+        PhotoView avatar;
+        TextView messageName;
+        PhotoView photo;
+        TextView messageSendingTime;
+        ImageView messageUnreadOutbox;
+        ProgressDownloadView progressDownloadView;
+
+        public VideoViewHolder(View itemView) {
+            super(itemView);
+            avatar = (PhotoView) itemView.findViewById(R.id.avatar);
+            messageName = (TextView) itemView.findViewById(R.id.message_name);
+            photo = (PhotoView) itemView.findViewById(R.id.photo);
+            messageSendingTime = (TextView) itemView.findViewById(R.id.message_sending_time);
+            messageUnreadOutbox = (ImageView) itemView.findViewById(R.id.message_unread_outbox);
+            progressDownloadView = (ProgressDownloadView) itemView.findViewById(R.id.progressDownloadView);
+        }
+    }
+
     ///// overrides methods /////
     @Override
     public long getItemId(int position) {
@@ -214,6 +236,9 @@ public class MessagesRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.V
         } else if (viewType == AUDIO_VIEW) {
             View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_message_list_audio, parent, false);
             return new AudioViewHolder(v);
+        } else if (viewType == VIDEO_VIEW) {
+            View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_message_list_video, parent, false);
+            return new AudioViewHolder(v);
         } else if (viewType == UNSUPPORTED_VIEW) {
             View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_message_list_unsupport, parent, false);
             return new UnsupportedViewHolder(v);
@@ -244,6 +269,8 @@ public class MessagesRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.V
             return GROUP_CHAT_CREATE_VIEW;
         } else if (contentType == MessageItem.ContentType.AUDIO) {
             return AUDIO_VIEW;
+        } else if (contentType == MessageItem.ContentType.VIDEO) {
+            return VIDEO_VIEW;
         }
         return UNSUPPORTED_VIEW;
     }
@@ -280,6 +307,9 @@ public class MessagesRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.V
 //                break;
             case AUDIO_VIEW:
                 onBindAudioHolder(holder, position);
+                break;
+            case VIDEO_VIEW:
+                onBindVideoHolder(holder, position);
                 break;
             case UNSUPPORTED_VIEW:
                 onBindUnsupportedHolder(holder, position);
@@ -513,6 +543,38 @@ public class MessagesRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.V
         audioViewHolder.messageAudioPerformer.setDownloadingInfo(audioItem, audioItem.getPerformer(), audioItem.getAudioFileSize());
         //
         audioViewHolder.progressDownloadView.setFileDownloader(audioItem);
+    }
+
+    private void onBindVideoHolder(RecyclerView.ViewHolder holder, int position) {
+        VideoViewHolder photoViewHolder = (VideoViewHolder) holder;
+        MessageItem message = getItem(position);
+        VideoItem videoItem = (VideoItem)message.getMessageContentItem();
+        if (videoItem == null) {
+            return;
+        }
+
+        PhotoItem photoItem = videoItem.getThumb();
+        if (photoItem != null) {
+            photoViewHolder.photo.setImageLoaderI(photoItem);
+        }
+
+        UserItem user = usersMap.get(message.getFromId());
+        if (user != null) {
+            // set name
+            String name = user.getName();
+            photoViewHolder.messageName.setText(name);
+            // Set avatar
+            photoViewHolder.avatar.setCircleRounds(true);
+            photoViewHolder.avatar.setImageLoaderI(user);
+        }
+
+        String dataString = TimeUtils.stringForMessageListDate(message.getDate());
+        photoViewHolder.messageSendingTime.setText(dataString);
+
+        // set unread outbox image
+        setUnreadOutboxImages(message, photoViewHolder.messageUnreadOutbox);
+        // set progressDownloadView
+        photoViewHolder.progressDownloadView.setFileDownloader(videoItem);
     }
 
     private void onBindUnsupportedHolder(RecyclerView.ViewHolder holder, int position) {

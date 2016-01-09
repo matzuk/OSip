@@ -14,6 +14,7 @@ import com.tg.osip.business.models.messages.contents.GroupChatCreate;
 import com.tg.osip.business.models.messages.contents.MessageContentItem;
 import com.tg.osip.business.models.messages.contents.MessageContentPhotoItem;
 import com.tg.osip.business.models.messages.contents.MessageContentTextItem;
+import com.tg.osip.business.models.messages.contents.VideoItem;
 import com.tg.osip.ui.messages.MessagesRecyclerAdapter;
 
 import org.drinkless.td.libcore.telegram.TdApi;
@@ -36,6 +37,7 @@ public class MessageItem {
         CHAT_JOIN_BY_LINK,
         GROUP_CHAT_CREATE,
         AUDIO,
+        VIDEO,
         UNSUPPORTED_TYPE,
         NULL_TYPE
     }
@@ -105,7 +107,10 @@ public class MessageItem {
         } else if (message.message.getClass() == TdApi.MessageAudio.class) {
             contentType = ContentType.AUDIO;
             messageContentItem = new AudioItem((TdApi.MessageAudio)message.message);
-        } else {
+        } else if (message.message.getClass() == TdApi.MessageVideo.class) {
+            contentType = ContentType.VIDEO;
+            messageContentItem = new VideoItem((TdApi.MessageVideo)message.message);
+        }  else {
             contentType = ContentType.UNSUPPORTED_TYPE;
         }
     }
