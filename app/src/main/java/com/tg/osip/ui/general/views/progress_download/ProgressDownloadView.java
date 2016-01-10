@@ -7,7 +7,6 @@ import android.content.Context;
 import android.content.res.TypedArray;
 import android.support.annotation.NonNull;
 import android.support.annotation.VisibleForTesting;
-import android.support.v4.content.res.ResourcesCompat;
 import android.util.AttributeSet;
 import android.view.View;
 import android.widget.FrameLayout;
@@ -20,6 +19,10 @@ import com.tg.osip.business.media.MediaManager;
 import com.tg.osip.tdclient.update_managers.FileDownloaderI;
 import com.tg.osip.tdclient.update_managers.FileDownloaderManager;
 import com.tg.osip.tdclient.update_managers.FileDownloaderUtils;
+import com.tg.osip.ui.general.views.progress_download.play_actions.IPlayAction;
+import com.tg.osip.ui.general.views.progress_download.play_actions.PlayActionsFactory;
+import com.tg.osip.ui.general.views.progress_download.view_resources.IViewResources;
+import com.tg.osip.ui.general.views.progress_download.view_resources.ViewResourcesFactory;
 import com.tg.osip.utils.CommonStaticFields;
 import com.tg.osip.utils.common.BackgroundExecutor;
 import com.tg.osip.utils.log.Logger;
@@ -53,7 +56,7 @@ public class ProgressDownloadView extends FrameLayout {
     private static final int INNER_DOWNLOAD_LEVEL = 0;
     private static final int INNER_PLAY_LEVEL = 1;
 
-    enum Type {
+    public enum Type {
         AUDIO(0),  DOCUMENT(1), VIDEO(2);
         private int typeInt;
         Type(int type) {
@@ -88,7 +91,7 @@ public class ProgressDownloadView extends FrameLayout {
 
     ViewState viewState;
     private FileDownloaderI fileDownloader;
-    PlayActionI playAction;
+    IPlayAction playAction;
 
     Subscription downloadProgressChannelSubscription;
     Subscription downloadChannelSubscription;
@@ -131,26 +134,30 @@ public class ProgressDownloadView extends FrameLayout {
     }
 
     private void initPlayAction(int fileId, String filePath) {
-        Logger.debug("initPlayAction");
-        Logger.debug("fileId: " + fileId + ", filePath: " + filePath);
         playAction = PlayActionsFactory.getPlayAction(type, filePath, fileId);
-        if (playAction == null) {
-            throw new ProgressDownloadViewException("null playAction");
+        // temp comment
+//        if (playAction == null) {
+//            throw new ProgressDownloadViewException("null playAction");
+//        }
+        // temp condition
+        if (playAction != null) {
+            subscribeToPlayChannel();
         }
-        subscribeToPlayChannel();
     }
 
     private void initViews() {
+        IViewResources iViewResources = ViewResourcesFactory.getViewResources(type);
+        if (iViewResources == null) {
+            throw new ProgressDownloadViewException("null iViewResources");
+        }
+
         inflate(getContext(), R.layout.progress_download_view, this);
         progressBar = (ProgressBar)findViewById(R.id.progressBar);
+        progressBar.setProgressDrawable(iViewResources.getProgressDrawable(getResources(), getContext()));
         downloadImage = (ImageView)findViewById(R.id.download_image);
+        downloadImage.setImageResource(iViewResources.getDownloadImage());
         downloadInner = (ImageView)findViewById(R.id.download_inner);
-        switch (type) {
-            case AUDIO:
-                progressBar.setProgressDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.progress_circular_outer, getContext().getTheme()));
-                downloadImage.setImageResource(R.drawable.progress_audio_download_icon);
-                downloadInner.setImageResource(R.drawable.progress_download_inner);
-        }
+        downloadInner.setImageResource(iViewResources.getDownloadInner());
     }
 
     @VisibleForTesting
@@ -196,7 +203,7 @@ public class ProgressDownloadView extends FrameLayout {
             } else {
                 initPlayAction(fileDownloader.getFileId(), fileDownloader.getFilePath());
             }
-            viewState = playAction.getId() == mediaManager.getCurrentIdFile()? mediaManager.isPaused()? ViewState.PAUSE_PLAY : ViewState.PLAY : ViewState.READY;
+            viewState = fileDownloader.getFileId() == mediaManager.getCurrentIdFile()? mediaManager.isPaused()? ViewState.PAUSE_PLAY : ViewState.PLAY : ViewState.READY;
         }
         this.viewState = viewState;
     }

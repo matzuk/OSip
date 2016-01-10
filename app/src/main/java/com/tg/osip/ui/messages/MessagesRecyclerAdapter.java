@@ -238,7 +238,7 @@ public class MessagesRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.V
             return new AudioViewHolder(v);
         } else if (viewType == VIDEO_VIEW) {
             View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_message_list_video, parent, false);
-            return new AudioViewHolder(v);
+            return new VideoViewHolder(v);
         } else if (viewType == UNSUPPORTED_VIEW) {
             View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_message_list_unsupport, parent, false);
             return new UnsupportedViewHolder(v);
