@@ -106,6 +106,7 @@ public class ProgressDownloadViewTest_AudioType {
         assertThat(progressDownloadView.playChannelSubscription).isNull();
         progressDownloadView.setFileDownloader(fileDownloaderI);
         assertThat(progressDownloadView.playAction.getId()).isEqualTo(100);
+        assertThat(progressDownloadView.playInfo.getId()).isEqualTo(100);
         assertThat(progressDownloadView.viewState).isEqualTo(ProgressDownloadView.ViewState.PLAY);
         assertThat(progressDownloadView.playChannelSubscription.isUnsubscribed()).isEqualTo(false);
     }
@@ -138,6 +139,7 @@ public class ProgressDownloadViewTest_AudioType {
         assertThat(progressDownloadView.playChannelSubscription).isNull();
         progressDownloadView.setFileDownloader(fileDownloaderI);
         assertThat(progressDownloadView.playAction.getId()).isEqualTo(100);
+        assertThat(progressDownloadView.playInfo.getId()).isEqualTo(100);
         assertThat(progressDownloadView.viewState).isEqualTo(ProgressDownloadView.ViewState.PAUSE_PLAY);
         assertThat(progressDownloadView.playChannelSubscription.isUnsubscribed()).isEqualTo(false);
     }
@@ -193,7 +195,7 @@ public class ProgressDownloadViewTest_AudioType {
         assertThat(progressDownloadView.progressBar.getProgress()).isEqualTo(100);
         assertThat(progressDownloadView.downloadProgressChannelSubscription.isUnsubscribed()).isEqualTo(true);
         assertThat(progressDownloadView.downloadChannelSubscription.isUnsubscribed()).isEqualTo(true);
-        assertThat(progressDownloadView.playChannelSubscription.isUnsubscribed()).isEqualTo(false);
+        assertThat(progressDownloadView.playChannelSubscription).isNull();
         assertThat(progressDownloadView.viewState).isEqualTo(ProgressDownloadView.ViewState.READY);
     }
 
@@ -248,7 +250,7 @@ public class ProgressDownloadViewTest_AudioType {
         assertThat(progressDownloadView.progressBar.getProgress()).isEqualTo(100);
         assertThat(progressDownloadView.downloadProgressChannelSubscription.isUnsubscribed()).isEqualTo(true);
         assertThat(progressDownloadView.downloadChannelSubscription.isUnsubscribed()).isEqualTo(true);
-        assertThat(progressDownloadView.playChannelSubscription.isUnsubscribed()).isEqualTo(false);
+        assertThat(progressDownloadView.playChannelSubscription).isNull();
         assertThat(progressDownloadView.viewState).isEqualTo(ProgressDownloadView.ViewState.READY);
     }
 
@@ -331,7 +333,7 @@ public class ProgressDownloadViewTest_AudioType {
         downloadChannel.onNext(40);
         // finish loading
         assertThat(progressDownloadView.progressBar.getProgress()).isEqualTo(100);
-        assertThat(progressDownloadView.playChannelSubscription.isUnsubscribed()).isEqualTo(false);
+        assertThat(progressDownloadView.playChannelSubscription).isNull();
         assertThat(progressDownloadView.downloadProgressChannelSubscription.isUnsubscribed()).isEqualTo(true);
         assertThat(progressDownloadView.downloadChannelSubscription.isUnsubscribed()).isEqualTo(true);
         assertThat(progressDownloadView.viewState).isEqualTo(ProgressDownloadView.ViewState.READY);
@@ -401,7 +403,7 @@ public class ProgressDownloadViewTest_AudioType {
         // finish loading
         downloadProgressChannel.onNext(new Pair<>(50, 100));
         downloadChannel.onNext(50);
-        assertThat(progressDownloadView.playChannelSubscription.isUnsubscribed()).isEqualTo(false);
+        assertThat(progressDownloadView.playChannelSubscription).isNull();
         assertThat(progressDownloadView.downloadProgressChannelSubscription.isUnsubscribed()).isEqualTo(true);
         assertThat(progressDownloadView.downloadChannelSubscription.isUnsubscribed()).isEqualTo(true);
         assertThat(progressDownloadView.viewState).isEqualTo(ProgressDownloadView.ViewState.READY);
@@ -437,6 +439,8 @@ public class ProgressDownloadViewTest_AudioType {
         assertThat(progressDownloadView.viewState).isEqualTo(ProgressDownloadView.ViewState.READY);
         assertThat(progressDownloadView.playAction.getId()).isEqualTo(60);
         assertThat(progressDownloadView.playAction.getPath()).isEqualTo("123");
+        assertThat(progressDownloadView.playInfo.getId()).isEqualTo(60);
+        assertThat(progressDownloadView.playInfo.getPath()).isEqualTo("123");
     }
 
     @Test
@@ -479,6 +483,8 @@ public class ProgressDownloadViewTest_AudioType {
         assertThat(progressDownloadView.viewState).isEqualTo(ProgressDownloadView.ViewState.READY);
         assertThat(progressDownloadView.playAction.getId()).isEqualTo(50);
         assertThat(progressDownloadView.playAction.getPath()).isEqualTo("123");
+        assertThat(progressDownloadView.playInfo.getId()).isEqualTo(50);
+        assertThat(progressDownloadView.playInfo.getPath()).isEqualTo("123");
     }
 
     @Test
