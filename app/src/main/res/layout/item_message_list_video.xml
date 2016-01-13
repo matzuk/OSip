@@ -72,12 +72,11 @@
             android:layout_height="@dimen/size_message_photo_height"
             android:scaleType="centerCrop"/>
 
-        <com.tg.osip.ui.general.views.progress_download.ProgressDownloadView
+        <com.tg.osip.ui.general.views.progress_download.VideoProgressDownloadView
             android:id="@+id/progressDownloadView"
             android:layout_width="@dimen/progress_download_view_size"
             android:layout_height="@dimen/progress_download_view_size"
-            android:layout_gravity="center"
-            res:type="video"/>
+            android:layout_gravity="center"/>
 
     </FrameLayout>
 

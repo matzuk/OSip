@@ -24,12 +24,12 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
- * Unit tests with Robolectric
+ * ProgressDownloadView logic + AudioProgressDownloadView testing
  *
  * @author e.matsyuk
  */
 @RunWith(RobolectricUnitTestRunner.class)
-public class ProgressDownloadViewTest_AudioType {
+public class AudioProgressDownloadViewTest {
 
     @Mock
     FileDownloaderManager fileDownloaderManager;
@@ -55,7 +55,7 @@ public class ProgressDownloadViewTest_AudioType {
 
     @Test
     public void setDownloadingState_emptyFileDownloaderI() {
-        ProgressDownloadView progressDownloadView = new ProgressDownloadView(activity, ProgressDownloadView.Type.AUDIO);
+        AudioProgressDownloadView progressDownloadView = new AudioProgressDownloadView(activity);
         progressDownloadView.setFileDownloaderManager(fileDownloaderManager);
 
         FileDownloaderI fileDownloaderI = new FileDownloaderI() {
@@ -80,13 +80,7 @@ public class ProgressDownloadViewTest_AudioType {
 
     @Test
     public void setDownloadingState_play() {
-        ProgressDownloadView progressDownloadView = new ProgressDownloadView(activity, ProgressDownloadView.Type.AUDIO);
-
-        MediaManager mediaManager = mock(MediaManager.class);
-        when(mediaManager.getCurrentIdFile()).thenReturn(100);
-        when(mediaManager.isPaused()).thenReturn(false);
-        progressDownloadView.setMediaManager(mediaManager);
-
+        AudioProgressDownloadView progressDownloadView = new AudioProgressDownloadView(activity);
         FileDownloaderI fileDownloaderI = new FileDownloaderI() {
             @Override
             public String getTGFilePath() {
@@ -103,9 +97,13 @@ public class ProgressDownloadViewTest_AudioType {
                 return 100;
             }
         };
+        // null playChannelSubscription
         assertThat(progressDownloadView.playChannelSubscription).isNull();
+        // mediaManager play
+        progressDownloadView.mediaManager.play("123", 100);
+        // setFileDownloader
         progressDownloadView.setFileDownloader(fileDownloaderI);
-        assertThat(progressDownloadView.playAction.getId()).isEqualTo(100);
+        // assert
         assertThat(progressDownloadView.playInfo.getId()).isEqualTo(100);
         assertThat(progressDownloadView.viewState).isEqualTo(ProgressDownloadView.ViewState.PLAY);
         assertThat(progressDownloadView.playChannelSubscription.isUnsubscribed()).isEqualTo(false);
@@ -113,13 +111,7 @@ public class ProgressDownloadViewTest_AudioType {
 
     @Test
     public void setDownloadingState_pausePlay() {
-        ProgressDownloadView progressDownloadView = new ProgressDownloadView(activity, ProgressDownloadView.Type.AUDIO);
-
-        MediaManager mediaManager = mock(MediaManager.class);
-        when(mediaManager.getCurrentIdFile()).thenReturn(100);
-        when(mediaManager.isPaused()).thenReturn(true);
-        progressDownloadView.setMediaManager(mediaManager);
-
+        AudioProgressDownloadView progressDownloadView = new AudioProgressDownloadView(activity);
         FileDownloaderI fileDownloaderI = new FileDownloaderI() {
             @Override
             public String getTGFilePath() {
@@ -136,9 +128,15 @@ public class ProgressDownloadViewTest_AudioType {
                 return 100;
             }
         };
+        // null playChannelSubscription
         assertThat(progressDownloadView.playChannelSubscription).isNull();
+        // mediaManager play
+        progressDownloadView.mediaManager.play("123", 100);
+        // mediaManager pause
+        progressDownloadView.mediaManager.pause();
+        // setFileDownloader
         progressDownloadView.setFileDownloader(fileDownloaderI);
-        assertThat(progressDownloadView.playAction.getId()).isEqualTo(100);
+        // assert
         assertThat(progressDownloadView.playInfo.getId()).isEqualTo(100);
         assertThat(progressDownloadView.viewState).isEqualTo(ProgressDownloadView.ViewState.PAUSE_PLAY);
         assertThat(progressDownloadView.playChannelSubscription.isUnsubscribed()).isEqualTo(false);
@@ -146,7 +144,7 @@ public class ProgressDownloadViewTest_AudioType {
 
     @Test
     public void progressUpdatingTest_downloadingState() {
-        ProgressDownloadView progressDownloadView = new ProgressDownloadView(activity, ProgressDownloadView.Type.AUDIO);
+        AudioProgressDownloadView progressDownloadView = new AudioProgressDownloadView(activity);
         progressDownloadView.setFileDownloaderManager(fileDownloaderManager);
 
         // file is loading in fileDownloaderManager
@@ -201,7 +199,7 @@ public class ProgressDownloadViewTest_AudioType {
 
     @Test
     public void progressUpdatingTest_startState() {
-        ProgressDownloadView progressDownloadView = new ProgressDownloadView(activity, ProgressDownloadView.Type.AUDIO);
+        AudioProgressDownloadView progressDownloadView = new AudioProgressDownloadView(activity);
         progressDownloadView.setFileDownloaderManager(fileDownloaderManager);
 
         when(fileDownloaderManager.isFileInCache(anyInt())).thenReturn(false);
@@ -256,7 +254,7 @@ public class ProgressDownloadViewTest_AudioType {
 
     @Test
     public void progressUpdatingTest_someFileDownloaders() {
-        ProgressDownloadView progressDownloadView = new ProgressDownloadView(activity, ProgressDownloadView.Type.AUDIO);
+        AudioProgressDownloadView progressDownloadView = new AudioProgressDownloadView(activity);
         progressDownloadView.setFileDownloaderManager(fileDownloaderManager);
 
         // file 40 is not exist yet
@@ -341,7 +339,7 @@ public class ProgressDownloadViewTest_AudioType {
 
     @Test
     public void progressUpdatingTest_pauseState() {
-        ProgressDownloadView progressDownloadView = new ProgressDownloadView(activity, ProgressDownloadView.Type.AUDIO);
+        AudioProgressDownloadView progressDownloadView = new AudioProgressDownloadView(activity);
         progressDownloadView.setFileDownloaderManager(fileDownloaderManager);
 
         when(fileDownloaderManager.isFileInCache(anyInt())).thenReturn(false);
@@ -411,7 +409,7 @@ public class ProgressDownloadViewTest_AudioType {
 
     @Test
     public void initPlayActionFromFileDownloaderCache() {
-        ProgressDownloadView progressDownloadView = new ProgressDownloadView(activity, ProgressDownloadView.Type.AUDIO);
+        AudioProgressDownloadView progressDownloadView = new AudioProgressDownloadView(activity);
         progressDownloadView.setFileDownloaderManager(fileDownloaderManager);
 
         when(fileDownloaderManager.isFileInCache(60)).thenReturn(true);
@@ -437,15 +435,13 @@ public class ProgressDownloadViewTest_AudioType {
 
         progressDownloadView.setFileDownloader(fileDownloaderI);
         assertThat(progressDownloadView.viewState).isEqualTo(ProgressDownloadView.ViewState.READY);
-        assertThat(progressDownloadView.playAction.getId()).isEqualTo(60);
-        assertThat(progressDownloadView.playAction.getPath()).isEqualTo("123");
         assertThat(progressDownloadView.playInfo.getId()).isEqualTo(60);
         assertThat(progressDownloadView.playInfo.getPath()).isEqualTo("123");
     }
 
     @Test
     public void initPlayActionAfterDownloading() {
-        ProgressDownloadView progressDownloadView = new ProgressDownloadView(activity, ProgressDownloadView.Type.AUDIO);
+        AudioProgressDownloadView progressDownloadView = new AudioProgressDownloadView(activity);
         progressDownloadView.setFileDownloaderManager(fileDownloaderManager);
 
         when(fileDownloaderManager.isFileInCache(anyInt())).thenReturn(false);
@@ -481,15 +477,13 @@ public class ProgressDownloadViewTest_AudioType {
         downloadProgressChannel.onNext(new Pair<>(50, 100));
         downloadChannel.onNext(50);
         assertThat(progressDownloadView.viewState).isEqualTo(ProgressDownloadView.ViewState.READY);
-        assertThat(progressDownloadView.playAction.getId()).isEqualTo(50);
-        assertThat(progressDownloadView.playAction.getPath()).isEqualTo("123");
         assertThat(progressDownloadView.playInfo.getId()).isEqualTo(50);
         assertThat(progressDownloadView.playInfo.getPath()).isEqualTo("123");
     }
 
     @Test
     public void playAndPause_ViewAndMediaManager() {
-        ProgressDownloadView progressDownloadView = new ProgressDownloadView(activity, ProgressDownloadView.Type.AUDIO);
+        AudioProgressDownloadView progressDownloadView = new AudioProgressDownloadView(activity);
         FileDownloaderI fileDownloaderI = new FileDownloaderI() {
             @Override
             public String getTGFilePath() {
@@ -527,7 +521,7 @@ public class ProgressDownloadViewTest_AudioType {
 
     @Test
     public void playChannel_test() {
-        ProgressDownloadView progressDownloadView = new ProgressDownloadView(activity, ProgressDownloadView.Type.AUDIO);
+        AudioProgressDownloadView progressDownloadView = new AudioProgressDownloadView(activity);
         FileDownloaderI fileDownloaderI = new FileDownloaderI() {
             @Override
             public String getTGFilePath() {

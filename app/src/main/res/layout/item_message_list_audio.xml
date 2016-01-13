@@ -59,15 +59,14 @@
         android:layout_marginTop="@dimen/size_xsmall_half"
         android:src="@drawable/ic_not_read"/>
 
-    <com.tg.osip.ui.general.views.progress_download.ProgressDownloadView
+    <com.tg.osip.ui.general.views.progress_download.AudioProgressDownloadView
         android:id="@+id/progressDownloadView"
         android:layout_width="@dimen/progress_download_view_size"
         android:layout_height="@dimen/progress_download_view_size"
         android:layout_below="@+id/message_name"
         android:layout_marginTop="@dimen/message_media_content_top_padding"
         android:layout_marginLeft="@dimen/size_yylarge"
-        android:layout_marginStart="@dimen/size_yylarge"
-        res:type="audio"/>
+        android:layout_marginStart="@dimen/size_yylarge"/>
 
     <TextView
         android:id="@+id/message_audio_title"

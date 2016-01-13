@@ -29,8 +29,10 @@ import com.tg.osip.business.models.messages.contents.MessageContentPhotoItem;
 import com.tg.osip.business.models.messages.contents.MessageContentTextItem;
 import com.tg.osip.business.models.messages.contents.VideoItem;
 import com.tg.osip.ui.general.views.ProgressTextView;
+import com.tg.osip.ui.general.views.progress_download.AudioProgressDownloadView;
 import com.tg.osip.ui.general.views.progress_download.ProgressDownloadView;
 import com.tg.osip.ui.general.views.images.PhotoView;
+import com.tg.osip.ui.general.views.progress_download.VideoProgressDownloadView;
 import com.tg.osip.utils.time.TimeUtils;
 
 import java.lang.ref.WeakReference;
@@ -157,7 +159,7 @@ public class MessagesRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.V
         TextView messageName;
         TextView messageSendingTime;
         ImageView messageUnreadOutbox;
-        ProgressDownloadView progressDownloadView;
+        AudioProgressDownloadView progressDownloadView;
         TextView messageAudioTitle;
         ProgressTextView messageAudioPerformer;
 
@@ -167,7 +169,7 @@ public class MessagesRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.V
             messageName = (TextView) itemView.findViewById(R.id.message_name);
             messageSendingTime = (TextView) itemView.findViewById(R.id.message_sending_time);
             messageUnreadOutbox = (ImageView) itemView.findViewById(R.id.message_unread_outbox);
-            progressDownloadView = (ProgressDownloadView) itemView.findViewById(R.id.progressDownloadView);
+            progressDownloadView = (AudioProgressDownloadView) itemView.findViewById(R.id.progressDownloadView);
             messageAudioTitle = (TextView) itemView.findViewById(R.id.message_audio_title);
             messageAudioPerformer = (ProgressTextView) itemView.findViewById(R.id.message_audio_performer);
         }
@@ -180,7 +182,7 @@ public class MessagesRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.V
         PhotoView photo;
         TextView messageSendingTime;
         ImageView messageUnreadOutbox;
-        ProgressDownloadView progressDownloadView;
+        VideoProgressDownloadView progressDownloadView;
 
         public VideoViewHolder(View itemView) {
             super(itemView);
@@ -189,7 +191,7 @@ public class MessagesRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.V
             photo = (PhotoView) itemView.findViewById(R.id.photo);
             messageSendingTime = (TextView) itemView.findViewById(R.id.message_sending_time);
             messageUnreadOutbox = (ImageView) itemView.findViewById(R.id.message_unread_outbox);
-            progressDownloadView = (ProgressDownloadView) itemView.findViewById(R.id.progressDownloadView);
+            progressDownloadView = (VideoProgressDownloadView) itemView.findViewById(R.id.progressDownloadView);
         }
     }
 
