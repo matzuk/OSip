@@ -24,14 +24,15 @@ import com.tg.osip.business.models.messages.contents.ChatAddParticipantItem;
 import com.tg.osip.business.models.messages.contents.ChatChangePhotoItem;
 import com.tg.osip.business.models.messages.contents.ChatChangeTitleItem;
 import com.tg.osip.business.models.messages.contents.ChatDeleteParticipantItem;
+import com.tg.osip.business.models.messages.contents.DocumentItem;
 import com.tg.osip.business.models.messages.contents.GroupChatCreate;
 import com.tg.osip.business.models.messages.contents.MessageContentPhotoItem;
 import com.tg.osip.business.models.messages.contents.MessageContentTextItem;
 import com.tg.osip.business.models.messages.contents.VideoItem;
 import com.tg.osip.ui.general.views.ProgressTextView;
 import com.tg.osip.ui.general.views.progress_download.AudioProgressDownloadView;
-import com.tg.osip.ui.general.views.progress_download.ProgressDownloadView;
 import com.tg.osip.ui.general.views.images.PhotoView;
+import com.tg.osip.ui.general.views.progress_download.DocumentProgressDownloadView;
 import com.tg.osip.ui.general.views.progress_download.VideoProgressDownloadView;
 import com.tg.osip.utils.time.TimeUtils;
 
@@ -62,7 +63,8 @@ public class MessagesRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.V
     private static final int GROUP_CHAT_CREATE_VIEW = 8;
     private static final int AUDIO_VIEW = 9;
     private static final int VIDEO_VIEW = 10;
-    private static final int UNSUPPORTED_VIEW = 11;
+    private static final int DOCUMENT_VIEW = 11;
+    private static final int UNSUPPORTED_VIEW = 12;
 
     private int myUserId;
     private int lastChatReadOutboxId;
@@ -195,6 +197,28 @@ public class MessagesRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.V
         }
     }
 
+    static class DocumentViewHolder extends RecyclerView.ViewHolder {
+
+        PhotoView avatar;
+        TextView messageName;
+        TextView messageSendingTime;
+        ImageView messageUnreadOutbox;
+        DocumentProgressDownloadView progressDownloadView;
+        TextView messageDocumentName;
+        ProgressTextView messageDocumentSize;
+
+        public DocumentViewHolder(View itemView) {
+            super(itemView);
+            avatar = (PhotoView) itemView.findViewById(R.id.avatar);
+            messageName = (TextView) itemView.findViewById(R.id.message_name);
+            messageSendingTime = (TextView) itemView.findViewById(R.id.message_sending_time);
+            messageUnreadOutbox = (ImageView) itemView.findViewById(R.id.message_unread_outbox);
+            progressDownloadView = (DocumentProgressDownloadView) itemView.findViewById(R.id.progressDownloadView);
+            messageDocumentName = (TextView) itemView.findViewById(R.id.message_document_name);
+            messageDocumentSize = (ProgressTextView) itemView.findViewById(R.id.message_document_size);
+        }
+    }
+
     ///// overrides methods /////
     @Override
     public long getItemId(int position) {
@@ -241,6 +265,9 @@ public class MessagesRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.V
         } else if (viewType == VIDEO_VIEW) {
             View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_message_list_video, parent, false);
             return new VideoViewHolder(v);
+        } else if (viewType == DOCUMENT_VIEW) {
+            View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_message_list_document, parent, false);
+            return new DocumentViewHolder(v);
         } else if (viewType == UNSUPPORTED_VIEW) {
             View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_message_list_unsupport, parent, false);
             return new UnsupportedViewHolder(v);
@@ -273,6 +300,8 @@ public class MessagesRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.V
             return AUDIO_VIEW;
         } else if (contentType == MessageItem.ContentType.VIDEO) {
             return VIDEO_VIEW;
+        } else if (contentType == MessageItem.ContentType.DOCUMENT) {
+            return DOCUMENT_VIEW;
         }
         return UNSUPPORTED_VIEW;
     }
@@ -312,6 +341,9 @@ public class MessagesRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.V
                 break;
             case VIDEO_VIEW:
                 onBindVideoHolder(holder, position);
+                break;
+            case DOCUMENT_VIEW:
+                onBindDocumentHolder(holder, position);
                 break;
             case UNSUPPORTED_VIEW:
                 onBindUnsupportedHolder(holder, position);
@@ -577,6 +609,36 @@ public class MessagesRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.V
         setUnreadOutboxImages(message, photoViewHolder.messageUnreadOutbox);
         // set progressDownloadView
         photoViewHolder.progressDownloadView.setFileDownloader(videoItem);
+    }
+
+    private void onBindDocumentHolder(RecyclerView.ViewHolder holder, int position) {
+        DocumentViewHolder documentViewHolder = (DocumentViewHolder) holder;
+        MessageItem message = getItem(position);
+        DocumentItem documentItem = (DocumentItem)message.getMessageContentItem();
+        if (documentItem == null) {
+            return;
+        }
+        // get user
+        UserItem user = usersMap.get(message.getFromId());
+        if (user != null) {
+            // set name
+            String name = user.getName();
+            documentViewHolder.messageName.setText(name);
+            // Set avatar
+            documentViewHolder.avatar.setCircleRounds(true);
+            documentViewHolder.avatar.setImageLoaderI(user);
+        }
+        // set data
+        String dataString = TimeUtils.stringForMessageListDate(message.getDate());
+        documentViewHolder.messageSendingTime.setText(dataString);
+        // set unread outbox image
+        setUnreadOutboxImages(message, documentViewHolder.messageUnreadOutbox);
+        // set audio title and performer
+        documentViewHolder.messageDocumentName.setText(documentItem.getFileName());
+        documentViewHolder.messageDocumentSize.setDownloadingInfo(documentItem, documentItem.getDocumentFileSizeString(), documentItem.getDocumentFileSize());
+        //
+        documentViewHolder.progressDownloadView.setMimeType(documentItem.getMimeType());
+        documentViewHolder.progressDownloadView.setFileDownloader(documentItem);
     }
 
     private void onBindUnsupportedHolder(RecyclerView.ViewHolder holder, int position) {

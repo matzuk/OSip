@@ -10,6 +10,7 @@ import com.tg.osip.business.models.messages.contents.ChatJoinByLink;
 import com.tg.osip.business.models.messages.contents.ChatAddParticipantItem;
 import com.tg.osip.business.models.messages.contents.ChatChangePhotoItem;
 import com.tg.osip.business.models.messages.contents.ChatChangeTitleItem;
+import com.tg.osip.business.models.messages.contents.DocumentItem;
 import com.tg.osip.business.models.messages.contents.GroupChatCreate;
 import com.tg.osip.business.models.messages.contents.MessageContentItem;
 import com.tg.osip.business.models.messages.contents.MessageContentPhotoItem;
@@ -38,6 +39,7 @@ public class MessageItem {
         GROUP_CHAT_CREATE,
         AUDIO,
         VIDEO,
+        DOCUMENT,
         UNSUPPORTED_TYPE,
         NULL_TYPE
     }
@@ -110,7 +112,10 @@ public class MessageItem {
         } else if (message.message.getClass() == TdApi.MessageVideo.class) {
             contentType = ContentType.VIDEO;
             messageContentItem = new VideoItem((TdApi.MessageVideo)message.message);
-        }  else {
+        }  else if (message.message.getClass() == TdApi.MessageDocument.class) {
+            contentType = ContentType.DOCUMENT;
+            messageContentItem = new DocumentItem((TdApi.MessageDocument)message.message);
+        } else {
             contentType = ContentType.UNSUPPORTED_TYPE;
         }
     }

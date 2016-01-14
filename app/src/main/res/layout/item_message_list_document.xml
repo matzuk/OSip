@@ -58,7 +58,7 @@
         android:layout_marginTop="@dimen/size_xsmall_half"
         android:src="@drawable/ic_not_read"/>
 
-    <com.tg.osip.ui.general.views.progress_download.AudioProgressDownloadView
+    <com.tg.osip.ui.general.views.progress_download.DocumentProgressDownloadView
         android:id="@+id/progressDownloadView"
         android:layout_width="@dimen/progress_download_view_size"
         android:layout_height="@dimen/progress_download_view_size"
@@ -68,7 +68,7 @@
         android:layout_marginStart="@dimen/size_yylarge"/>
 
     <TextView
-        android:id="@+id/message_audio_title"
+        android:id="@+id/message_document_name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/message_name"
@@ -80,16 +80,16 @@
         android:textSize="@dimen/message_text_text_size"
         android:textColor="@color/color_text_primary"
         android:textStyle="bold"
-        android:text="Audio title"
+        android:text="Document name"
         android:singleLine="true"
         android:textAppearance="?android:attr/textAppearanceMedium"
         android:ellipsize="end" />
 
     <com.tg.osip.ui.general.views.ProgressTextView
-        android:id="@+id/message_audio_performer"
+        android:id="@+id/message_document_size"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/message_audio_title"
+        android:layout_below="@+id/message_document_name"
         android:layout_toRightOf="@+id/progressDownloadView"
         android:layout_toEndOf="@+id/progressDownloadView"
         android:paddingLeft="@dimen/size_small"

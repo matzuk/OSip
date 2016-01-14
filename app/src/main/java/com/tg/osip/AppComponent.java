@@ -9,6 +9,7 @@ import com.tg.osip.ui.activities.PhotoMediaActivity;
 import com.tg.osip.ui.chats.ChatsFragment;
 import com.tg.osip.ui.general.views.ProgressTextView;
 import com.tg.osip.ui.general.views.progress_download.AudioProgressDownloadView;
+import com.tg.osip.ui.general.views.progress_download.DocumentProgressDownloadView;
 import com.tg.osip.ui.general.views.progress_download.VideoProgressDownloadView;
 import com.tg.osip.ui.general.views.progress_download.play_actions.AudioPlayAction;
 import com.tg.osip.ui.general.views.progress_download.ProgressDownloadView;
@@ -39,6 +40,7 @@ public interface AppComponent {
     void inject(PhotoView photoView);
     void inject(AudioProgressDownloadView audioProgressDownloadView);
     void inject(VideoProgressDownloadView videoProgressDownloadView);
+    void inject(DocumentProgressDownloadView documentProgressDownloadView);
     void inject(AudioPlayAction progressActionAudio);
     void inject(ProgressTextView progressTextView);
 }
