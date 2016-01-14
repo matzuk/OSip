@@ -7,10 +7,12 @@ public class PlayInfo {
 
     private int id;
     private String path;
+    private String tgPath;
 
-    public PlayInfo(int id, String path) {
+    public PlayInfo(int id, String path, String tgPath) {
         this.path = path;
         this.id = id;
+        this.tgPath = tgPath;
     }
 
     public String getPath() {
@@ -21,12 +23,16 @@ public class PlayInfo {
         return id;
     }
 
+    public String getTgPath() {
+        return tgPath;
+    }
+
     @Override
     public String toString() {
         return "PlayInfo{" +
                 "id=" + id +
                 ", path='" + path + '\'' +
+                ", tgPath='" + tgPath + '\'' +
                 '}';
     }
-
 }

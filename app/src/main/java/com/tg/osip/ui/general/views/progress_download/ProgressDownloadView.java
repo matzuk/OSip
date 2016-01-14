@@ -144,9 +144,9 @@ public abstract class ProgressDownloadView extends FrameLayout {
             return;
         }
         if (isFileInCache(fileDownloader)) {
-            setPlayInfo(fileDownloader.getFileId(), getFileDownloaderManager().getFilePath(fileDownloader.getFileId()));
+            setPlayInfo(fileDownloader.getFileId(), getFileDownloaderManager().getFilePath(fileDownloader.getFileId()), getFileDownloaderManager().getTGFilePath(fileDownloader.getFileId()));
         } else {
-            setPlayInfo(fileDownloader.getFileId(), fileDownloader.getFilePath());
+            setPlayInfo(fileDownloader.getFileId(), fileDownloader.getFilePath(), fileDownloader.getTGFilePath());
         }
         if (viewState == ViewState.PLAY || viewState == ViewState.PAUSE_PLAY) {
             subscribeToPlayChannel();
@@ -168,8 +168,8 @@ public abstract class ProgressDownloadView extends FrameLayout {
         return getFileDownloaderManager().isFileInProgress(fileDownloaderI.getFileId());
     }
 
-    private void setPlayInfo(int id, String path) {
-        playInfo = new PlayInfo(id, path);
+    private void setPlayInfo(int id, String path, String tgPath) {
+        playInfo = new PlayInfo(id, path, tgPath);
     }
 
     private void setViews() {
@@ -317,7 +317,7 @@ public abstract class ProgressDownloadView extends FrameLayout {
 
     protected void setReadyStatus() {
         viewState = ViewState.READY;
-        setPlayInfo(fileDownloader.getFileId(), getFileDownloaderManager().getFilePath(fileDownloader.getFileId()));
+        setPlayInfo(fileDownloader.getFileId(), getFileDownloaderManager().getFilePath(fileDownloader.getFileId()), getFileDownloaderManager().getTGFilePath(fileDownloader.getFileId()));
         animateToReadyStatus();
     }
 

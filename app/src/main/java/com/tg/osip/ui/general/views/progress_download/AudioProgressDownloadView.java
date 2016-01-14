@@ -5,6 +5,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.VisibleForTesting;
 import android.util.AttributeSet;
+import android.view.View;
 
 import com.tg.osip.ApplicationSIP;
 import com.tg.osip.business.media.MediaManager;
@@ -97,39 +98,42 @@ public class AudioProgressDownloadView extends ProgressDownloadView {
     @Override
     public void setFileDownloader(@NonNull FileDownloaderI fileDownloader) {
         super.setFileDownloader(fileDownloader);
-        setOnClickListener(v -> {
-            switch (viewState) {
-                case START:
-                    animateStartToDownloadingStateChanging();
-                    viewState = ViewState.DOWNLOADING;
-                    startDownloading();
-                    break;
-                case DOWNLOADING:
-                    animateDownloadingToStartStateChanging();
-                    viewState = ViewState.START;
-                    stopDownloading();
-                    break;
-                case READY:
-                    getAnimateImageLevelChanging(downloadImage, IMAGE_PLAY_LEVEL, IMAGE_PLAY_PAUSE_LEVEL).start();
-                    viewState = ViewState.PLAY;
-                    if (playInfo != null) {
-                        subscribeToPlayChannel();
-                        mediaManager.play(playInfo.getPath(), playInfo.getId());
-                    }
-                    break;
-                case PLAY:
-                    getAnimateImageLevelChanging(downloadImage, IMAGE_PLAY_PAUSE_LEVEL, IMAGE_PLAY_LEVEL).start();
-                    viewState = ViewState.PAUSE_PLAY;
-                    mediaManager.pause();
-                    break;
-                case PAUSE_PLAY:
-                    getAnimateImageLevelChanging(downloadImage, IMAGE_PLAY_LEVEL, IMAGE_PLAY_PAUSE_LEVEL).start();
-                    viewState = ViewState.PLAY;
-                    if (playInfo != null) {
-                        subscribeToPlayChannel();
-                        mediaManager.play(playInfo.getPath(), playInfo.getId());
-                    }
-                    break;
+        setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                switch (viewState) {
+                    case START:
+                        animateStartToDownloadingStateChanging();
+                        viewState = ViewState.DOWNLOADING;
+                        startDownloading();
+                        break;
+                    case DOWNLOADING:
+                        animateDownloadingToStartStateChanging();
+                        viewState = ViewState.START;
+                        stopDownloading();
+                        break;
+                    case READY:
+                        getAnimateImageLevelChanging(downloadImage, IMAGE_PLAY_LEVEL, IMAGE_PLAY_PAUSE_LEVEL).start();
+                        viewState = ViewState.PLAY;
+                        if (playInfo != null) {
+                            subscribeToPlayChannel();
+                            mediaManager.play(playInfo.getPath(), playInfo.getId());
+                        }
+                        break;
+                    case PLAY:
+                        getAnimateImageLevelChanging(downloadImage, IMAGE_PLAY_PAUSE_LEVEL, IMAGE_PLAY_LEVEL).start();
+                        viewState = ViewState.PAUSE_PLAY;
+                        mediaManager.pause();
+                        break;
+                    case PAUSE_PLAY:
+                        getAnimateImageLevelChanging(downloadImage, IMAGE_PLAY_LEVEL, IMAGE_PLAY_PAUSE_LEVEL).start();
+                        viewState = ViewState.PLAY;
+                        if (playInfo != null) {
+                            subscribeToPlayChannel();
+                            mediaManager.play(playInfo.getPath(), playInfo.getId());
+                        }
+                        break;
+                }
             }
         });
     }
