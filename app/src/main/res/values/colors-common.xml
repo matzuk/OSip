@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- This files contains common colors for the whole application. -->
+<!-- author: a.bilchuk -->
+<resources>
+
+    <!-- Primary color, Positive button text color -->
+    <color name="common_medium_blue">#2196F3</color>
+
+    <!-- Primary color dark -->
+    <color name="common_medium_blue_dark">#1976D2</color>
+
+    <!-- Accent color -->
+    <color name="common_cyan">#00BCD4</color>
+
+    <!-- Light primary color -->
+    <color name="common_medium_light">#BBDEFB</color>
+
+    <!-- Primary text -->
+    <color name="common_black">#212121</color>
+
+    <!-- Secondary text -->
+    <color name="common_grey">#727272</color>
+
+    <!-- Background -->
+    <color name="common_white">#FFFFFF</color>
+
+    <!-- Divider color -->
+    <color name="common_cool_grey">#B6B6B6</color>
+
+    <!-- Background color for photo gallery -->
+    <color name="common_black_bg">#000000</color>
+
+    <!-- Background color for photo gallery toolbar -->
+    <color name="common_black_toolbar_bg">#60000000</color>
+
+</resources>

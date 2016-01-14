@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/white">
+
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:minHeight="?attr/actionBarSize"
+        android:background="?attr/colorPrimary"
+        app:titleTextAppearance="@style/Toolbar.TitleText"
+        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+        app:popupTheme="@style/ThemeOverlay.AppCompat.Light" >
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end"
+            android:orientation="horizontal">
+
+            <com.tg.osip.ui.general.views.images.ScalableImageView
+                android:id="@+id/next_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="@dimen/size_medium"
+                android:layout_gravity="end"
+                android:visibility="gone"
+                android:src="@drawable/checkbig"
+                android:scaleType="centerCrop"/>
+
+        </LinearLayout>
+
+    </android.support.v7.widget.Toolbar>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true"
+        android:overScrollMode="never" >
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="@dimen/activity_horizontal_margin">
+
+            <EditText
+                android:id="@+id/first_name_edit"
+                style="@style/MaterialEditText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/size_medium"
+                android:hint="@string/reg_first_name_hint"
+                android:focusable="true"
+                android:singleLine="true"
+                android:ellipsize="end"
+                android:inputType="text"
+                android:imeOptions="actionNext|flagNoExtractUi">
+                <requestFocus />
+            </EditText>
+
+            <EditText
+                android:id="@+id/last_name_edit"
+                style="@style/MaterialEditText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/size_large"
+                android:layout_marginBottom="@dimen/size_xlarge"
+                android:hint="@string/reg_last_name_hint"
+                android:focusable="true"
+                android:singleLine="true"
+                android:ellipsize="end"
+                android:inputType="text"
+                android:imeOptions="actionNext|flagNoExtractUi">
+            </EditText>
+
+        </LinearLayout>
+
+    </ScrollView>
+
+</LinearLayout>

@@ -1,0 +1,8 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <group android:checkableBehavior="none">
+        <item
+            android:id="@+id/navigation_item_logout"
+            android:icon="@drawable/ic_logout"
+            android:title="@string/navigation_list_log_out" />
+    </group>
+</menu>

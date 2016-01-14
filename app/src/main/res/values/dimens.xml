@@ -1,5 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- Default screen margins, per the Android Design guidelines. -->
-    <dimen name="activity_horizontal_margin">16dp</dimen>
-    <dimen name="activity_vertical_margin">16dp</dimen>
+    <dimen name="activity_horizontal_margin">@dimen/size_medium</dimen>
+    <dimen name="activity_vertical_margin">@dimen/size_medium</dimen>
+    <dimen name="ctrl_plain_margin">@dimen/size_xxsmall</dimen>
+    <dimen name="ctrl_plain_radius">@dimen/size_xxsmall</dimen>
+
+    <!-- Dimens for message items -->
+    <dimen name="message_avatar_size">@dimen/size_xxlarge_plus</dimen>
+    <dimen name="message_name_text_size">@dimen/text_size_medium</dimen>
+    <dimen name="message_sending_time_text_size">@dimen/text_size_small</dimen>
+    <dimen name="message_text_text_size">@dimen/text_size_medium</dimen>
+    <dimen name="message_padding_top_bottom">@dimen/size_small</dimen>
+    <dimen name="message_chat_changing_padding_left_right">@dimen/size_large</dimen>
+    <dimen name="message_chat_changing_photo_size">@dimen/size_xxxlarge</dimen>
+    <dimen name="progress_download_view_size">@dimen/size_xxlarge</dimen>
+    <dimen name="message_media_content_top_padding">@dimen/size_small</dimen>
 </resources>

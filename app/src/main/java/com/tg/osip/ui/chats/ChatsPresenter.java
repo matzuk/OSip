@@ -1,0 +1,105 @@
+package com.tg.osip.ui.chats;
+
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.RecyclerView;
+
+import com.tg.osip.R;
+import com.tg.osip.business.PersistentInfo;
+import com.tg.osip.business.chats.ChatsInteract;
+import com.tg.osip.business.models.ChatItem;
+import com.tg.osip.ui.general.DefaultSubscriber;
+import com.tg.osip.ui.general.views.pagination.PaginationTool;
+import com.tg.osip.ui.messages.MessagesFragment;
+
+import java.lang.ref.WeakReference;
+import java.util.List;
+
+import rx.Subscription;
+import rx.android.schedulers.AndroidSchedulers;
+
+/**
+ * @author e.matsyuk
+ */
+public class ChatsPresenter implements ChatsContract.UserActionsListener {
+
+    private static final int LIMIT = 50;
+
+    ChatsInteract chatsInteract;
+    PersistentInfo persistentInfo;
+
+    private ChatRecyclerAdapter chatRecyclerAdapter;
+    private Subscription listPagingSubscription;
+    private WeakReference<ChatsContract.View> chatsContractViewWeak;
+
+    public ChatsPresenter(ChatsInteract chatsInteract, PersistentInfo persistentInfo) {
+        this.chatsInteract = chatsInteract;
+        this.persistentInfo = persistentInfo;
+    }
+
+    @Override
+    public void bindView(ChatsContract.View chatsContractView) {
+        this.chatsContractViewWeak = new WeakReference<>(chatsContractView);
+    }
+
+    @Override
+    public void loadChatsList(RecyclerView recyclerView) {
+        // first start
+        if (chatRecyclerAdapter == null) {
+            // start progressbar
+            if (chatsContractViewWeak != null && chatsContractViewWeak.get() != null) {
+                chatsContractViewWeak.get().showProgress();
+            }
+            // init Controller
+            chatRecyclerAdapter = new ChatRecyclerAdapter();
+            chatRecyclerAdapter.setMyUserId(persistentInfo.getMeUserId());
+        }
+        recyclerView.setAdapter(chatRecyclerAdapter);
+        startListPaging(recyclerView);
+    }
+
+    private void startListPaging(RecyclerView recyclerView) {
+        if (chatRecyclerAdapter.isAllItemsLoaded()) {
+            return;
+        }
+
+        PaginationTool<List<ChatItem>> paginationTool = PaginationTool.buildPagingObservable(recyclerView, offset -> chatsInteract.getNextDataPortionInList(offset, LIMIT))
+                .build();
+        listPagingSubscription = paginationTool
+                .getPagingObservable()
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new DefaultSubscriber<List<ChatItem>>() {
+                    @Override
+                    public void onNext(List<ChatItem> chatItems) {
+                        // hide progressbar
+                        if (chatsContractViewWeak != null && chatsContractViewWeak.get() != null) {
+                            chatsContractViewWeak.get().hideProgress();
+                        }
+                        chatRecyclerAdapter.addNewItems(chatItems);
+                    }
+                });
+    }
+
+    @Override
+    public void clickChatItem(AppCompatActivity activity, int position) {
+        long chatId = chatRecyclerAdapter.getItem(position).getChat().id;
+        MessagesFragment messagesFragment = MessagesFragment.newInstance(chatId);
+        startFragment(activity, messagesFragment);
+    }
+
+    private void startFragment(AppCompatActivity activity, Fragment fragment) {
+        FragmentTransaction transaction = activity.getSupportFragmentManager().beginTransaction();
+        transaction.addToBackStack(null);
+        transaction.replace(R.id.container, fragment);
+        transaction.commit();
+    }
+
+    @Override
+    public void onDestroy() {
+        if (listPagingSubscription != null && !listPagingSubscription.isUnsubscribed()) {
+            listPagingSubscription.unsubscribe();
+        }
+    }
+
+}

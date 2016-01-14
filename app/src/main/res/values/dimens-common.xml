@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- This file contains common dimens for the whole application. -->
+<!-- author: e.matsyuk -->
+<resources>
+
+    <!-- Common paddings, margins, widths and heights -->
+    <dimen name="size_xxxsmall">1dp</dimen>
+    <dimen name="size_xxsmall">2dp</dimen>
+    <dimen name="size_xsmall">4dp</dimen>
+    <dimen name="size_xsmall_half">6dp</dimen>
+    <dimen name="size_small">8dp</dimen>
+    <dimen name="size_small_plus_half">10dp</dimen>
+    <dimen name="size_small_plus">12dp</dimen>
+    <dimen name="size_medium">16dp</dimen>
+    <dimen name="size_medium_plus">20dp</dimen>
+    <dimen name="size_large">24dp</dimen>
+    <dimen name="size_large_plus">28dp</dimen>
+    <dimen name="size_xlarge">32dp</dimen>
+    <dimen name="size_xlarge_plus">36dp</dimen>
+    <dimen name="size_xxlarge">40dp</dimen>
+    <dimen name="size_xxlarge_plus">44dp</dimen>
+    <dimen name="size_xxxlarge">48dp</dimen>
+    <dimen name="size_ylarge">52dp</dimen>
+    <dimen name="size_yylarge">56dp</dimen>
+
+    <dimen name="size_chat_avatar">54dp</dimen>
+    <dimen name="size_padding_common">64dp</dimen>
+    <dimen name="size_navigation_header_avatar">72dp</dimen>
+    <dimen name="size_reg_edittext_width">166dp</dimen>
+    <dimen name="size_medium_plus_negative">-20dp</dimen>
+    <dimen name="size_message_photo_width">220dp</dimen>
+    <dimen name="size_message_photo_height">260dp</dimen>
+
+    <dimen name="divider_height">1dp</dimen>
+
+    <!-- Common text sizes in dp (do not use sp) -->
+    <dimen name="text_size_xsmall">12sp</dimen>
+    <dimen name="text_size_small">14sp</dimen>
+    <dimen name="text_size_medium">16sp</dimen>
+    <dimen name="text_size_medium_plus">18sp</dimen>
+    <dimen name="text_size_large">20sp</dimen>
+    <dimen name="text_size_large_plus">22sp</dimen>
+    <dimen name="text_size_xlarge">24sp</dimen>
+    <dimen name="text_size_xxlarge">28sp</dimen>
+
+    <!-- Wrap content and match parents constants -->
+    <integer name="wrap_content_int">-2</integer>
+    <integer name="match_parent_int">-1</integer>
+
+</resources>

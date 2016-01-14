@@ -1,6 +1,103 @@
 <resources>
-    <string name="app_name">OSip</string>
+    <string name="app_name">O\'sip</string>
 
-    <string name="hello_world">Hello world!</string>
-    <string name="action_settings">Settings</string>
+    <!-- TG Proxy -->
+    <string name="need_sd_card">Connect your SD card to continue</string>
+
+    <!-- splash fragment -->
+    <string name="splash_text_main">New Telegram</string>
+    <string name="splash_text_secondary">Some interesting info.....</string>
+    <string name="splash_start_button_name">Start messaging</string>
+
+    <!-- phone registration fragment -->
+    <string name="reg_phone_toolbar_title">Phone number</string>
+    <string name="reg_phone_toolbar_next">Next</string>
+    <string name="reg_phone_choose_country">Choose a country</string>
+    <string name="reg_phone_wrong_country">Wrong country code</string>
+    <string name="reg_phone_edit_plus">+</string>
+    <string name="reg_phone_help_text">We will send an SMS with a confirmation code to your new number</string>
+    <string name="dialog_ok">OK</string>
+    <string name="dialog_invalid_phone">Invalid phone number</string>
+
+    <!-- country registration fragment -->
+    <string name="reg_country_toolbar_title">Country</string>
+    <string name="reg_country_toolbar_search">Search</string>
+
+    <!-- verification code registration fragment -->
+    <string name="reg_verification_toolbar_title">Activation code</string>
+    <string name="reg_verification_help_text">We\'ve sent an SMS with an activation code to your phone</string>
+    <string name="reg_verification_right_number">Right number</string>
+    <string name="reg_verification_wrong_number">Wrong number</string>
+
+    <!-- name registration fragment -->
+    <string name="reg_name_toolbar_title">User name</string>
+    <string name="reg_first_name_hint">First name</string>
+    <string name="reg_last_name_hint">Last name</string>
+    <string name="reg_enter_first_name">Enter first name</string>
+    <string name="reg_enter_last_name">Enter last name</string>
+
+    <!-- Navigation Drawer -->
+    <string name="openDrawer">Open</string>
+    <string name="closeDrawer">Close</string>
+    <string name="navigation_list_log_out">Log Out</string>
+
+    <!-- Chat Fragment -->
+    <string name="chat_list_toolbar_title">Messages</string>
+    <string name="chat_list_toolbar_title_waiting_network">Waiting for network…</string>
+    <string name="chat_list_message_type_audio">Audio</string>
+    <string name="chat_list_message_type_video">Video</string>
+    <string name="chat_list_message_type_photo">Photo</string>
+    <string name="chat_list_message_type_sticker">Sticker</string>
+    <string name="chat_list_message_type_other">Other</string>
+    <string name="chat_list_message_text_you">You:</string>
+    <string name="chat_list_unknown_chat">Unknown chat</string>
+    <string name="chat_list_unknown_group_chat">Unknown group chat</string>
+
+    <!-- config params -->
+    <bool name="isTablet">false</bool>
+
+    <!--date formatters-->
+    <string name="formatterMonthYear">MMMM yyyy</string>
+    <string name="formatterMonth">MMM dd</string>
+    <string name="formatterYear">dd.MM.yy</string>
+    <string name="formatterYearMax">dd.MM.yyyy</string>
+    <string name="chatDate">MMMM d</string>
+    <string name="chatFullDate">MMMM d, yyyy</string>
+    <string name="formatterWeek">EEE</string>
+    <string name="formatterDay24H">HH:mm</string>
+    <string name="formatterDay12H">h:mm a</string>
+    <string name="formatDateAtTime">%1$s at %2$s</string>
+
+    <!-- Messages Fragment -->
+    <string name="chat_header_many">new messages</string>
+    <string name="chat_status_online">online</string>
+    <string name="chat_status_offline">offline</string>
+    <string name="chat_status_offline_first">last seen</string>
+    <string name="chat_status_offline_last">ago</string>
+    <string name="chat_status_members">members</string>
+    <string name="progress_textview_downloading">Downloaded %1$s of %2$s</string>
+    <!-- Chat changings Fragment -->
+    <string name="added">%1$s added "%2$s"</string>
+    <string name="changed_group_photo">%1$s changed the group photo to</string>
+    <string name="changed_group_title">%1$s changed the group name to \"%2$s\"</string>
+    <string name="removed_participant">%1$s removed %2$s</string>
+    <string name="removed_photo">%1$s removed photo</string>
+    <string name="created_group">%1$s created the group \"%2$s\"</string>
+
+    <string name="left_group">left group</string>
+    <string name="removed_group_photo">removed group photo</string>
+    <string name="unsupported_type">Sorry! Unsupported type</string>
+
+    <!-- Emoji -->
+    <string name="description_back_space">Back space</string>
+    <string name="description_cell">Cell</string>
+    <string name="emoji_no_recent">No recent used emoji</string>
+
+    <!-- Dialogs -->
+    <string name="toolbar_title_in_photo_gallery">%1$d of %2$d</string>
+
+    <!-- Dialogs -->
+    <string name="wait">Please wait…</string>
+
+
 </resources>

@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="178dp"
+    android:background="@color/color_primary"
+    android:orientation="vertical" >
+
+    <com.tg.osip.ui.general.views.images.PhotoView
+        android:id="@+id/avatar"
+        android:layout_width="@dimen/size_navigation_header_avatar"
+        android:layout_height="@dimen/size_navigation_header_avatar"
+        android:layout_marginLeft="@dimen/size_medium"
+        android:layout_marginStart="@dimen/size_medium"
+        android:layout_marginTop="@dimen/size_xlarge_plus"
+        android:layout_marginBottom="@dimen/size_medium"
+        android:scaleType="centerCrop"/>
+
+    <TextView
+        android:id="@+id/name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="@dimen/size_medium"
+        android:layout_marginStart="@dimen/size_medium"
+        android:textColor="@color/color_background"
+        android:text="First Second"
+        android:textSize="@dimen/text_size_small"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/phone"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@color/color_background"
+        android:layout_marginLeft="@dimen/size_medium"
+        android:layout_marginStart="@dimen/size_medium"
+        android:layout_marginTop="@dimen/size_xsmall"
+        android:paddingBottom="@dimen/size_medium"
+        android:text="+79021234567"
+        android:textSize="@dimen/text_size_small"
+        android:textStyle="normal" />
+
+</LinearLayout>
